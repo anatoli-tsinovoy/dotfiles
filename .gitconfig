@@ -1,0 +1,119 @@
+[user]
+	name = Anatoli Tsinovoy
+	email = anatoli@joytunes.com
+	editor = sublime
+
+[alias]
+		ss = submodule foreach -q --recursive 'rev=$(git rev-parse @) && git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master) && git reset --hard $rev'
+		lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+    rclone = clone --reference /git/cache.git/
+
+    last  = cat-file commit HEAD
+    st    = ls-files --exclude-per-directory=.gitignore \
+                    --exclude-from=.git/info/exclude \
+                    -t -o -u -s -m -d
+    stc   = diff --stat --name-status --cached
+    cat   = -p cat-file -p
+    up    = !git remote update ; git gc
+    debug = !GIT_PAGER= gdb --args git
+
+    top = !eval cd "$(pwd)/$(git rev-parse --show-cdup)" && pwd
+
+    push-head = !git push origin `git symbolic-ref HEAD`
+    publish = push publish
+    pushall = !git remote | xargs -n1 git push
+    pushalltags = !git remote | xargs -n1 git push --tags
+
+    tblog = log --not-grep='Auto-increment of build number due to changes in directory '
+    tbk   = !gitk --not-grep='Auto-increment of build number due to changes in directory '
+
+    vgc = repack -f -a -d --depth=250 --window=250
+    nvgc = !ionice -n7 nice -n20 git vgc
+
+    svnup = !git config --get-regexp 'svn-remote.*url' | cut -d . -f 2 | xargs -n1 git svn fetch
+
+    log1 = log --pretty=oneline --abbrev-commit --decorate
+
+    findnext = rev-list --reverse -n1 HEAD..master
+    checkoutnext = !git checkout `git findnext`
+
+    file-blame = !git ls-files | xargs -n1 -i{} git log -1 --pretty=format:\"%ci {}\" -- {}
+    amend = commit --amend -C HEAD
+
+    su = submodule update
+    sui = submodule update --init
+
+    seturl = remote set-url origin
+
+    rbc = rebase --continue
+    rba = rebase --abort
+
+[core]
+    whitespace = trailing-space,space-before-tab,indent-with-non-tab,cr-at-eol
+	editor = vim
+	autocrlf = input
+	pager = delta
+
+[color]
+    pager = true
+    ui = auto
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+[color "status"]
+    added = yellow
+    untracked = cyan
+
+[rerere]
+    enabled = true
+
+[push]
+    default = tracking
+
+[branch]
+	autosetuprebase = always
+
+[branch "master"]
+	rebase = true
+
+[help]
+	autocorrect = 1
+[filter "hawser"]
+	clean = git hawser clean %f
+	smudge = git hawser smudge %f
+	required = true
+
+[diff "localizablestrings"]
+    textconv = "iconv -f utf-16 -t utf-8"
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[diff]
+	submodule = log
+[status]
+	submoduleSummary = true
+
+[color]
+  diff = auto
+  status = auto
+  branch = auto
+[format]
+  pretty = "Commit:  %C(yellow)%H%nAuthor:  %C(green)%aN <%aE>%nDate:    (%C(red)%ar%Creset) %ai%nSubject: %s%n%n%b"
+[credential]
+	helper = osxkeychain
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+[merge]
+	conflictStyle = zdiff3
