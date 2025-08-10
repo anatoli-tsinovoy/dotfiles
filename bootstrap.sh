@@ -18,6 +18,11 @@ main() {
   # Ensure Homebrew on mac (optional)
   if [[ "$os" == "mac" ]]; then
     if ! command -v brew >/dev/null 2>&1; then
+      # Xcode CLT (needed for brew on clean macs)
+      if ! xcode-select -p >/dev/null 2>&1; then
+        warn "Xcode Command Line Tools not found. Installing (you may see a popup)…"
+        xcode-select --install || true
+      fi
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       eval "$(/opt/homebrew/bin/brew shellenv)" # Apple Silicon default
     fi
@@ -38,13 +43,37 @@ main() {
 
   # Adopt existing files (moves them into the package and replaces with symlink).
   # Run once carefully; remove --adopt afterwards.
-  # stow --adopt -t ~ nvim
+  # stow -t ~ nvim
   stow --adopt -t ~ nvim
   if [[ "$os" == "mac" ]]; then
-    # stow --adopt aerospace iterm2 cursor-macos zsh-macos
-    stow --adopt -t ~ aerospace iterm2 cursor-macos zsh-macos
+    # stow -t ~ aerospace iterm2 cursor-macos
+    stow --adopt -t ~ aerospace iterm2 cursor-macos
     # Apply macOS defaults if you have them:
     [[ -x mac/.macos ]] && bash mac/.macos || true
+  elif [[ 1 == 0 ]]; then
+    echo "Placeholder for linux distros"
+  fi
+
+  OMZ="$HOME/.oh-my-zsh"
+  OMZ_CUSTOM="${OMZ}/custom"
+  # oh-my-zsh (unattended, don’t auto-run zsh, don’t chsh)
+  if [[ ! -d $OMZ ]]; then
+    echo "Installing oh-my-zsh (unattended)…"
+    RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+      sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    mkdir -p "$OMZ_CUSTOM"
+  else
+    echo "oh-my-zsh already present. Skipping."
+  fi
+
+  # prepare custom dir
+
+  # (optional) submodules for external plugins/themes
+  echo "$(pwd)"
+  git submodule update --init --recursive
+  if [[ "$os" == "mac" ]]; then
+    # stow -t ~ zsh-macos
+    stow --adopt -t ~ zsh-macos
   elif [[ 1 == 0 ]]; then
     echo "Placeholder for linux distros"
   fi

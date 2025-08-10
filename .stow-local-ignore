@@ -2,4 +2,5 @@
 (^|/)README\.md$
 (^|/)LICENSE$
 (^|/)Brewfile$
+(^|/)\.DS_Store$
 (^|/)termcolors(/|$)
