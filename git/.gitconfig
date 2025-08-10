@@ -5,7 +5,7 @@
 
 [alias]
   lg = log --graph --pretty=format:'%C(yellow)%h%Creset -%C(red)%d%Creset %s %C(green)(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-  top = !eval cd "$(pwd)/$(git rev-parse --show-cdup)" && show-cdup
+  top = !eval cd "$(pwd)/$(git rev-parse --show-cdup)" && pwd
 
 # clearly makes git better
 [column]
