@@ -135,7 +135,7 @@ alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
 export DOCKER_HOST=unix://$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')
 alias snowsql='/Applications/SnowSQL.app/Contents/MacOS/snowsql'
 alias code='cursor'
-alias ls='eza -Gla --icons --group-directories-first'
+alias ls='eza -la --icons --group-directories-first'
 alias vim='nvim'
 alias bat="bat --theme auto:system --theme-dark default --theme-light GitHub"
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
@@ -152,8 +152,6 @@ export NVM_DIR="$HOME/.nvm"
 export ANDROID_HOME="$HOME/Library/Android/sdk"
 export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
 export PATH="/usr/local/bin/convert:$PATH"
-export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
-export SG_HOME="$HOME/Documents/SimplyGuitar"
 
 eval $(thefuck --alias)
 
