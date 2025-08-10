@@ -44,7 +44,7 @@ main() {
   # Adopt existing files (moves them into the package and replaces with symlink).
   # Run once carefully; remove --adopt afterwards.
   # stow -t ~ nvim
-  stow --adopt -t ~ nvim
+  stow --adopt -t ~ nvim git
   if [[ "$os" == "mac" ]]; then
     # stow -t ~ aerospace iterm2 cursor-macos
     stow --adopt -t ~ aerospace iterm2 cursor-macos
@@ -69,7 +69,6 @@ main() {
   # prepare custom dir
 
   # (optional) submodules for external plugins/themes
-  echo "$(pwd)"
   git submodule update --init --recursive
   if [[ "$os" == "mac" ]]; then
     # stow -t ~ zsh-macos

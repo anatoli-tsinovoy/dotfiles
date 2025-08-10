@@ -1,0 +1,68 @@
+[user]
+	name = Anatoli Tsinovoy
+	email = anatoli.tsinovoy@gmail.com
+	editor = vim
+
+[alias]
+  lg = log --graph --pretty=format:'%C(yellow)%h%Creset -%C(red)%d%Creset %s %C(green)(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  top = !eval cd "$(pwd)/$(git rev-parse --show-cdup)" && show-cdup
+
+# clearly makes git better
+[column]
+  ui = auto
+[branch]
+  sort = -committerdate
+	autosetuprebase = always
+[tag]
+  sort = version:refname
+[init]
+  defaultBranch = main
+[diff]
+  algorithm = histogram
+  colorMoved = plain
+  mnemonicPrefix = true
+  renames = true
+[push]
+  default = simple
+  autoSetupRemote = true
+  followTags = true
+[fetch]
+  prune = true
+  pruneTags = true
+  all = true
+
+# why the hell not?
+
+[help]
+  autocorrect = prompt
+[commit]
+  verbose = true
+[rerere]
+  enabled = true
+  autoupdate = true
+[core]
+  excludesfile = ~/.gitignore
+  pager = delta
+  editor = vim
+	autocrlf = input
+[rebase]
+  autoSquash = true
+  autoStash = true
+  updateRefs = true
+[interactive]
+  diffFilter = delta --color-only
+[delta]
+  navigate = true  # use n and N to move between diff sections
+[merge]
+  conflictstyle = zdiff3
+
+# macos specific
+[credential]
+	helper = osxkeychain
+
+# submodules
+[diff]
+	submodule = log
+[status]
+	submoduleSummary = true
+
