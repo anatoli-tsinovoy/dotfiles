@@ -133,7 +133,6 @@ alias zcp='zmv -C'
 alias zln='zmv -L'
 alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
 export DOCKER_HOST=unix://$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')
-alias snowsql='/Applications/SnowSQL.app/Contents/MacOS/snowsql'
 alias code='cursor'
 alias ls='eza -la --icons --group-directories-first'
 alias vim='nvim'
