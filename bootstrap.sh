@@ -29,6 +29,11 @@ main() {
     brew bundle --file="$SCRIPT_DIR/Brewfile" || true
   fi
 
+  # mac System settings
+  if [[ "$os" == "mac" ]]; then
+    defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
+  fi
+
   # Install GNU Stow
   if ! command -v stow >/dev/null 2>&1; then
     if [[ "$os" == "mac" ]]; then
