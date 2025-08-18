@@ -114,5 +114,9 @@
     "terminal.background": "#00000000"
   },
   "terminal.integrated.drawBoldTextInBrightColors": true,
+  "redhat.telemetry.enabled": false,
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "terminal.integrated.gpuAcceleration": "off"
 }
