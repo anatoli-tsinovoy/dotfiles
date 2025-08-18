@@ -32,6 +32,9 @@ main() {
   # mac System settings
   if [[ "$os" == "mac" ]]; then
     defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
+    defaults write -g AppleMenuBarVisibleInFullscreen -bool false
+    defaults write NSGlobalDomain _HIHideMenuBar -bool true
+    killall SystemUIServer
   fi
 
   # Install GNU Stow

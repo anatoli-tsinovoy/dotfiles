@@ -5,7 +5,13 @@
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = [
     'exec-and-forget borders active_color="gradient(top_left=0xff00C8AB,bottom_right=0xff8217FF)" inactive_color="gradient(top_left=0x00FFC9D7,bottom_right=0xffF3F0DF" width=6',
+    'exec-and-forget sketchybar',
     'trigger-binding alt-shift-m --mode service'
+]
+
+exec-on-workspace-change = [
+  '/bin/bash', '-c',
+  'sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE',
 ]
 
 # Start AeroSpace at login
@@ -169,7 +175,11 @@ automatically-unhide-macos-hidden-apps = true
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.service.binding]
-    esc = ['reload-config', 'mode main']
+    esc = [
+      'reload-config',
+      'exec-and-forget sketchybar --reload',
+      'mode main',
+    ]
     r = ['flatten-workspace-tree', 'mode main'] # reset layout
     f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
     shift-f = ['fullscreen', 'mode main']
