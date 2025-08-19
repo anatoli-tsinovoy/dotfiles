@@ -65,7 +65,7 @@ automatically-unhide-macos-hidden-apps = true
     inner.vertical =   8
     outer.left =       12
     outer.bottom =     12
-    outer.top =        6
+    outer.top =        [{monitor.main = 6}, 40]
     outer.right =      12
 
 # 'main' binding mode declaration
@@ -240,4 +240,8 @@ run = ['move-node-to-workspace 6']
 [[on-window-detected]]
 if.app-name-regex-substring = 'YouTube'
 run = ['move-node-to-workspace 3']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Xcode'
+run = ['move-node-to-workspace 9']
 

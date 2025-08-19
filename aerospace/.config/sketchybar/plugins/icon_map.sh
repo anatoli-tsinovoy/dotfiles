@@ -9,6 +9,9 @@ function __icon_map() {
   "Cursor")
     icon_result=":cursor:"
     ;;
+  "Rive")
+    icon_result="R"
+    ;;
   "Live")
     icon_result=":ableton:"
     ;;
