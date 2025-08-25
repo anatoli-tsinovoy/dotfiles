@@ -9,10 +9,6 @@ PLUGIN_DIR="$CONFIG_DIR/plugins" # Directory where all the plugin scripts are st
 FONT="SF Pro" # Needs to have Regular, Bold, Semibold, Heavy and Black variants
 PADDINGS=3    # All paddings use this value (icon, label, background)
 
-# aerospace setting
-AEROSPACE_FOCUSED_MONITOR_NO=$(aerospace list-workspaces --focused)
-AEROSPACE_LIST_OF_WINDOWS_IN_FOCUSED_MONITOR=$(aerospace list-windows --workspace $AEROSPACE_FOCUSED_MONITOR_NO | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
-
 # Setting up and starting the helper process
 HELPER=git.felix.helper
 killall helper
@@ -71,7 +67,7 @@ defaults=(
 
 sketchybar --default "${defaults[@]}"
 
-# Left
+# Left (LTR)
 source "$ITEM_DIR/apple.sh"
 source "$ITEM_DIR/spaces.sh"
 source "$ITEM_DIR/front_app.sh"
@@ -81,7 +77,7 @@ source "$ITEM_DIR/front_app.sh"
 # source "$ITEM_DIR/spotify.sh"
 # source "$ITEM_DIR/media.sh"
 
-# Right
+# Right (RTL)
 source "$ITEM_DIR/calendar.sh"
 # source "$ITEM_DIR/wifi.sh"
 source "$ITEM_DIR/battery.sh"

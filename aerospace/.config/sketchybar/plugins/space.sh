@@ -1,13 +1,7 @@
 #!/bin/bash
 
-#echo space.sh $'FOCUSED_WORKSPACE': $FOCUSED_WORKSPACE, $'SELECTED': $SELECTED, NAME: $NAME, SENDER: $SENDER  >> ~/aaaa
-
 update() {
-  # 처음 시작에만 작동하기 위해서
-  # 현재 forced, space_change 이벤트가 동시에 발생하고 있다.
   if [ "$SENDER" = "space_change" ]; then
-    #echo space.sh $'FOCUSED_WORKSPACE': $FOCUSED_WORKSPACE, $'SELECTED': $SELECTED, NAME: $NAME, SENDER: $SENDER, INFO: $INFO  >> ~/aaaa
-    #echo $(aerospace list-workspaces --focused) >> ~/aaaa
     source "$CONFIG_DIR/colors.sh"
     COLOR=$BACKGROUND_2
     if [ "$SELECTED" = "true" ]; then
@@ -16,10 +10,10 @@ update() {
     # sketchybar --set $NAME icon.highlight=$SELECTED \
     #                        label.highlight=$SELECTED \
     #                        background.border_color=$COLOR
-    
+
     sketchybar --set space.$(aerospace list-workspaces --focused) icon.highlight=true \
-                      label.highlight=true \
-                      background.border_color=$GREY
+      label.highlight=true \
+      background.border_color=$COLOR
   fi
 }
 
@@ -42,17 +36,17 @@ mouse_clicked() {
         fi
       fi
     else
-      #yabai -m space --focus $SID 2>/dev/null
       #echo space.sh BUTTON: $BUTTON, $'SELECTED': $SELECTED, MODIFIER: $MODIFIER, NAME: $NAME, SENDER: $SENDER, INFO: $INFO, TEST: ${NAME#*.}, ${NAME:6} >> ~/aaaa
       aerospace workspace ${NAME#*.}
     fi
   fi
 }
 
-# echo plugin_space.sh $SENDER >> ~/aaaa
 case "$SENDER" in
-  "mouse.clicked") mouse_clicked
+"mouse.clicked")
+  mouse_clicked
   ;;
-  *) update
+*)
+  update
   ;;
 esac

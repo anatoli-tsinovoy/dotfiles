@@ -1,15 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 
 #SPACE_ICONS=("1 IC1 IC2" "2 IC3 IC4" "3 IC5" "4 IC6")
+# aerospace setting
 
-sketchybar --add event aerospace_workspace_change
-
-declare -A monitors
+declare -A SB_AS_MONITOR_MAP
 while IFS=" " read -r monitor_id display_id; do
-monitors["$monitor_id"]="$display_id"
+  SB_AS_MONITOR_MAP["$monitor_id"]="$display_id"
 done < <(aerospace list-monitors --format '%{monitor-id} %{monitor-appkit-nsscreen-screens-id}')
 
-for m in "${monitors[@]}"; do
+args=()
+args+=(--add event aerospace_workspace_change)
+args+=(--add event aerospace_focus_change)
+for m in "${SB_AS_MONITOR_MAP[@]}"; do
   for i in $(aerospace list-workspaces --monitor $m); do
     sid=$i
     space=(
@@ -18,7 +20,7 @@ for m in "${monitors[@]}"; do
       icon.highlight_color=$GREEN
       icon.padding_left=10
       icon.padding_right=10
-      display="${monitors["$m"]}"
+      display="${SB_AS_MONITOR_MAP["$m"]}"
       padding_left=2
       padding_right=2
       label.padding_right=20
@@ -31,51 +33,48 @@ for m in "${monitors[@]}"; do
       background.border_color=$BACKGROUND_2
       script="$PLUGIN_DIR/space.sh"
     )
-
-    sketchybar --add space space.$sid left \
-               --set space.$sid "${space[@]}" \
-               --subscribe space.$sid mouse.clicked \
-               --subscribe space.$sid aerospace_workspace_change
+    args+=(--add space space.$sid left)
+    args+=(--set space.$sid "${space[@]}")
+    args+=(--subscribe space.$sid mouse.clicked)
+    args+=(--subscribe space.$sid aerospace_workspace_change)
+    # args+=(--subscribe space.$sid aerospace_focus_change)
 
     apps=$(aerospace list-windows --workspace $sid | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
 
     icon_strip=" "
     if [ "${apps}" != "" ]; then
-      while read -r app
-      do
+      while read -r app; do
         icon_strip+=" $($CONFIG_DIR/plugins/icon_map.sh "$app")"
-      done <<< "${apps}"
+      done <<<"${apps}"
     else
       icon_strip=" —"
     fi
 
-    sketchybar --set space.$sid label="$icon_strip"
+    args+=(--set space.$sid label="$icon_strip")
   done
 
-  for i in $(aerospace list-workspaces --monitor ${monitors["$m"]} --empty); do
-    sketchybar --set space.$i display=0
+  for i in $(aerospace list-workspaces --monitor "$m" --empty); do
+    args+=(--set space.$i display=0)
   done
-  
+
 done
 
-
 space_creator=(
-  icon=􀆊
+  icon="􀆊"
   icon.font="$FONT:Heavy:16.0"
   padding_left=10
   padding_right=8
   label.drawing=off
   display=active
-  #click_script='yabai -m space --create'
-  script="$PLUGIN_DIR/space_windows.sh"
-  #script="$PLUGIN_DIR/aerospace.sh"
-  icon.color=$WHITE
+  icon.color=$GREEN
 )
+args+=(--add item space_creator left)
+args+=(--set space_creator "${space_creator[@]}")
 
-sketchybar --add item space_creator left               \
-           --set space_creator "${space_creator[@]}"   \
-           --subscribe space_creator aerospace_workspace_change
+args+=(--add item as_ws_changer left)
+args+=(--set as_ws_changer drawing=off updates=on script="$PLUGIN_DIR/space_windows.sh")
+args+=(--subscribe as_ws_changer aerospace_workspace_change)
 
-# sketchybar  --add item change_windows left \
-#             --set change_windows script="$PLUGIN_DIR/change_windows.sh" \
-#             --subscribe change_windows space_changes
+if [ ${#args[@]} -gt 0 ]; then
+  sketchybar "${args[@]}"
+fi

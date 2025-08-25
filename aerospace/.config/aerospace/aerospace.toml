@@ -4,9 +4,7 @@
 # You can use it to add commands that run after AeroSpace startup.
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = [
-    'exec-and-forget borders active_color="gradient(top_left=0xff00C8AB,bottom_right=0xff8217FF)" inactive_color="gradient(top_left=0x00FFC9D7,bottom_right=0xffF3F0DF" width=6',
-    'exec-and-forget sketchybar',
-    'trigger-binding alt-shift-m --mode service'
+  'trigger-binding esc --mode service'
 ]
 
 exec-on-workspace-change = [
@@ -40,7 +38,10 @@ default-root-container-orientation = 'auto'
 # See https://nikitabobko.github.io/AeroSpace/commands#move-mouse
 # Fallback value (if you omit the key): on-focused-monitor-changed = []
 # on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
-on-focus-changed = ['move-mouse window-lazy-center']
+on-focus-changed = [
+  'move-mouse window-lazy-center',
+  'exec-and-forget sketchybar --trigger aerospace_focus_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE',
+]
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
@@ -63,10 +64,10 @@ automatically-unhide-macos-hidden-apps = true
 [gaps]
     inner.horizontal = 8
     inner.vertical =   8
-    outer.left =       12
-    outer.bottom =     12
-    outer.top =        [{monitor.main = 11}, 45]
-    outer.right =      12
+    outer.left =       8
+    outer.bottom =     8
+    outer.top =        [{monitor.main = 15}, 45]
+    outer.right =      8
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -177,7 +178,8 @@ automatically-unhide-macos-hidden-apps = true
 [mode.service.binding]
     esc = [
       'reload-config',
-      'exec-and-forget sketchybar --reload',
+      'trigger-binding alt-shift-b --mode service',
+      'trigger-binding alt-shift-m --mode service',
       'mode main',
     ]
     r = ['flatten-workspace-tree', 'mode main'] # reset layout
@@ -198,6 +200,14 @@ automatically-unhide-macos-hidden-apps = true
         'move-workspace-to-monitor --workspace 6 "Built\-in"',
         'workspace 1', 'workspace 3', 'workspace 2', 'mode main',
     ]
+    
+    # Refresh janky borders and sketchybar
+    alt-shift-b = [
+        'exec-and-forget borders active_color="gradient(top_left=0xff00C8AB,bottom_right=0xff8217FF)" inactive_color="gradient(top_left=0x00FFC9D7,bottom_right=0xffF3F0DF" width=6',
+        'exec-and-forget sketchybar --reload',
+        'mode main'
+    ]
+
 
 
 [[on-window-detected]]

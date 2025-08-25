@@ -10,7 +10,6 @@ AEROSPACE_LIST_OF_WINDOWS_IN_FOCUSED_MONITOR=$(aerospace list-windows --workspac
 
 if [ "$SENDER" = "front_app_switched" ]; then
   #echo name:$NAME INFO: $INFO SENDER: $SENDER, SID: $SID >> ~/aaaa
-  sketchybar --set "$NAME" label="$INFO" icon.background.image="app.$INFO" icon.background.image.scale=0.8
 
   apps=$AEROSPACE_LIST_OF_WINDOWS_IN_FOCUSED_MONITOR
   icon_strip=" "
@@ -22,5 +21,6 @@ if [ "$SENDER" = "front_app_switched" ]; then
   else
     icon_strip=" —"
   fi
-  sketchybar --set space.$AEROSPACE_FOCUSED_MONITOR_NO label="$icon_strip"
+  sketchybar --set space.$AEROSPACE_FOCUSED_MONITOR_NO label="$icon_strip" \
+             --set "$NAME" label="$INFO" icon.background.image="app.$INFO" icon.background.image.scale=0.8
 fi

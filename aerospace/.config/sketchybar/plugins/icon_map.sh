@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 ### START-OF-ICON-MAP
 function __icon_map() {
@@ -11,6 +11,9 @@ function __icon_map() {
     ;;
   "Rive")
     icon_result="R"
+    ;;
+  "YouTube")
+    icon_result=":youtube:"
     ;;
   "Live")
     icon_result=":ableton:"
