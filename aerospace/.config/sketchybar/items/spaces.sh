@@ -8,12 +8,23 @@ while IFS=" " read -r monitor_id display_id; do
   SB_AS_MONITOR_MAP["$monitor_id"]="$display_id"
 done < <(aerospace list-monitors --format '%{monitor-id} %{monitor-appkit-nsscreen-screens-id}')
 
+AEROSPACE_FOCUSED_WS=$(aerospace list-workspaces --focused)
+
 args=()
 args+=(--add event aerospace_workspace_change)
 args+=(--add event aerospace_focus_change)
 for m in "${SB_AS_MONITOR_MAP[@]}"; do
   for i in $(aerospace list-workspaces --monitor $m); do
     sid=$i
+    if [ $sid = $AEROSPACE_FOCUSED_WS ]; then
+      SID_BORDER_COLOR=$GREEN
+      SID_ICON_HIGHLIGHT="true"
+      SID_LABEL_HIGHLIGHT="true"
+    else
+      SID_BORDER_COLOR=$BACKGROUND_1
+      SID_ICON_HIGHLIGHT="false"
+      SID_LABEL_HIGHLIGHT="false"
+    fi
     space=(
       space="$sid"
       icon="$sid"
@@ -25,12 +36,14 @@ for m in "${SB_AS_MONITOR_MAP[@]}"; do
       padding_right=2
       label.padding_right=20
       icon.color=$MAGENTA
+      icon.highlight=$SID_ICON_HIGHLIGHT
       label.color=$BLUE
       label.highlight_color=$GREEN
+      label.highlight=$SID_LABEL_HIGHLIGHT
       label.font="sketchybar-app-font:Regular:16.0"
       label.y_offset=-1
-      background.color=$BACKGROUND_1
-      background.border_color=$BACKGROUND_2
+      background.color=$BG0
+      background.border_color=$SID_BORDER_COLOR
       script="$PLUGIN_DIR/space.sh"
     )
     args+=(--add space space.$sid left)

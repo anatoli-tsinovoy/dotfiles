@@ -3,14 +3,11 @@
 ### START-OF-ICON-MAP
 function __icon_map() {
   case "$1" in
-  # "Rive")
-  #   icon_result=":rive:"
-  #   ;;
   "Cursor")
     icon_result=":cursor:"
     ;;
   "Rive")
-    icon_result="R"
+    icon_result=":default:"
     ;;
   "YouTube")
     icon_result=":youtube:"
@@ -246,8 +243,11 @@ function __icon_map() {
   "Iris")
     icon_result=":iris:"
     ;;
-  "iTerm" | "iTerm2")
+  "iTerm")
     icon_result=":iterm:"
+    ;;
+  "iTerm2")
+    icon_result=":terminal:"
     ;;
   "Jellyfin Media Player")
     icon_result=":jellyfin:"
@@ -603,7 +603,7 @@ function __icon_map() {
   "WezTerm")
     icon_result=":wezterm:"
     ;;
-  "WhatsApp" | "‎WhatsApp")
+  "WhatsApp" | "‎WhatsApp" | "WhatsApp Web")
     icon_result=":whats_app:"
     ;;
   "Xcode")
@@ -615,7 +615,7 @@ function __icon_map() {
   "Zeplin")
     icon_result=":zeplin:"
     ;;
-  "zoom.us")
+  "zoom.us" | "Meet")
     icon_result=":zoom:"
     ;;
   "Zotero")

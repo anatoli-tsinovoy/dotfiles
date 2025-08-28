@@ -41,15 +41,15 @@ defaults=(
   updates=when_shown
   icon.font="$FONT:Regular:14.0"
   icon.color=$ICON_COLOR
-  icon.padding_left=$PADDINS
+  icon.padding_left=$PADDINGS
   icon.padding_right=$PADDINGS
   label.font="$FONT:Semibold:13.0"
   label.color=$LABEL_COLOR
+  label.shadow.color=$SHADOW_COLOR
   label.padding_left=$PADDINGS
   label.padding_right=$PADDINGS
   label.shadow.drawing=on
   label.shadow.distance=2
-  # label.shadow.color=0xff000000
   padding_right=$PADDINGS
   padding_left=$PADDINGS
   background.height=26
@@ -62,7 +62,6 @@ defaults=(
   popup.blur_radius=20
   popup.background.shadow.drawing=on
   scroll_texts=on
-
 )
 
 sketchybar --default "${defaults[@]}"

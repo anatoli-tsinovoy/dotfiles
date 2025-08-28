@@ -2,18 +2,16 @@
 
 update() {
   if [ "$SENDER" = "space_change" ]; then
-    source "$CONFIG_DIR/colors.sh"
-    COLOR=$BACKGROUND_2
-    if [ "$SELECTED" = "true" ]; then
-      COLOR=$GREY
-    fi
+    # source "$CONFIG_DIR/colors.sh"
+    # if [ "$SELECTED" = "true" ]; then
+    #   sketchybar --set space.$(aerospace list-workspaces --focused) icon.highlight=true \
+    #     label.highlight=true \
+    #     background.border_color=$GREEN
+    # fi
     # sketchybar --set $NAME icon.highlight=$SELECTED \
     #                        label.highlight=$SELECTED \
     #                        background.border_color=$COLOR
 
-    sketchybar --set space.$(aerospace list-workspaces --focused) icon.highlight=true \
-      label.highlight=true \
-      background.border_color=$COLOR
   fi
 }
 

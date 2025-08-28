@@ -6,9 +6,6 @@ AEROSPACE_FOCUSED_MONITOR=$(aerospace list-monitors --focused | awk '{print $1}'
 AEROSAPCE_WORKSPACE_FOCUSED_MONITOR=$(aerospace list-workspaces --monitor focused --empty no)
 AEROSPACE_EMPTY_WORKSPACE=$(aerospace list-workspaces --monitor focused --empty)
 
-AEROSPACE_FOCUSED_MONITOR_NO=$(aerospace list-workspaces --focused)
-AEROSPACE_LIST_OF_WINDOWS_IN_FOCUSED_MONITOR=$(aerospace list-windows --workspace $AEROSPACE_FOCUSED_MONITOR_NO | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
-
 reload_workspace_icon() {
   apps=$(aerospace list-windows --workspace "$@" | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
 
@@ -56,7 +53,7 @@ if [ "$SENDER" = "aerospace_workspace_change" ]; then
   # current workspace space border color
   args+=(--set space.$AEROSPACE_FOCUSED_WORKSPACE icon.highlight=true
     label.highlight=true
-    background.border_color=$GREY)
+    background.border_color=$GREEN)
 
   # prev workspace space border color
   args+=(--set space.$AEROSPACE_PREV_WORKSPACE icon.highlight=false

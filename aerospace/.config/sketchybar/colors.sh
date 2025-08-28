@@ -13,50 +13,50 @@
 # export TRANSPARENT=0x00000000
 # export BG0=0xff2c2e34
 # export BG1=0xff363944
-# export BG2=0xff414550
+# export BG2=0xff414550i
+# export THEME="DARK"
 
 ## Simply Dark
-export BLACK=0xff110034
-export WHITE=0xfff3f0df
-export RED=0xffff4f44
-export GREEN=0xff00c8ab
-export BLUE=0xff8217ff
-export YELLOW=0xffffd44f
-export ORANGE=0xffffe680
-export MAGENTA=0xffffc9d7
-export GREY=0xff330d81
-export TRANSPARENT=0x00000000
-export BG0=0xff110034
-export BG1=0x60330d81
-export BG2=0x609a67ff
-
-export BATTERY_1=0xff00c8ab
-export BATTERY_2=0xffffd44f
-export BATTERY_3=0xffffe680
-export BATTERY_4=0xffff6767
-export BATTERY_5=0xffff4f44
-
-### Simply Light
-## Values from iTerm2 profile `termcolors/simply-brand.itermcolors` (Light) and Cursor `settings.json` Default Light+
 # export BLACK=0xff110034
 # export WHITE=0xfff3f0df
-# export RED=0xffcc3e34
-# export GREEN=0xff009a81
-# export BLUE=0xff330d81
-# export YELLOW=0xffcd9a1b
-# export ORANGE=0xffe6b334
-# export MAGENTA=0xffe69ab3
+# export RED=0xffff4f44
+# export GREEN=0xff00c8ab
+# export BLUE=0xff8217ff
+# export YELLOW=0xffffd44f
+# export ORANGE=0xffffe680
+# export MAGENTA=0xffffc9d7
 # export GREY=0xff330d81
 # export TRANSPARENT=0x00000000
-# export BG0=0xfff3f0df
-# export BG1=0x60b39aff
-# export BG2=0x606734cd
+# export BG0=0xff110034
+# export BG1=0x60330d81
+# export BG2=0x60ff67ff
+# export BATTERY_1=0xff00c8ab
+# export BATTERY_2=0xffffd44f
+# export BATTERY_3=0xffffe680
+# export BATTERY_4=0xffff6767
+# export BATTERY_5=0xffff4f44
+# export THEME="DARK"
 
-# export BATTERY_1=0xff009a81
-# export BATTERY_2=0xffcd9a1b
-# export BATTERY_3=0xffe6b334
-# export BATTERY_4=0xffcc3e34
-# export BATTERY_5=0xffcc3e34
+## Simply Light
+export BLACK=0xff110034
+export WHITE=0xfff3f0df
+export RED=0xffcc3e34
+export GREEN=0xff009a81
+export BLUE=0xff330d81
+export YELLOW=0xffcd9a1b
+export ORANGE=0xffcdac4ci
+export MAGENTA=0xffe69ab3
+export GREY=0xff330d81
+export TRANSPARENT=0x00000000
+export BG0=0xfff3f0df
+export BG1=0x60b39aff
+export BG2=0x60f1aaaa
+export BATTERY_1=0xff009a81
+export BATTERY_2=0xffcd9a1b
+export BATTERY_3=0xffe6b334
+export BATTERY_4=0xffcc3e34
+export BATTERY_5=xffcc3e34
+export THEME="LIGHT"
 
 ### Catppuccin
 # export BLACK=0xff181926
@@ -78,14 +78,22 @@ export BATTERY_5=0xffff4f44
 # export BATTERY_3=0xfff5a97f
 # export BATTERY_4=0xffee99a0
 # export BATTERY_5=0xffed8796
+# export THEME="DARK"
 
 # General bar colors
 export BAR_COLOR=$BG0
 export BAR_BORDER_COLOR=$BG2
 export BACKGROUND_1=$BG1
 export BACKGROUND_2=$BG2
-export ICON_COLOR=$WHITE  # Color of all icons
-export LABEL_COLOR=$WHITE # Color of all labels
+if [ $THEME = "LIGHT" ]; then
+  export ICON_COLOR=$BLACK  # Color of all icons
+  export LABEL_COLOR=$BLACK # Color of all labels
+  export POPUP_BORDER_COLOR=$BLACK
+  export SHADOW_COLOR=$BG1
+else
+  export ICON_COLOR=$WHITE  # Color of all icons
+  export LABEL_COLOR=$WHITE # Color of all labels
+  export POPUP_BORDER_COLOR=$WHITE
+  export SHADOW_COLOR=$BG1
+fi
 export POPUP_BACKGROUND_COLOR=$BAR_COLOR
-export POPUP_BORDER_COLOR=$WHITE
-export SHADOW_COLOR=$BLACK
