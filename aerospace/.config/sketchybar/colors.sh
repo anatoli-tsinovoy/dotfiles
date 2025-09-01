@@ -46,12 +46,12 @@ else
   export GREEN=0xff009a81
   export BLUE=0xff330d81
   export YELLOW=0xffcd9a1b
-  export ORANGE=0xffcdac4ci
-  export MAGENTA=0xffe69ab3
+  export ORANGE=0xffcdac4c
+  export MAGENTA=0xffc47891
   export GREY=0xff330d81
   export TRANSPARENT=0x00000000
   export BG0=0xfff3f0df
-  export BG1=0x60b39aff
+  export BG1=0x60a289ee
   export BG2=0x60f1aaaa
   export BATTERY_1=0xff009a81
   export BATTERY_2=0xffcd9a1b
@@ -84,7 +84,7 @@ fi
 
 # General bar colors
 export BAR_COLOR=$BG0
-export BAR_BORDER_COLOR=$BG2
+export BAR_BORDER_COLOR=$BG1
 export BACKGROUND_1=$BG1
 export BACKGROUND_2=$BG2
 if [ $THEME = "LIGHT" ]; then

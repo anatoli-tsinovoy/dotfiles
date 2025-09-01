@@ -26,7 +26,7 @@ reload_workspace_icon() {
   else
     SID_ICON_HIGHLIGHT="false"
     SID_LABEL_HIGHLIGHT="false"
-    SID_BORDER_COLOR=$BACKGROUND_2
+    SID_BORDER_COLOR=$BACKGROUND_1
     if [ -z "$(aerospace list-windows --workspace $2)" ]; then
       SID_DISPLAY=0
     else
