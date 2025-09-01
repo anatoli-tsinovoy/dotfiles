@@ -2,6 +2,7 @@
 
 update() {
   if [ "$SENDER" = "space_change" ]; then
+    echo ""
     # source "$CONFIG_DIR/colors.sh"
     # if [ "$SELECTED" = "true" ]; then
     #   sketchybar --set space.$(aerospace list-workspaces --focused) icon.highlight=true \
@@ -34,7 +35,6 @@ mouse_clicked() {
         fi
       fi
     else
-      #echo space.sh BUTTON: $BUTTON, $'SELECTED': $SELECTED, MODIFIER: $MODIFIER, NAME: $NAME, SENDER: $SENDER, INFO: $INFO, TEST: ${NAME#*.}, ${NAME:6} >> ~/aaaa
       aerospace workspace ${NAME#*.}
     fi
   fi

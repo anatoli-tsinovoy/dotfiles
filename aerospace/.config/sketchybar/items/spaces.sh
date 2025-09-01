@@ -2,12 +2,7 @@
 
 #SPACE_ICONS=("1 IC1 IC2" "2 IC3 IC4" "3 IC5" "4 IC6")
 # aerospace setting
-
-declare -A SB_AS_MONITOR_MAP
-while IFS=" " read -r monitor_id display_id; do
-  SB_AS_MONITOR_MAP["$monitor_id"]="$display_id"
-done < <(aerospace list-monitors --format '%{monitor-id} %{monitor-appkit-nsscreen-screens-id}')
-
+source "$CONFIG_DIR/plugins/map_monitors.sh"
 AEROSPACE_FOCUSED_WS=$(aerospace list-workspaces --focused)
 
 args=()
