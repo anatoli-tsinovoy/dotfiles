@@ -5,6 +5,7 @@ source "$CONFIG_DIR/colors.sh"
 # Read the plist data
 plist_data=$(defaults read ~/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources)
 current_input_source=$(echo "$plist_data" | plutil -convert xml1 -o - - | grep -A1 'KeyboardLayout Name' | tail -n1 | cut -d '>' -f2 | cut -d '<' -f1)
+# current_input_source=$(defaults read ~/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources | awk -F'= ' '/KeyboardLayout Name/ {print $2}' | tr -d ';')
 
 if [ $THEME = "LIGHT" ]; then
   A_ICON="􂏿"
