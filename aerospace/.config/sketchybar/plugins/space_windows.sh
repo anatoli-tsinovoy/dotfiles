@@ -3,9 +3,6 @@
 source "$CONFIG_DIR/colors.sh"
 source "$CONFIG_DIR/plugins/map_monitors.sh"
 
-AEROSAPCE_WORKSPACE_FOCUSED_MONITOR=$(aerospace list-workspaces --monitor focused --empty no)
-AEROSPACE_EMPTY_WORKSPACE=$(aerospace list-workspaces --monitor focused --empty)
-
 reload_workspace_icon() {
   local outvar=$1
   local args_=()
@@ -22,7 +19,7 @@ reload_workspace_icon() {
     SID_ICON_HIGHLIGHT="true"
     SID_LABEL_HIGHLIGHT="true"
     SID_BORDER_COLOR=$GREEN
-    SID_DISPLAY=${SB_AS_MONITOR_MAP["$3"]}
+    SID_DISPLAY=${AS_TO_SB["$3"]}
   else
     SID_ICON_HIGHLIGHT="false"
     SID_LABEL_HIGHLIGHT="false"
@@ -30,7 +27,7 @@ reload_workspace_icon() {
     if [ -z "$(aerospace list-windows --workspace $2)" ]; then
       SID_DISPLAY=0
     else
-      SID_DISPLAY=${SB_AS_MONITOR_MAP["$3"]}
+      SID_DISPLAY=${AS_TO_SB["$3"]}
     fi
   fi
   args_+=(--animate sin "10"
@@ -46,10 +43,15 @@ reload_workspace_icon() {
 }
 
 if [ "$SENDER" = "aerospace_workspace_change" ]; then
+
+  AEROSAPCE_WORKSPACE_FOCUSED_MONITOR=$(aerospace list-workspaces --monitor focused --empty no)
+  # TODO: This is only the empty workspaces on the newly-in-focus monitor
+  AEROSPACE_EMPTY_WORKSPACE=$(aerospace list-workspaces --monitor focused --empty)
+
   args=()
-  for display_id in "${!SB_AS_MONITOR_MAP[@]}"; do
-    if aerospace list-workspaces --monitor "${SB_AS_MONITOR_MAP[$display_id]}" | grep -Fxq -- "$AEROSPACE_PREV_WORKSPACE"; then
-      AEROSPACE_PREV_MONITOR=$display_id
+  for as_monitor in "${!AS_TO_SB[@]}"; do
+    if aerospace list-workspaces --monitor $as_monitor | grep -Fxq -- "$AEROSPACE_PREV_WORKSPACE"; then
+      AEROSPACE_PREV_MONITOR=$as_monitor
     fi
   done
 

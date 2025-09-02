@@ -8,8 +8,11 @@ AEROSPACE_FOCUSED_WS=$(aerospace list-workspaces --focused)
 args=()
 args+=(--add event aerospace_workspace_change)
 args+=(--add event aerospace_focus_change)
-for m in "${SB_AS_MONITOR_MAP[@]}"; do
-  for i in $(aerospace list-workspaces --monitor $m); do
+m_ind=0
+for sb_monitor in "${AS_TO_SB[@]}"; do
+  ((as_monitor++))
+
+  for i in $(aerospace list-workspaces --monitor $as_monitor); do
     sid=$i
     if [ $sid = $AEROSPACE_FOCUSED_WS ]; then
       SID_BORDER_COLOR=$GREEN
@@ -26,7 +29,6 @@ for m in "${SB_AS_MONITOR_MAP[@]}"; do
       icon.highlight_color=$GREEN
       icon.padding_left=10
       icon.padding_right=10
-      display="${SB_AS_MONITOR_MAP["$m"]}"
       padding_left=2
       padding_right=2
       label.padding_right=20
@@ -42,7 +44,6 @@ for m in "${SB_AS_MONITOR_MAP[@]}"; do
       script="$PLUGIN_DIR/space.sh"
     )
     args+=(--add space space.$sid left)
-    args+=(--set space.$sid "${space[@]}")
     args+=(--subscribe space.$sid mouse.clicked)
     args+=(--subscribe space.$sid aerospace_workspace_change)
     # args+=(--subscribe space.$sid aerospace_focus_change)
@@ -58,10 +59,14 @@ for m in "${SB_AS_MONITOR_MAP[@]}"; do
       icon_strip=" —"
     fi
 
-    args+=(--set space.$sid label="$icon_strip")
+    args+=(
+      --set space.$sid "${space[@]}"
+      label="$icon_strip"
+      display="$sb_monitor"
+    )
   done
 
-  for i in $(aerospace list-workspaces --monitor "$m" --empty); do
+  for i in $(aerospace list-workspaces --monitor "$as_monitor" --empty); do
     args+=(--set space.$i display=0)
   done
 
