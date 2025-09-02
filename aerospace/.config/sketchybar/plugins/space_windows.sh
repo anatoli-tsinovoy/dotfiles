@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source "$CONFIG_DIR/colors.sh"
-source "$CONFIG_DIR/plugins/map_monitors.sh"
+read -a AS_TO_SB <<<"$(sketchybar --query AS_TO_SB | jq -r '.label.value')"
 
 reload_workspace_icon() {
   local outvar=$1
@@ -19,7 +19,8 @@ reload_workspace_icon() {
     SID_ICON_HIGHLIGHT="true"
     SID_LABEL_HIGHLIGHT="true"
     SID_BORDER_COLOR=$GREEN
-    SID_DISPLAY=${AS_TO_SB["$3"]}
+    # AS_TO_SB is zero-based, but as_monitor is one-based
+    SID_DISPLAY=${AS_TO_SB[(($3 - 1))]}
   else
     SID_ICON_HIGHLIGHT="false"
     SID_LABEL_HIGHLIGHT="false"
@@ -27,7 +28,8 @@ reload_workspace_icon() {
     if [ -z "$(aerospace list-windows --workspace $2)" ]; then
       SID_DISPLAY=0
     else
-      SID_DISPLAY=${AS_TO_SB["$3"]}
+      # AS_TO_SB is zero-based, but as_monitor is one-based
+      SID_DISPLAY=${AS_TO_SB[(($3 - 1))]}
     fi
   fi
   args_+=(--animate sin "10"
@@ -49,8 +51,8 @@ if [ "$SENDER" = "aerospace_workspace_change" ]; then
   AEROSPACE_EMPTY_WORKSPACE=$(aerospace list-workspaces --monitor focused --empty)
 
   args=()
-  for as_monitor in "${!AS_TO_SB[@]}"; do
-    if aerospace list-workspaces --monitor $as_monitor | grep -Fxq -- "$AEROSPACE_PREV_WORKSPACE"; then
+  for as_monitor in $(aerospace list-monitors --format '%{monitor-id}'); do
+    if aerospace list-workspaces --monitor "$as_monitor" | grep -Fxq -- "$AEROSPACE_PREV_WORKSPACE"; then
       AEROSPACE_PREV_MONITOR=$as_monitor
     fi
   done

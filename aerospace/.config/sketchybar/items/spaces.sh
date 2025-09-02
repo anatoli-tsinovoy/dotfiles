@@ -1,14 +1,13 @@
 #!/bin/bash
-
-#SPACE_ICONS=("1 IC1 IC2" "2 IC3 IC4" "3 IC5" "4 IC6")
-# aerospace setting
+#TODO: Update the monitor listing automatically somehow
 source "$CONFIG_DIR/plugins/map_monitors.sh"
+read -a AS_TO_SB <<<"$(sketchybar --query AS_TO_SB | jq -r '.label.value')"
 AEROSPACE_FOCUSED_WS=$(aerospace list-workspaces --focused)
 
 args=()
 args+=(--add event aerospace_workspace_change)
 args+=(--add event aerospace_focus_change)
-m_ind=0
+as_monitor=0
 for sb_monitor in "${AS_TO_SB[@]}"; do
   ((as_monitor++))
 

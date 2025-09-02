@@ -21,3 +21,7 @@ declare -A AS_TO_SB
 while IFS=" " read -r as_monitor nsscreen_id; do
   AS_TO_SB[$as_monitor]=${DIRECT_TO_SB["${NSSCREEN_TO_DIRECT["$nsscreen_id"]}"]}
 done < <(aerospace list-monitors --format '%{monitor-id} %{monitor-appkit-nsscreen-screens-id}')
+
+if ! $(sketchybar --query AS_TO_SB &>/dev/null); then
+  sketchybar --add item AS_TO_SB left --set AS_TO_SB display=0 label="${AS_TO_SB[*]}"
+fi
