@@ -16,7 +16,7 @@
 # export BG2=0xff414550
 # export THEME="DARK"
 
-if [ defaults read -g AppleInterfaceStyle ] &>/dev/null; then
+if defaults read -g AppleInterfaceStyle &>/dev/null; then
   # command succeeds and prints Dark
   export THEME="DARK"
 else
@@ -43,7 +43,6 @@ if [ $THEME = "DARK" ]; then
   export BATTERY_3=0xffffe680
   export BATTERY_4=0xffff6767
   export BATTERY_5=0xffff4f44
-  export THEME="DARK"
 else
   ## Simply Light
   export BLACK=0xff110034

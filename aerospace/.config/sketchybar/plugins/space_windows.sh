@@ -56,6 +56,22 @@ reload_workspace_icon() {
 ALL_APPS=$(aerospace list-windows --all --format '%{workspace} %{app-name}')
 # this should be enough actually $(aerospace list-windows --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id} %{app-name}')
 ALL_AS_WS=$(aerospace list-workspaces --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id}')
+
+if [ "$SENDER" = "front_app_switched" ]; then
+  while IFS=" " read -r sid is_focused is_visible as_monitor; do
+    if [ "$is_focused" = "true" ]; then
+      AS_FOCUSED_MONITOR=$as_monitor
+      AS_FOCUSED_WS=$sid
+    fi
+  done <<<"${ALL_AS_WS}"
+  args=()
+  reload_workspace_icon "$ALL_APPS" args $AS_FOCUSED_WS $AS_FOCUSED_MONITOR 1 0
+
+  if [ ${#args[@]} -gt 0 ]; then
+    sketchybar "${args[@]}"
+  fi
+fi
+
 if [ "$SENDER" = "aerospace_monitor_move" ]; then
   while IFS=" " read -r sid is_focused is_visible as_monitor; do
     if [ "$is_focused" = "true" ]; then
