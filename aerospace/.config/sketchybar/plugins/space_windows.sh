@@ -82,12 +82,12 @@ if [ "$SENDER" = "aerospace_workspace_change" ]; then
 
   AS_EMPTY_WS=""
   while IFS=" " read -r sid is_focused is_visible as_monitor; do
-    if [ "$sid" = "$AEROSPACE_PREV_WORKSPACE" ]; then
-      AEROSPACE_PREV_MONITOR=$as_monitor
+    if [ "$sid" = "$AS_PREV_WS" ]; then
+      AS_PREV_MONITOR=$as_monitor
     fi
 
     if [ "$is_focused" = "true" ]; then
-      AEROSPACE_FOCUSED_MONITOR=$as_monitor
+      AS_FOCUSED_MONITOR=$as_monitor
     fi
 
     if [[ ! " $AS_NONEMPTY_WS " == *" $sid "* ]]; then
@@ -97,16 +97,16 @@ if [ "$SENDER" = "aerospace_workspace_change" ]; then
 
   args=()
   for i in $AS_EMPTY_WS; do
-    if [ "$i" -eq $AEROSPACE_FOCUSED_WORKSPACE ]; then
+    if [ "$i" -eq $AS_FOCUSED_WS ]; then
       continue
     fi
-    if [ "$i" -eq $AEROSPACE_PREV_WORKSPACE ]; then
+    if [ "$i" -eq $AS_PREV_WS ]; then
       AS_PREV_WS_IS_EMPTY=1
     fi
     args+=(--set space.$i display=0)
   done
-  reload_workspace_icon "$ALL_APPS" args $AEROSPACE_PREV_WORKSPACE $AEROSPACE_PREV_MONITOR 0 $AS_PREV_WS_IS_EMPTY
-  reload_workspace_icon "$ALL_APPS" args $AEROSPACE_FOCUSED_WORKSPACE $AEROSPACE_FOCUSED_MONITOR 1 0
+  reload_workspace_icon "$ALL_APPS" args $AS_PREV_WS $AS_PREV_MONITOR 0 $AS_PREV_WS_IS_EMPTY
+  reload_workspace_icon "$ALL_APPS" args $AS_FOCUSED_WS $AS_FOCUSED_MONITOR 1 0
   if [ ${#args[@]} -gt 0 ]; then
     sketchybar "${args[@]}"
   fi
