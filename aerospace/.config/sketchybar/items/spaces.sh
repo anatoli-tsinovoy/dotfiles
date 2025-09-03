@@ -60,8 +60,11 @@ while read -r i as_monitor; do
     display="$sb_monitor"
   )
 
-done <<<"${ALL_AS_WS_AS_MON}"
+  for i in $(aerospace list-workspaces --monitor "$as_monitor" --empty </dev/null); do
+    args+=(--set space.$i display=0)
+  done
 
+done <<<"${ALL_AS_WS_AS_MON}"
 space_creator=(
   icon="􀆊"
   icon.font="$FONT:Heavy:16.0"
