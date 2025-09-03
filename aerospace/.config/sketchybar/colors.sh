@@ -16,7 +16,13 @@
 # export BG2=0xff414550
 # export THEME="DARK"
 
-export THEME="LIGHT"
+if [ defaults read -g AppleInterfaceStyle ] &>/dev/null; then
+  # command succeeds and prints Dark
+  export THEME="DARK"
+else
+  # for light mode command fails and prints some odd error
+  export THEME="LIGHT"
+fi
 if [ $THEME = "DARK" ]; then
   # Simply Dark
   export BLACK=0xff110034

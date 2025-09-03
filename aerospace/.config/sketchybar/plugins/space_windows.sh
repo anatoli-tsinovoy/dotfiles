@@ -55,6 +55,7 @@ reload_workspace_icon() {
 if [ "$SENDER" = "aerospace_workspace_change" ]; then
   # START_TIME=$(gdate +%s%3N)
   ALL_APPS=$(aerospace list-windows --all --format '%{workspace} %{app-name}')
+  # this should be enough actually $(aerospace list-windows --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id} %{app-name}')
   AS_NONEMPTY_WS=""
   while read -r sid app_names; do
     AS_NONEMPTY_WS+="$sid"$'\n'
