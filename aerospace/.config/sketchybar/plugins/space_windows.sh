@@ -65,7 +65,6 @@ if [ "$SENDER" = "aerospace_monitor_move" ]; then
   done <<<"${ALL_AS_WS}"
 
   args=()
-  # args+=(--set space.$i display=0)
   reload_workspace_icon "$ALL_APPS" args $AS_FOCUSED_WS $AS_FOCUSED_MONITOR 1 0
 
   if [ ${#args[@]} -gt 0 ]; then
