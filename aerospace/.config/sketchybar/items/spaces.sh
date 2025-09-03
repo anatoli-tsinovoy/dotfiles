@@ -7,6 +7,7 @@ AEROSPACE_FOCUSED_WS=$(aerospace list-workspaces --focused)
 args=()
 args+=(--add event aerospace_workspace_change)
 args+=(--add event aerospace_focus_change)
+args+=(--add event aerospace_monitor_move)
 as_monitor=0
 for sb_monitor in "${AS_TO_SB[@]}"; do
   ((as_monitor++))
@@ -44,8 +45,6 @@ for sb_monitor in "${AS_TO_SB[@]}"; do
     )
     args+=(--add space space.$sid left)
     args+=(--subscribe space.$sid mouse.clicked)
-    args+=(--subscribe space.$sid aerospace_workspace_change)
-    # args+=(--subscribe space.$sid aerospace_focus_change)
 
     apps=$(aerospace list-windows --workspace $sid | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
 
@@ -86,6 +85,7 @@ args+=(--set space_creator "${space_creator[@]}")
 args+=(--add item as_ws_changer left)
 args+=(--set as_ws_changer drawing=off updates=on script="$PLUGIN_DIR/space_windows.sh")
 args+=(--subscribe as_ws_changer aerospace_workspace_change)
+args+=(--subscribe as_ws_changer aerospace_monitor_move)
 
 if [ ${#args[@]} -gt 0 ]; then
   sketchybar "${args[@]}"

@@ -52,10 +52,28 @@ reload_workspace_icon() {
   eval "$outvar+=(\"\${args_[@]}\")"
 }
 
+# START_TIME=$(gdate +%s%3N)
+ALL_APPS=$(aerospace list-windows --all --format '%{workspace} %{app-name}')
+# this should be enough actually $(aerospace list-windows --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id} %{app-name}')
+ALL_AS_WS=$(aerospace list-workspaces --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id}')
+if [ "$SENDER" = "aerospace_monitor_move" ]; then
+  while IFS=" " read -r sid is_focused is_visible as_monitor; do
+    if [ "$is_focused" = "true" ]; then
+      AS_FOCUSED_MONITOR=$as_monitor
+      AS_FOCUSED_WS=$sid
+    fi
+  done <<<"${ALL_AS_WS}"
+
+  args=()
+  # args+=(--set space.$i display=0)
+  reload_workspace_icon "$ALL_APPS" args $AS_FOCUSED_WS $AS_FOCUSED_MONITOR 1 0
+
+  if [ ${#args[@]} -gt 0 ]; then
+    sketchybar "${args[@]}"
+  fi
+fi
+
 if [ "$SENDER" = "aerospace_workspace_change" ]; then
-  # START_TIME=$(gdate +%s%3N)
-  ALL_APPS=$(aerospace list-windows --all --format '%{workspace} %{app-name}')
-  # this should be enough actually $(aerospace list-windows --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id} %{app-name}')
   AS_NONEMPTY_WS=""
   while read -r sid app_names; do
     AS_NONEMPTY_WS+="$sid"$'\n'
@@ -75,8 +93,7 @@ if [ "$SENDER" = "aerospace_workspace_change" ]; then
     if [[ ! " $AS_NONEMPTY_WS " == *" $sid "* ]]; then
       AS_EMPTY_WS+="$sid"$'\n'
     fi
-
-  done < <(aerospace list-workspaces --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id}')
+  done <<<"${ALL_AS_WS}"
 
   args=()
   for i in $AS_EMPTY_WS; do
