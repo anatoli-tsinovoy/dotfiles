@@ -18,48 +18,83 @@ return {
       on_colors = function(c)
         local is_light = (vim.o.background == "light")
         if is_light then
-          -- LIGHT UI (from your plist)
-          c.bg = "#F3F0DF" -- Background (Light)
-          c.bg_dark = "#E7E2C9"
-          c.fg = "#110034" -- Foreground (Light)
-          c.red = "#CC3E34" -- ANSI 1
-          c.green = "#009A81" -- ANSI 2
-          c.yellow = "#CD9A1B" -- ANSI 3
-          c.blue = "#330D81" -- ANSI 4
-          c.magenta = "#E69AB3" -- ANSI 5
-          c.cyan = "#00B39A" -- ANSI 6
-          c.orange = "#E6B334" -- from Light ansi11
+          -- LIGHT (higher contrast)
+          c.bg = "#F3F0DF" -- base bg (unchanged)
+          c.bg_dark = "#E1DAC0" -- darker than before for floats/pmenus
+          c.fg = "#0B0026" -- DARKER fg for contrast (was #110034)
+          c.red = "#B22F27" -- slightly deeper hues for syntax punch
+          c.green = "#00836C"
+          c.yellow = "#A67611"
+          c.blue = "#2A0A6B"
+          c.magenta = "#C77796"
+          c.cyan = "#008E7A"
+          c.orange = "#C39216"
         else
-          -- DARK UI (from your plist)
-          c.bg = "#110034" -- Background (Dark)
+          -- DARK (unchanged)
+          c.bg = "#110034"
           c.bg_dark = "#0B0026"
-          c.fg = "#F3F0DF" -- Foreground (Dark)
-          c.red = "#FF4F44" -- ANSI 1
-          c.green = "#00C8AB" -- ANSI 2
-          c.yellow = "#FFD44F" -- ANSI 3
-          c.blue = "#8217FF" -- ANSI 4
-          c.magenta = "#FFC9D7" -- ANSI 5
-          c.cyan = "#00E6BB" -- ANSI 6
-          c.orange = "#FFD44F" -- reuse yellow-ish
+          c.fg = "#F3F0DF"
+          c.red = "#FF4F44"
+          c.green = "#00C8AB"
+          c.yellow = "#FFD44F"
+          c.blue = "#8217FF"
+          c.magenta = "#FFC9D7"
+          c.cyan = "#00E6BB"
+          c.orange = "#FFD44F"
         end
       end,
 
       on_highlights = function(h, c)
         local is_light = (vim.o.background == "light")
         if is_light then
-          h.Visual = { bg = "#B39AFF" } -- Selection (Light)
-          h.Cursor = { fg = "#F3F0DF", bg = "#8217FF" } -- Cursor (Light)
-          h.NormalFloat = { bg = "#E7E2C9", fg = "#110034" }
-          h.IncSearch = { bg = "#FFD44F", fg = "#110034" }
-          h.Search = { bg = "#FFD44F", fg = "#110034" }
-          h.Underlined = { fg = "#8217FF", underline = true } -- Link (Light)
+          -- Core UI
+          h.Normal = { fg = "#0B0026", bg = "#F3F0DF" }
+          h.NormalNC = { fg = "#0B0026", bg = "#F3F0DF" }
+          h.NormalFloat = { fg = "#0B0026", bg = "#E1DAC0" }
+          h.FloatBorder = { fg = "#2A0A6B", bg = "#E1DAC0" }
+          h.WinSeparator = { fg = "#C4B893" }
+          h.CursorLine = { bg = "#E9E4CE" }
+          h.LineNr = { fg = "#5B4F85" } -- darker
+          h.CursorLineNr = { fg = "#A67611", bold = true }
+
+          -- Selection / Search
+          h.Visual = { bg = "#B39AFF" } -- still readable on light bg
+          h.Search = { bg = "#FFD44F", fg = "#0B0026" }
+          h.IncSearch = { bg = "#FFD44F", fg = "#0B0026" }
+
+          -- Comments & nontext (increase legibility)
+          h.Comment = { fg = "#5A5680", italic = true }
+          h.NonText = { fg = "#8E86B6" }
+          h.Whitespace = { fg = "#C4B893" }
+
+          -- Headline-ish groups (more “ink”)
+          h.Identifier = { fg = "#2A0A6B" }
+          h.Function = { fg = "#2A0A6B", bold = true }
+          h.Keyword = { fg = "#B22F27", bold = true }
+          h.Statement = { fg = "#A67611" }
+          h.Type = { fg = "#00836C", bold = true }
+          h.Constant = { fg = "#C77796" }
+          h.String = { fg = "#008E7A" }
+          h.Number = { fg = "#B22F27" }
+
+          -- Diagnostics (crisper)
+          h.DiagnosticError = { fg = "#B22F27" }
+          h.DiagnosticWarn = { fg = "#A67611" }
+          h.DiagnosticInfo = { fg = "#2A0A6B" }
+          h.DiagnosticHint = { fg = "#00836C" }
+
+          -- Underlines/links
+          h.Underlined = { fg = "#2A0A6B", underline = true }
         else
-          h.Visual = { bg = "#330D81" } -- Selection (Dark)
-          h.Cursor = { fg = "#110034", bg = "#8217FF" } -- Cursor (Dark)
+          -- DARK (keep your previous feel)
+          h.Visual = { bg = "#330D81" }
+          h.Cursor = { fg = "#110034", bg = "#8217FF" }
           h.NormalFloat = { bg = "#0B0026", fg = "#F3F0DF" }
           h.IncSearch = { bg = "#FFD44F", fg = "#110034" }
           h.Search = { bg = "#FFD44F", fg = "#110034" }
-          h.Underlined = { fg = "#9A67FF", underline = true } -- Link (Dark)
+          h.Underlined = { fg = "#9A67FF", underline = true }
+          h.LineNr = { fg = "#6F66A0" }
+          h.CursorLineNr = { fg = "#FFE680", bold = true }
         end
       end,
     },
