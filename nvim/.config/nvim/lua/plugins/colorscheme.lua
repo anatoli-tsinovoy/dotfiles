@@ -48,7 +48,8 @@ return {
         local is_light = (vim.o.background == "light")
         if is_light then
           -- Core UI
-          h.Normal = { fg = "#0B0026", bg = "#F3F0DF" }
+          -- h.Normal = { fg = "", bg = "#F3F0DF" }
+          h.Normal = { fg = "#0B0026" }
           h.NormalNC = { fg = "#0B0026", bg = "#F3F0DF" }
           h.NormalFloat = { fg = "#0B0026", bg = "#E1DAC0" }
           h.FloatBorder = { fg = "#2A0A6B", bg = "#E1DAC0" }
