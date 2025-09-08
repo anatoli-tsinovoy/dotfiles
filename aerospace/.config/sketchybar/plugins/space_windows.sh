@@ -8,7 +8,7 @@ reload_workspace_icon() {
   local outvar=$2
   local args_=()
   apps=""
-  while read -r sid app_name; do
+  while read -r sid ws_is_focused app_name; do
     if [ "$sid" = "$3" ]; then
       apps+="$app_name"$'\n'
     fi
@@ -53,9 +53,23 @@ reload_workspace_icon() {
 }
 
 # START_TIME=$(gdate +%s%3N)
-ALL_APPS=$(aerospace list-windows --all --format '%{workspace} %{app-name}')
+ALL_APPS=$(aerospace list-windows --all --format '%{workspace} %{workspace-is-focused} %{app-name}')
 # this should be enough actually $(aerospace list-windows --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id} %{app-name}')
 ALL_AS_WS=$(aerospace list-workspaces --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id}')
+
+if [ "$SENDER" = "aerospace_focus_change" ]; then
+  echo ""
+  # CURRENT_FOCUS=
+  # while read -r sid ws_is_focused app_names; do
+  #   if [ "$ws_if_focused" = "true" ]; then
+  #     CURRENT_FOCUS=$sid
+  #   fi
+  # done <<<"${ALL_APPS}"
+  # if [ -z $CURRENT_FOCUS ]; then
+  #   echo ""
+  #   # echo "GOTEM 2" >>~/aaaa
+  # fi
+fi
 
 if [ "$SENDER" = "front_app_switched" ]; then
   while IFS=" " read -r sid is_focused is_visible as_monitor; do
@@ -90,7 +104,7 @@ fi
 
 if [ "$SENDER" = "aerospace_workspace_change" ]; then
   AS_NONEMPTY_WS=""
-  while read -r sid app_names; do
+  while read -r sid ws_is_focused app_names; do
     AS_NONEMPTY_WS+="$sid"$'\n'
   done <<<"${ALL_APPS}"
   AS_NONEMPTY_WS=" ${AS_NONEMPTY_WS//$'\n'/ }"

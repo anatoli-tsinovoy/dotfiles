@@ -162,3 +162,5 @@ eval "$(uv generate-shell-completion zsh)"
 if [ $IS_CURSOR_TERMINAL -eq 0 ]; then
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

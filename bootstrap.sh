@@ -34,6 +34,8 @@ main() {
     defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
     defaults write -g AppleMenuBarVisibleInFullscreen -bool false
     defaults write NSGlobalDomain _HIHideMenuBar -bool true
+    defaults write -g ApplePressAndHoldEnabled -bool false
+    defaults write -g NSWindowShouldDragOnGesture -bool true
     killall SystemUIServer
   fi
 

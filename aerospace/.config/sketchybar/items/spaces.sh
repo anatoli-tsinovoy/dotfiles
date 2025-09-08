@@ -80,6 +80,7 @@ args+=(--set space_creator "${space_creator[@]}")
 args+=(--add item as_ws_changer left)
 args+=(--set as_ws_changer drawing=off updates=on script="$PLUGIN_DIR/space_windows.sh")
 args+=(--subscribe as_ws_changer aerospace_workspace_change)
+args+=(--subscribe as_ws_changer aerospace_focus_change)
 args+=(--subscribe as_ws_changer aerospace_monitor_move)
 args+=(--subscribe as_ws_changer front_app_switched)
 

@@ -118,5 +118,13 @@
   "[github-actions-workflow]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "remote.SSH.remotePlatform": {
+    "Simply-Workstation": "linux"
+  },
+  "workbench.settings.openDefaultKeybindings": true,
+  "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
   "terminal.integrated.gpuAcceleration": "off"
 }
