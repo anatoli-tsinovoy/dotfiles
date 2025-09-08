@@ -94,3 +94,5 @@ sketchybar --hotload on
 sketchybar --update
 
 echo "sketchybar configuation loaded.."
+
+source "$ITEM_DIR/dark-light.sh"
