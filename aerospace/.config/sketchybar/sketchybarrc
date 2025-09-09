@@ -66,6 +66,8 @@ defaults=(
 
 sketchybar --default "${defaults[@]}"
 
+source "$ITEM_DIR/dark_light.sh"
+
 # Left (LTR)
 source "$ITEM_DIR/apple.sh"
 source "$ITEM_DIR/spaces.sh"
