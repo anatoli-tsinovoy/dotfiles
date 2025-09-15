@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source "$CONFIG_DIR/colors.sh"
-read -a AS_TO_SB <<<"$(sketchybar --query AS_TO_SB | jq -r '.label.value')"
+read -a AS_TO_SB <<<"$(sketchybar --query DISPLAY_CHANGE | jq -r '.label.value')"
 
 reload_workspace_icon() {
   local all_apps=$1

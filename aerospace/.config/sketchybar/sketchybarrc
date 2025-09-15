@@ -67,12 +67,12 @@ defaults=(
 sketchybar --default "${defaults[@]}"
 
 source "$ITEM_DIR/dark_light.sh"
+source "$ITEM_DIR/display_changes.sh"
 
 # Left (LTR)
 source "$ITEM_DIR/apple.sh"
 source "$ITEM_DIR/spaces.sh"
 source "$ITEM_DIR/front_app.sh"
-#source "$ITEM_DIR/yabai.sh"
 
 # Center
 # source "$ITEM_DIR/spotify.sh"

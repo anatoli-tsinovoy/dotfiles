@@ -1,7 +1,5 @@
 #!/bin/bash
-#TODO: Update the monitor listing automatically somehow
-source "$CONFIG_DIR/plugins/map_monitors.sh"
-read -a AS_TO_SB <<<"$(sketchybar --query AS_TO_SB | jq -r '.label.value')"
+read -a AS_TO_SB <<<"$(sketchybar --query DISPLAY_CHANGE | jq -r '.label.value')"
 AEROSPACE_FOCUSED_WS=$(aerospace list-workspaces --focused)
 
 args=()
