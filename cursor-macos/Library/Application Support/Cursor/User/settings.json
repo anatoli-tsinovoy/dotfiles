@@ -126,5 +126,6 @@
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1
   },
+  "cursorpyright.shouldImportPylanceSettings": "never",
   "terminal.integrated.gpuAcceleration": "off"
 }
