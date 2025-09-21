@@ -135,8 +135,8 @@ automatically-unhide-macos-hidden-apps = true
 
     # Applications
     alt-g = 'exec-and-forget open -a "Google Chrome"'
-    alt-t = 'exec-and-forget open -a "iTerm"'
-    alt-shift-t = 'exec-and-forget open -a "iTerm" ~'
+    alt-t = 'exec-and-forget open -a "Warp"'
+    alt-shift-t = 'exec-and-forget open -a "Warp" ~'
     alt-c = 'exec-and-forget open -a "Cursor"'
     alt-m = 'exec-and-forget open -a "Spotify"'
     alt-v = 'exec-and-forget open -a "WhatsApp"'
