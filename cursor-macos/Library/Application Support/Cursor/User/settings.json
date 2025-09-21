@@ -58,7 +58,9 @@
   "vscode_vibrancy.opacity": 0.0,
   "vscode_vibrancy.preferedDarkTheme": "Default Dark",
   "vscode_vibrancy.preferedLightTheme": "Default Light",
-  "workbench.colorTheme": "Default Dark+",
+  "vscode_vibrancy.imports": [
+    "/Users/anatoli/Documents/dotfiles/cursor-macos/Library/Application Support/Cursor/User/LightModified.css"
+  ],
   "workbench.preferredDarkColorTheme": "Default Dark+",
   "workbench.preferredLightColorTheme": "Default Light+",
   "vscode_vibrancy.theme": "Default Light",
@@ -123,9 +125,9 @@
   },
   "workbench.settings.openDefaultKeybindings": true,
   "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+  "cursorpyright.shouldImportPylanceSettings": "never",
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1
   },
-  "cursorpyright.shouldImportPylanceSettings": "never",
   "terminal.integrated.gpuAcceleration": "off"
 }

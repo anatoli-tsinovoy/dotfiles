@@ -56,8 +56,8 @@ main() {
   # stow -t ~ nvim
   stow --adopt -t ~ nvim git
   if [[ "$os" == "mac" ]]; then
-    # stow -t ~ aerospace iterm2 cursor-macos
-    stow --adopt -t ~ aerospace iterm2 cursor-macos
+    # stow -t ~ aerospace iterm2 cursor-macos warp-macos
+    stow --adopt -t ~ aerospace iterm2 cursor-macos warp-macos
     # Apply macOS defaults if you have them:
     [[ -x mac/.macos ]] && bash mac/.macos || true
   elif [[ 1 == 0 ]]; then

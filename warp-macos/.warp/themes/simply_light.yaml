@@ -1,0 +1,25 @@
+name: Simply (Light)
+accent: '#330d81'
+cursor: '#8217ff'
+background: '#f9f9e8'
+foreground: '#110034'
+details: lighter
+terminal_colors:
+  bright:
+    black: '#330d81'
+    blue: '#6734cd'
+    cyan: '#009a81'
+    green: '#00b39a'
+    magenta: '#e69ab3'
+    red: '#cc3e34'
+    white: '#f3f0df'
+    yellow: '#e6b334'
+  normal:
+    black: '#110034'
+    blue: '#330d81'
+    cyan: '#00b39a'
+    green: '#009a81'
+    magenta: '#e69ab3'
+    red: '#cc3e34'
+    white: '#f3f0df'
+    yellow: '#cd9a1b'

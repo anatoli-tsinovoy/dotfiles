@@ -111,9 +111,6 @@ else
 fi
 
 
-source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
-source /opt/homebrew/opt/chruby/share/chruby/auto.sh
-
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
