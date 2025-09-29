@@ -8,7 +8,7 @@ after-startup-command = [
 ]
 
 exec-on-workspace-change = [
-  '/bin/bash', '-c',
+  '/usr/bin/env', 'bash', '-c',
   'sketchybar --trigger aerospace_workspace_change AS_FOCUSED_WS=$AEROSPACE_FOCUSED_WORKSPACE AS_PREV_WS=$AEROSPACE_PREV_WORKSPACE',
 ]
 
@@ -135,8 +135,8 @@ automatically-unhide-macos-hidden-apps = true
 
     # Applications
     alt-g = 'exec-and-forget open -a "Google Chrome"'
-    alt-t = 'exec-and-forget open -a "Warp"'
-    alt-shift-t = 'exec-and-forget open -a "Warp" ~'
+    alt-t = 'exec-and-forget open -a "iTerm"'
+    alt-shift-t = 'exec-and-forget open -a "iTerm" ~'
     alt-c = 'exec-and-forget open -a "Cursor"'
     alt-m = 'exec-and-forget open -a "Spotify"'
     alt-v = 'exec-and-forget open -a "WhatsApp"'
@@ -159,7 +159,7 @@ automatically-unhide-macos-hidden-apps = true
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
     alt-shift-tab = [
       'move-workspace-to-monitor --wrap-around next',
-      'exec-and-forget /bin/bash -c "sketchybar --trigger aerospace_monitor_move"',
+      'exec-and-forget /usr/bin/env bash -c "sketchybar --trigger aerospace_monitor_move"',
     ]
 
     ctrl-alt-up = 'fullscreen'

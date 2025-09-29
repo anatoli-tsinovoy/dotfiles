@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 source "$CONFIG_DIR/plugins/map_monitors.sh"
 current_displays="$(map_monitors)"
 previous_displays="$(sketchybar --query DISPLAY_CHANGE | jq -r '.label.value')"

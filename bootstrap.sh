@@ -23,7 +23,7 @@ main() {
         warn "Xcode Command Line Tools not found. Installing (you may see a popup)…"
         xcode-select --install || true
       fi
-      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       eval "$(/opt/homebrew/bin/brew shellenv)" # Apple Silicon default
     fi
     brew bundle --file="$SCRIPT_DIR/Brewfile" || true

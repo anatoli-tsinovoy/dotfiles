@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 read -a AS_TO_SB <<<"$(sketchybar --query DISPLAY_CHANGE | jq -r '.label.value')"
 AEROSPACE_FOCUSED_WS=$(aerospace list-workspaces --focused)
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 detect_theme() {
   if defaults read -g AppleInterfaceStyle &>/dev/null; then

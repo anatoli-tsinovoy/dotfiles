@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 map_monitors() {
   local -a NSSCREEN_TO_DIRECT
   local -a DIRECT_TO_SB

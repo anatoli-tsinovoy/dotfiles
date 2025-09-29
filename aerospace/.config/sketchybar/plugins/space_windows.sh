@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source "$CONFIG_DIR/colors.sh"
 read -a AS_TO_SB <<<"$(sketchybar --query DISPLAY_CHANGE | jq -r '.label.value')"

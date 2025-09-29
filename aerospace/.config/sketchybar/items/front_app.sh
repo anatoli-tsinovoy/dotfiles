@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 front_app=(
   icon.background.drawing=on

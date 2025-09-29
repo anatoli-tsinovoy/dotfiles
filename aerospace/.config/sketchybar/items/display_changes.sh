@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 source "$CONFIG_DIR/plugins/map_monitors.sh"
 # Invisible watcher that stores the current connected displays state in its label.
 # Create the invisible item and attach the plugin script

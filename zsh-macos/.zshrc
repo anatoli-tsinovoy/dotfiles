@@ -160,4 +160,48 @@ if [ $IS_CURSOR_TERMINAL -eq 0 ]; then
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 fi
 
+bindkey -v
+bindkey -v '^?' backward-delete-char
+bindkey '^K' kill-line
+bindkey '^Y' yank
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Quick Action runner function
+quickaction() {
+  if [ $# -ne 2 ]; then
+    echo "Usage: quickaction \"Service Name\" file"
+    echo "Available services:"
+    ls -1 ~/Library/Services/ | sed 's/\.workflow$//'
+    return 1
+  fi
+
+  local service_name="$1"
+  local input_file="$2"
+
+  if [ ! -d ~/Library/Services/"$service_name.workflow" ]; then
+    echo "Service '$service_name' not found"
+    echo "Available services:"
+    ls -1 ~/Library/Services/ | sed 's/\.workflow$//'
+    return 1
+  fi
+  local absolute_path
+  
+  # Convert relative path to absolute path
+  if [[ "$input_file" = /* ]]; then
+    # Already absolute path
+    absolute_path="$input_file"
+  else
+    # Convert relative path to absolute path
+    absolute_path="$(cd "$(dirname "$input_file")" && pwd)/$(basename "$input_file")"
+  fi
+  
+  automator -i "$absolute_path" ~/Library/Services/"$service_name.workflow"
+}
+
+git-lfs-dl() {
+  local input_file="$1"
+  quickaction "Download from Git LFS" $input_file
+}
+
+

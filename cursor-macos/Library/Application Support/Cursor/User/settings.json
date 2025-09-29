@@ -65,7 +65,7 @@
   "workbench.preferredLightColorTheme": "Default Light+",
   "vscode_vibrancy.theme": "Default Light",
   "workbench.colorCustomizations": {
-    "[Default Dark]": {
+    "[Default Dark+]": {
       "terminal.ansiBlack": "#110034",
       "terminal.ansiRed": "#FF4F44",
       "terminal.ansiGreen": "#00C8AB",

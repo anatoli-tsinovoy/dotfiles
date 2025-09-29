@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Invisible watcher that stores the current theme in its label.
 # Create the invisible item and attach the plugin script

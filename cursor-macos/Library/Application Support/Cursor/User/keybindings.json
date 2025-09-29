@@ -19,10 +19,5 @@
     "key": "cmd+right",
     "command": "-editor.action.inlineSuggest.acceptNextWord",
     "when": "cppSuggestion && !editorReadonly || inlineSuggestionVisible && !editorReadonly"
-  },
-  {
-    "key": "ctrl+r",
-    "command": "-workbench.action.tasks.reRunTask",
-    "when": "taskCommandsRegistered && !terminalFocus"
   }
 ]
