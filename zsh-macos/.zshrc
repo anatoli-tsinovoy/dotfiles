@@ -164,6 +164,10 @@ bindkey -v
 bindkey -v '^?' backward-delete-char
 bindkey '^K' kill-line
 bindkey '^Y' yank
+bindkey -M viins '^A' beginning-of-line
+bindkey -M vicmd '^A' beginning-of-line
+bindkey -M viins '^E' end-of-line
+bindkey -M vicmd '^E' end-of-line
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
