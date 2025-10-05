@@ -22,6 +22,8 @@ launchctl unload -F /System/Library/LaunchAgents/com.apple.OSDUIHelper.plist >/d
 bar=(
   height=45
   color=$BAR_COLOR
+  color.alpha=0.5
+  blur_radius=16
   border_width=2
   border_color=$BAR_BORDER_COLOR
   shadow=off
