@@ -64,3 +64,4 @@ syntax on
 set number
 
 set nocompatible
+set rtp+=/opt/homebrew/opt/fzf
