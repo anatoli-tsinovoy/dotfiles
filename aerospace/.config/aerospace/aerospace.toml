@@ -132,6 +132,12 @@ automatically-unhide-macos-hidden-apps = true
     alt-7 = 'workspace 7'
     alt-8 = 'workspace 8'
     alt-9 = 'workspace 9'
+    ctrl-alt-1 = 'workspace a'
+    ctrl-alt-2 = 'workspace b'
+    ctrl-alt-3 = 'workspace c'
+    ctrl-alt-4 = 'workspace d'
+    ctrl-alt-5 = 'workspace e'
+    ctrl-alt-6 = 'workspace f'
 
     # Applications
     alt-g = 'exec-and-forget open -a "Google Chrome"'

@@ -126,10 +126,10 @@ if [ "$SENDER" = "aerospace_workspace_change" ]; then
 
   args=()
   for i in $AS_EMPTY_WS; do
-    if [ "$i" -eq $AS_FOCUSED_WS ]; then
+    if [ "$i" = "$AS_FOCUSED_WS" ]; then
       continue
     fi
-    if [ "$i" -eq $AS_PREV_WS ]; then
+    if [ "$i" = "$AS_PREV_WS" ]; then
       AS_PREV_WS_IS_EMPTY=1
     fi
     args+=(--set space.$i display=0)
