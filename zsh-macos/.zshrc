@@ -94,7 +94,6 @@ plugins=(
 autoload -Uz compinit && compinit
 
 source $ZSH/oh-my-zsh.sh
-
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -119,9 +118,6 @@ fi
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 #
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
 alias python="/opt/homebrew/bin/python3"
 # alias pip="/opt/homebrew/bin/pip3"
 
@@ -133,10 +129,13 @@ export DOCKER_HOST=unix://$(podman machine inspect --format '{{.ConnectionInfo.P
 alias code='cursor'
 alias ls='eza -la --icons --group-directories-first'
 alias vim='nvim'
-alias bat="bat --theme auto:system --theme-dark default --theme-light GitHub"
+alias bat="bat --color=always --theme auto:system --theme-dark default --theme-light GitHub"
+fbat="bat --color=always --theme auto:system --theme-dark default --theme-light GitHub"
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
-alias fzf='fzf --preview "bat --color=always --style=numbers --theme auto:system --theme-dark default --theme-light GitHub {}"'
+
+alias fzf='fzf --preview-window=right:60%:wrap --preview "${fbat} --style=numbers {} 2>/dev/null || printf %s "{}" | ${fbat} --wrap=auto -l zsh -p"'
+# alias fzf='fzf --preview "bat --color=always --style=numbers --theme auto:system --theme-dark default --theme-light GitHub {}"'
 alias lzd='lazydocker'
 
 
@@ -170,6 +169,21 @@ bindkey -M viins '^E' end-of-line
 bindkey -M vicmd '^E' end-of-line
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+autoload -Uz up-line-or-beginning-search
+autoload -Uz down-line-or-beginning-search
+bindkey -M viins '^R' fzf-history-widget
+bindkey -M vicmd '^R' vi-redo
+fzf-history-widget() {
+  # Use fzf to select a command from history
+  local selected
+  selected=$(fc -l 1 | fzf --height 40% --reverse --tac | sed 's/^[ 0-9]*//')
+  if [[ -n $selected ]]; then
+    BUFFER=$selected
+    CURSOR=$#BUFFER
+    zle redisplay
+  fi
+}
+zle -N fzf-history-widget
 
 # Quick Action runner function
 quickaction() {
@@ -204,8 +218,11 @@ quickaction() {
 }
 
 git-lfs-dl() {
-  local input_file="$1"
-  quickaction "Download from Git LFS" $input_file
+  for input_file in "$@"; do
+    quickaction "Download from Git LFS" "$input_file"
+  done
 }
 
+eval "$(zoxide init zsh --cmd cd)"
 
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"

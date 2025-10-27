@@ -121,7 +121,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "remote.SSH.remotePlatform": {
-    "Simply-Workstation": "linux"
+    "Simply-Workstation": "linux",
+    "Simply-Workstation-TailScale": "linux"
   },
   "workbench.settings.openDefaultKeybindings": true,
   "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
