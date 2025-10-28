@@ -42,7 +42,7 @@
   autoupdate = true
 [core]
   excludesfile = ~/.gitignore
-  pager = delta
+  pager = emojify | delta
   editor = vim
 	autocrlf = input
 [rebase]

@@ -8,13 +8,6 @@
   "editor.semanticHighlighting.enabled": true,
   "jupyter.askForKernelRestart": false,
   "jupyter.widgetScriptSources": ["jsdelivr.com", "unpkg.com"],
-  "semantic-highlighting.colors": [
-    "#529D52",
-    "#BE7070",
-    "#3D7676",
-    "#BE9970",
-    "#9D527C"
-  ],
   "python.analysis.typeCheckingMode": "off",
   "[python]": {
     "editor.formatOnSave": true,
@@ -130,5 +123,17 @@
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1
   },
+  "semantic-highlighting.colors": [
+    // "#CC3E34", // Red
+    // "#00C8AB", // Green
+    // "#CD9A1B", // Yellow
+    // "#6734CD", // Purple
+    // "#E69AB3" // Pink
+    "#B5544E", // Red
+    "#33BCA7", // Green
+    "#B8953E", // Yellow
+    "#6D50B5", // Purple
+    "#E69AB3" // Pink
+  ],
   "terminal.integrated.gpuAcceleration": "off"
 }
