@@ -37,14 +37,14 @@ body {
 }
 
 .monaco-list.settings-toc-tree .monaco-list-row.focused {
-  outline-color: rgba(255, 255, 255,0.6) !important;
+  outline-color: rgba(255, 255, 255, 0.6) !important;
 }
 
 .monaco-list.settings-toc-tree .monaco-list-row.selected,
 .monaco-list.settings-toc-tree .monaco-list-row.focused,
 .monaco-list .monaco-list-row.selected,
 .monaco-list.settings-toc-tree:not(.drop-target) .monaco-list-row:hover:not(.selected):not(.focused) {
-  background-color: rgb(228, 230, 241,0.6) !important;
+  background-color: rgb(228, 230, 241, 0.6) !important;
 }
 
 .monaco-list.settings-editor-tree .monaco-list-row {
@@ -53,7 +53,7 @@ body {
 }
 
 .monaco-inputbox {
-  background-color: rgba(228, 230, 241,0.2) !important;
+  background-color: rgba(228, 230, 241, 0.2) !important;
 }
 
 .monaco-editor .selected-text {
@@ -73,7 +73,7 @@ body {
 }
 
 .monaco-editor .view-overlays .current-line {
-  border-color: rgba(41, 41, 41,0.2) !important;
+  border-color: rgba(41, 41, 41, 0.2) !important;
 }
 
 .extension-editor,

@@ -4,13 +4,16 @@
     "vimMode": true
   },
   "model": {
-    "modelId": "gpt-5",
-    "displayModelId": "gpt-5",
-    "displayName": "OpenAI GPT-5",
-    "displayNameShort": "GPT-5",
-    "aliases": []
+    "modelId": "claude-4-opus",
+    "displayModelId": "opus-4.1",
+    "displayName": "Claude 4.1 Opus",
+    "displayNameShort": "Opus 4.1",
+    "aliases": [
+      "opus",
+      "opus-4.1"
+    ]
   },
-  "hasChangedDefaultModel": false,
+  "hasChangedDefaultModel": true,
   "permissions": {
     "allow": [
       "Shell(ls)"
@@ -20,6 +23,6 @@
   "privacyCache": {
     "ghostMode": true,
     "privacyMode": 1,
-    "updatedAt": 1754816519624
+    "updatedAt": 1758005141733
   }
 }
