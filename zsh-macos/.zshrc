@@ -168,22 +168,8 @@ bindkey -M vicmd '^A' beginning-of-line
 bindkey -M viins '^E' end-of-line
 bindkey -M vicmd '^E' end-of-line
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-autoload -Uz up-line-or-beginning-search
-autoload -Uz down-line-or-beginning-search
-bindkey -M viins '^R' fzf-history-widget
-bindkey -M vicmd '^R' vi-redo
-fzf-history-widget() {
-  # Use fzf to select a command from history
-  local selected
-  selected=$(fc -l 1 | fzf --height 40% --reverse --tac | sed 's/^[ 0-9]*//')
-  if [[ -n $selected ]]; then
-    BUFFER=$selected
-    CURSOR=$#BUFFER
-    zle redisplay
-  fi
-}
-zle -N fzf-history-widget
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
 
 # Quick Action runner function
 quickaction() {
