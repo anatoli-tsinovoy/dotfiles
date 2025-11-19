@@ -7,19 +7,15 @@ reload_workspace_icon() {
   local all_apps=$1
   local outvar=$2
   local args_=()
-  apps=""
+  apps=()
   while read -r sid ws_is_focused app_name; do
     if [ "$sid" = "$3" ]; then
-      apps+="$app_name"$'\n'
+      apps+=("$app_name")
     fi
   done <<<"$all_apps"
-  apps=${apps%$'\n'}
 
-  icon_strip=" "
-  if [ "${apps}" != "" ]; then
-    while read -r app; do
-      icon_strip+=" $($CONFIG_DIR/plugins/icon_map.sh "$app")"
-    done <<<"$apps"
+  if [[ ${#apps[@]} -gt 0 ]]; then
+    icon_strip="$($CONFIG_DIR/plugins/icon_map.sh "${apps[@]}")"
   else
     icon_strip=" —"
   fi

@@ -42,12 +42,9 @@ while read -r i as_monitor; do
   args+=(--add space space.$sid left)
   args+=(--subscribe space.$sid mouse.clicked)
 
-  apps=$(aerospace list-windows --workspace "$sid" </dev/null | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
-  icon_strip=" "
-  if [ "${apps}" != "" ]; then
-    while read -r app; do
-      icon_strip+=" $($CONFIG_DIR/plugins/icon_map.sh "$app")"
-    done <<<"${apps}"
+  mapfile -t apps <<<$(aerospace list-windows --workspace "$sid" </dev/null | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
+  if [[ ${#apps} -gt 0 ]]; then
+    icon_strip="$($CONFIG_DIR/plugins/icon_map.sh "${apps[@]}")"
   else
     icon_strip=" —"
   fi
