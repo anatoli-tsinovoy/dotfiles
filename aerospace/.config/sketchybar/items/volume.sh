@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 volume_slider=(
   script="$PLUGIN_DIR/volume.sh"
@@ -17,23 +17,14 @@ volume_icon=(
   click_script="$PLUGIN_DIR/volume_click.sh"
   icon.color=$GREY
   icon.font="$FONT:Regular:14.0"
-  label.width=25
+  label.width=50
   label.align=left
   label.font="$FONT:Regular:14.0"
 )
 
-status_bracket=(
-  background.color=$BACKGROUND_1
-  background.border_color=$BACKGROUND_2
-)
-
-sketchybar --add slider volume right            \
-           --set volume "${volume_slider[@]}"   \
-           --subscribe volume volume_change     \
-                              mouse.clicked     \
-           --add item volume_icon right         \
-           --set volume_icon "${volume_icon[@]}"
-
-sketchybar --add bracket status brew github.bell wifi volume_icon \
-           --set status "${status_bracket[@]}"
-
+sketchybar --add slider volume right \
+  --set volume "${volume_slider[@]}" \
+  --subscribe volume volume_change \
+  mouse.clicked \
+  --add item volume_icon right \
+  --set volume_icon "${volume_icon[@]}"

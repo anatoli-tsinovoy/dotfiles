@@ -41,11 +41,11 @@ fi
 # updated with the current battery status
 sketchybar --set "$NAME" icon="$ICON" label="${PERCENTAGE}%" icon.color=${ICON_COLOR}
 if [[ $SENDER == "mouse.clicked" ]]; then
-  LABEL_VISIBLE=$(sketchybar --query battery | jq .label.drawing)
+  LABEL_VISIBLE=$(sketchybar --query battery | jq -r ".label.drawing")
 
-  if [[ "$LABEL_VISIBLE" == '"off"' ]]; then
+  if [[ "$LABEL_VISIBLE" == "off" ]]; then
     sketchybar --set battery label.drawing="on"
-  elif [[ "$LABEL_VISIBLE" == '"on"' ]]; then
+  elif [[ "$LABEL_VISIBLE" == "on" ]]; then
     sketchybar --set battery label.drawing="off"
   fi
 fi

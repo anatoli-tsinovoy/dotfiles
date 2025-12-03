@@ -27,18 +27,18 @@ toggle_devices() {
   COUNTER=0
   CURRENT="$(SwitchAudioSource -t output -c)"
   while IFS= read -r device; do
-    COLOR=$GREY
+    COLOR=$BLACK
     if [ "${device}" = "$CURRENT" ]; then
-      COLOR=$WHITE
+      COLOR=$GREEN
     fi
-    args+=(--add item volume.device.$COUNTER popup."$NAME" \
-           --set volume.device.$COUNTER label="${device}" \
-                                        label.color="$COLOR" \
-                 click_script="SwitchAudioSource -s \"${device}\" && sketchybar --set /volume.device\.*/ label.color=$GREY --set \$NAME label.color=$WHITE --set $NAME popup.drawing=off")
-    COUNTER=$((COUNTER+1))
-  done <<< "$(SwitchAudioSource -a -t output)"
+    args+=(--add item volume.device.$COUNTER popup."$NAME"
+      --set volume.device.$COUNTER label="${device}"
+      label.color="$COLOR"
+      click_script="SwitchAudioSource -s \"${device}\" && sketchybar --set /volume.device\.*/ label.color=$GREY --set \$NAME label.color=$WHITE --set $NAME popup.drawing=off")
+    COUNTER=$((COUNTER + 1))
+  done <<<"$(SwitchAudioSource -a -t output)"
 
-  sketchybar -m "${args[@]}" > /dev/null
+  sketchybar -m "${args[@]}" >/dev/null
 }
 
 if [ "$BUTTON" = "right" ] || [ "$MODIFIER" = "shift" ]; then
