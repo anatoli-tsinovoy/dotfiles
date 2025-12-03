@@ -11,4 +11,4 @@ battery=(
 )
 sketchybar --add item battery right \
   --set battery "${battery[@]}" \
-  --subscribe battery power_source_change system_woke
+  --subscribe battery power_source_change system_woke mouse.clicked

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 source "$CONFIG_DIR/colors.sh"
 
@@ -40,3 +40,12 @@ fi
 # The item invoking this script (name $NAME) will get its icon and label
 # updated with the current battery status
 sketchybar --set "$NAME" icon="$ICON" label="${PERCENTAGE}%" icon.color=${ICON_COLOR}
+if [[ $SENDER == "mouse.clicked" ]]; then
+  LABEL_VISIBLE=$(sketchybar --query battery | jq .label.drawing)
+
+  if [[ "$LABEL_VISIBLE" == '"off"' ]]; then
+    sketchybar --set battery label.drawing="on"
+  elif [[ "$LABEL_VISIBLE" == '"on"' ]]; then
+    sketchybar --set battery label.drawing="off"
+  fi
+fi
