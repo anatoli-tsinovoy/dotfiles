@@ -585,7 +585,7 @@ function __icon_map() {
   "Mattermost")
     icon_result=":mattermost:"
     ;;
-  "Google Meet")
+  "Google Meet" | "Meet")
     icon_result=":meet:"
     ;;
   "Messages" | "信息" | "Nachrichten" | "メッセージ")

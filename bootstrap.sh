@@ -87,6 +87,13 @@ main() {
     echo "Placeholder for linux distros"
   fi
 
+  # Compile helpers
+  if [[ "$os" == "mac" ]]; then
+    swiftc $SCRIPT_DIR/aerospace/.config/aerospace/winbounds.swift -o $SCRIPT_DIR/.config/aerospace/winbounds
+  elif [[ 1 == 0 ]]; then
+    echo "Placeholder for linux distros"
+  fi
+
   echo "Done. Open a new shell."
 }
 
