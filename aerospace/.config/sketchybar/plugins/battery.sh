@@ -41,11 +41,24 @@ fi
 # updated with the current battery status
 sketchybar --set "$NAME" icon="$ICON" label="${PERCENTAGE}%" icon.color=${ICON_COLOR}
 if [[ $SENDER == "mouse.clicked" ]]; then
-  LABEL_VISIBLE=$(sketchybar --query battery | jq -r ".label.drawing")
+  # TODO: We need to somehow allow a second click to cancel the whole thing
+  LOCKDIR="/tmp/$(basename "$0").lockdir"
 
-  if [[ "$LABEL_VISIBLE" == "off" ]]; then
-    sketchybar --set battery label.drawing="on"
-  elif [[ "$LABEL_VISIBLE" == "on" ]]; then
-    sketchybar --set battery label.drawing="off"
+  if ! mkdir "$LOCKDIR" 2>/dev/null; then
+    # Another instance is running (still in its sleep 5)
+    exit 0
   fi
+
+  # Ensure lock is released on exit
+  trap 'rmdir "$LOCKDIR"' EXIT
+
+  for i in 0 1; do
+    LABEL_VISIBLE=$(sketchybar --query battery | jq -r ".label.drawing")
+    if [[ "$LABEL_VISIBLE" == "off" ]]; then
+      sketchybar --set battery label.drawing="on"
+    elif [[ "$LABEL_VISIBLE" == "on" ]]; then
+      sketchybar --set battery label.drawing="off"
+    fi
+    ((i == 0)) && sleep 5
+  done
 fi
