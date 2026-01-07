@@ -69,7 +69,7 @@ else
   export BATTERY_2=0xffcd9a1b
   export BATTERY_3=0xffe6b334
   export BATTERY_4=0xffcc3e34
-  export BATTERY_5=xffcc3e34
+  export BATTERY_5=0xffcc3e34
 fi
 
 ### Catppuccin

@@ -6,4 +6,5 @@ source "$CONFIG_DIR/plugins/map_monitors.sh"
 sketchybar --add item DISPLAY_CHANGE right \
   --set DISPLAY_CHANGE script="$PLUGIN_DIR/display_changes.sh" display=0 updates=on label="$(map_monitors)" \
   --add event display_changed \
-  --subscribe DISPLAY_CHANGE display_changed
+  --subscribe DISPLAY_CHANGE display_changed \
+  --subscribe DISPLAY_CHANGE system_woke

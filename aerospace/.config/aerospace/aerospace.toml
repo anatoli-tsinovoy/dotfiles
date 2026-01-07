@@ -266,7 +266,7 @@ run = ['move-node-to-workspace 4']
 
 [[on-window-detected]]
 if.app-id = 'com.spotify.client'
-run = ['move-node-to-workspace 5']
+run = ['move-node-to-workspace e']
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Cursor'
@@ -274,7 +274,7 @@ run = ['move-node-to-workspace 2']
 
 [[on-window-detected]]
 if.app-id = 'net.whatsapp.WhatsApp'
-run = ['move-node-to-workspace 6']
+run = ['move-node-to-workspace f']
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'YouTube'
