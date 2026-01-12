@@ -88,6 +88,13 @@ main() {
     echo "Placeholder for linux distros"
   fi
 
+  # Apply podman shim
+  if [[ "$os" == "mac" ]]; then
+    cp $SCRIPT_DIR/docker-shim.sh /opt/homebrew/bin/docker
+  elif [[ 1 == 0 ]]; then
+    echo "Placeholder for linux distros"
+  fi
+
   echo "Done. Open a new shell."
 }
 
