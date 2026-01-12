@@ -30,14 +30,9 @@ main() {
     brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
   fi
 
-  # mac System settings
+  # macOS system defaults
   if [[ "$os" == "mac" ]]; then
-    defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
-    defaults write -g AppleMenuBarVisibleInFullscreen -bool false
-    defaults write NSGlobalDomain _HIHideMenuBar -bool true
-    defaults write -g ApplePressAndHoldEnabled -bool false
-    defaults write -g NSWindowShouldDragOnGesture -bool true
-    killall SystemUIServer
+    bash "$SCRIPT_DIR/macos-defaults.sh"
   fi
 
   # Install GNU Stow
@@ -59,8 +54,6 @@ main() {
   if [[ "$os" == "mac" ]]; then
     # stow -t ~ aerospace iterm2 cursor-macos warp-macos
     stow --adopt -t ~ aerospace iterm2 cursor-macos warp-macos
-    # Apply macOS defaults if you have them:
-    [[ -x mac/.macos ]] && bash mac/.macos || true
   elif [[ 1 == 0 ]]; then
     echo "Placeholder for linux distros"
   fi

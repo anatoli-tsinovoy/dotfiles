@@ -21,7 +21,7 @@ apple_prefs=(
 apple_activity=(
   icon=$ACTIVITY
   label="Activity"
-  click_script="open -a iTerm /opt/homebrew/bin/btop && aerospace layout floating; $POPUP_OFF"
+  click_script="osascript -e 'tell application \"iTerm\" to create window with profile \"btop\"'; $POPUP_OFF"
 )
 
 apple_lock=(

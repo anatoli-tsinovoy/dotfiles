@@ -256,9 +256,15 @@ run = ['move-node-to-workspace 4']
 # 
 # run = ['join-with up']
 
-# [[on-window-detected]]
-# if.app-id = 'com.googlecode.iterm2'
-# run = ['move-node-to-workspace 1']
+# btop profile has title set immediately, so this matches before shell loads
+[[on-window-detected]]
+if.app-id = 'com.googlecode.iterm2'
+if.window-title-regex-substring = 'btop'
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.googlecode.iterm2'
+run = ['move-node-to-workspace b']
 
 # [[on-window-detected]]
 # if.app-id = 'com.google.Chrome'
