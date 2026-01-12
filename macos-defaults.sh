@@ -258,10 +258,10 @@ defaults write com.apple.TextInputMenu visible -bool true
 ###############################################################################
 
 # Disable reduce motion
-defaults write com.apple.universalaccess reduceMotion -bool false
+defaults write com.apple.universalaccess reduceMotion -bool false || true
 
 # Disable reduce transparency
-defaults write com.apple.universalaccess reduceTransparency -bool false
+defaults write com.apple.universalaccess reduceTransparency -bool false || true
 
 ###############################################################################
 # Kill affected applications                                                  #
