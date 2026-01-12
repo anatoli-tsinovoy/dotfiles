@@ -25,8 +25,9 @@ main() {
       fi
       /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       eval "$(/opt/homebrew/bin/brew shellenv)" # Apple Silicon default
+      eval "$(/opt/homebrew/bin/brew shellenv zsh)"
     fi
-    brew bundle --file="$SCRIPT_DIR/Brewfile" || true
+    brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
   fi
 
   # mac System settings
@@ -89,7 +90,7 @@ main() {
 
   # Compile helpers
   if [[ "$os" == "mac" ]]; then
-    swiftc $SCRIPT_DIR/aerospace/.config/aerospace/winbounds.swift -o $SCRIPT_DIR/.config/aerospace/winbounds
+    swiftc $SCRIPT_DIR/aerospace/.config/aerospace/winbounds.swift -o $SCRIPT_DIR/aerospace/.config/aerospace/winbounds
   elif [[ 1 == 0 ]]; then
     echo "Placeholder for linux distros"
   fi
