@@ -629,6 +629,15 @@
         "Alpha Component": 1,
         "Green Component": 0.94117647058823528
       }
+    },
+    {
+      "Name" : "btop",
+      "Guid" : "btop-floating-terminal",
+      "Custom Command" : "Yes",
+      "Command" : "/opt/homebrew/bin/btop",
+      "Title" : "btop",
+      "Allow Title Setting" : false
     }
   ]
 }
+
