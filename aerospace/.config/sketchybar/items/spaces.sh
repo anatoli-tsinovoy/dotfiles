@@ -20,7 +20,6 @@ while read -r i as_monitor; do
     SID_LABEL_HIGHLIGHT="false"
   fi
   space=(
-    space="$sid"
     icon="$sid"
     icon.highlight_color=$GREEN
     icon.padding_left=10

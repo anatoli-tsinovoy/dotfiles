@@ -16,19 +16,10 @@
 # export BG2=0xff414550
 # export THEME="DARK"
 
-if $(sketchybar --query DARK_LIGHT &>/dev/null); then
-  THEME=$(sketchybar --query DARK_LIGHT | jq -r '.label.value')
-fi
-if [ -z $THEME ]; then
-  if defaults read -g AppleInterfaceStyle &>/dev/null; then
-    # command succeeds and prints Dark
-    export THEME="DARK"
-  else
-    # for light mode command fails and prints some odd error
-    export THEME="LIGHT"
-  fi
+if defaults read -g AppleInterfaceStyle &>/dev/null; then
+  export THEME="DARK"
 else
-  export THEME=$THEME
+  export THEME="LIGHT"
 fi
 if [ $THEME = "DARK" ]; then
   # Simply Dark
