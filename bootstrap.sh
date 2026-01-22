@@ -50,7 +50,7 @@ main() {
   # Adopt existing files (moves them into the package and replaces with symlink).
   # Run once carefully; remove --adopt afterwards.
   # stow -t ~ nvim
-  stow --adopt -t ~ nvim git
+  stow --adopt -t ~ nvim git opencode
   if [[ "$os" == "mac" ]]; then
     # stow -t ~ aerospace iterm2 cursor-macos warp-macos
     stow --adopt -t ~ aerospace iterm2 cursor-macos warp-macos

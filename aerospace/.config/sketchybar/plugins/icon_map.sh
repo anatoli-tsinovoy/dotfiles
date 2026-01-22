@@ -1164,9 +1164,12 @@ function __icon_map() {
   esac
 }
 ### END-OF-ICON-MAP
-# Process all arguments in batch (eliminates subprocess overhead)
-for app_name in "$@"; do
-  __icon_map "$app_name"
-  echo -n "$icon_result "
-done
-echo # Final newline
+
+# Only run if executed directly (not sourced)
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  for app_name in "$@"; do
+    __icon_map "$app_name"
+    echo -n "$icon_result "
+  done
+  echo
+fi

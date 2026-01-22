@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 source "$CONFIG_DIR/colors.sh"
+source "$CONFIG_DIR/plugins/icon_map.sh"
 read -a AS_TO_SB <<<"$(sketchybar --query DISPLAY_CHANGE | jq -r '.label.value')"
 
 reload_workspace_icon() {
@@ -15,7 +16,11 @@ reload_workspace_icon() {
   done <<<"$all_apps"
 
   if [[ ${#apps[@]} -gt 0 ]]; then
-    icon_strip="$($CONFIG_DIR/plugins/icon_map.sh "${apps[@]}")"
+    icon_strip=""
+    for app in "${apps[@]}"; do
+      __icon_map "$app"
+      icon_strip+="$icon_result "
+    done
   else
     icon_strip=" —"
   fi

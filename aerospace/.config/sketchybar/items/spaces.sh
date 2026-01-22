@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+source "$CONFIG_DIR/plugins/icon_map.sh"
 read -a AS_TO_SB <<<"$(sketchybar --query DISPLAY_CHANGE | jq -r '.label.value')"
 AEROSPACE_FOCUSED_WS=$(aerospace list-workspaces --focused)
 
@@ -38,12 +39,16 @@ while read -r i as_monitor; do
     background.border_color=$SID_BORDER_COLOR
     script="$PLUGIN_DIR/space.sh"
   )
-  args+=(--add space space.$sid left)
+  args+=(--add item space.$sid left)
   args+=(--subscribe space.$sid mouse.clicked)
 
   mapfile -t apps <<<$(aerospace list-windows --workspace "$sid" </dev/null | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
-  if [[ ${#apps} -gt 0 ]]; then
-    icon_strip="$($CONFIG_DIR/plugins/icon_map.sh "${apps[@]}")"
+  if [[ ${#apps[@]} -gt 0 ]]; then
+    icon_strip=""
+    for app in "${apps[@]}"; do
+      __icon_map "$app"
+      icon_strip+="$icon_result "
+    done
   else
     icon_strip=" —"
   fi
