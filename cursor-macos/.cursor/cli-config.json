@@ -1,28 +1,41 @@
 {
+  "permissions": {
+    "allow": [
+      "Shell(ls)",
+      "Shell(cd)",
+      "Shell(uv add)",
+      "Shell(uv lock)",
+      "Shell(uv run)",
+      "Shell(uv sync)",
+      "Shell(grep)",
+      "Shell(tail)",
+      "Shell(aerospace)",
+      "Shell(which)"
+    ],
+    "deny": []
+  },
   "version": 1,
   "editor": {
     "vimMode": true
   },
   "model": {
-    "modelId": "claude-4-opus",
-    "displayModelId": "opus-4.1",
-    "displayName": "Claude 4.1 Opus",
-    "displayNameShort": "Opus 4.1",
+    "modelId": "claude-4.5-opus-high-thinking",
+    "displayModelId": "opus-4.5-thinking",
+    "displayName": "Claude 4.5 Opus (Thinking)",
+    "displayNameShort": "Opus 4.5 (Thinking)",
     "aliases": [
-      "opus",
-      "opus-4.1"
-    ]
-  },
-  "hasChangedDefaultModel": true,
-  "permissions": {
-    "allow": [
-      "Shell(ls)"
+      "opus-4.5-thinking",
+      "claude-4.5-opus-thinking"
     ],
-    "deny": []
+    "maxMode": false
   },
+  "hasChangedDefaultModel": false,
   "privacyCache": {
     "ghostMode": true,
     "privacyMode": 1,
-    "updatedAt": 1758005141733
+    "updatedAt": 1768431056914
+  },
+  "network": {
+    "useHttp1ForAgent": false
   }
 }

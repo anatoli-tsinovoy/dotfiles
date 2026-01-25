@@ -80,14 +80,22 @@ setup_p10k() {
 setup_zsh_plugins() {
   local OMZ_CUSTOM="$HOME/.oh-my-zsh/custom"
   
-  if [[ ! -d "$OMZ_CUSTOM/plugins/zsh-syntax-highlighting" ]]; then
+  local plugin_dir="$OMZ_CUSTOM/plugins/zsh-syntax-highlighting"
+  if [[ -d "$plugin_dir/.git" ]]; then
+    log_ok "zsh-syntax-highlighting already installed"
+  else
+    rm -rf "$plugin_dir"
     log_info "Installing zsh-syntax-highlighting..."
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$OMZ_CUSTOM/plugins/zsh-syntax-highlighting"
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir"
   fi
   
-  if [[ ! -d "$OMZ_CUSTOM/plugins/zsh-autosuggestions" ]]; then
+  plugin_dir="$OMZ_CUSTOM/plugins/zsh-autosuggestions"
+  if [[ -d "$plugin_dir/.git" ]]; then
+    log_ok "zsh-autosuggestions already installed"
+  else
+    rm -rf "$plugin_dir"
     log_info "Installing zsh-autosuggestions..."
-    git clone https://github.com/zsh-users/zsh-autosuggestions "$OMZ_CUSTOM/plugins/zsh-autosuggestions"
+    git clone https://github.com/zsh-users/zsh-autosuggestions "$plugin_dir"
   fi
 }
 
@@ -176,11 +184,11 @@ main() {
     # Remove macOS-specific conflicts
     rm -rf ~/.config/aerospace ~/.config/iterm2
     rm -rf ~/Library/Application\ Support/Cursor/User
-    rm -rf ~/.warp
     
     # macOS-specific stow packages
     log_info "Stowing macOS-specific dotfiles..."
-    stow -t ~ aerospace iterm2 cursor-macos warp-macos
+    stow -t ~ aerospace iterm2
+    stow --adopt -t ~ cursor-macos
     
     # Create macOS-specific gitconfig.local
     cp "$SCRIPT_DIR/git/.gitconfig.macos" "$HOME/.gitconfig.local"
