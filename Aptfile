@@ -1,0 +1,53 @@
+#!/usr/bin/env aptfile
+# Aptfile - Declarative apt package management (like Brewfile for macOS)
+# Run with: sudo aptfile Aptfile
+# Requires: https://github.com/seatgeek/bash-aptfile
+#
+# NOTE: PPAs are NOT supported - they only work on Ubuntu, not Debian.
+# For latest neovim, install via GitHub releases in install-binaries.sh
+
+update
+
+# === Core utilities ===
+package "stow"
+package "wget"
+package "curl"
+package "git"
+package "zsh"
+package "make"
+package "cmake"
+package "dos2unix"
+package "g++"
+package "unzip"
+package "tzdata"
+
+# === Modern CLI tools ===
+package "ripgrep"
+package "fd-find"      # NOTE: Binary is 'fdfind', alias to 'fd' in zshrc
+package "bat"          # NOTE: On Ubuntu <23.04, binary is 'batcat', alias in zshrc
+package "eza"
+package "btop"
+package "glow"
+package "fzf"
+package "zoxide"
+
+# === Git tools ===
+package "git-lfs"
+package "git-delta"
+
+# === Security ===
+package "gitleaks"
+
+# === Editors ===
+package "vim"
+# NOTE: neovim installed via GitHub releases in install-binaries.sh for latest version
+# (apt version is often outdated, and PPAs don't work on Debian)
+
+# === Process management (for dev containers) ===
+package "supervisor"
+
+echo "✅ Apt packages installed successfully"
+echo ""
+echo "📦 Next steps:"
+echo "   1. Run ./install-binaries.sh for tools not available via apt"
+echo "   2. Run git lfs install to initialize git-lfs"

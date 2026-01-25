@@ -1,0 +1,69 @@
+# macOS-specific zsh configuration
+# Sourced from ~/.zshrc on Darwin systems
+
+# === Homebrew ===
+HOMEBREW_AUTO_UPDATE_SECS=86400  # one day
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# === Plugins (add to existing plugins array) ===
+# podman and docker plugins for completion
+plugins+=(podman docker)
+
+# === macOS Aliases ===
+alias python="/opt/homebrew/bin/python3"
+alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
+alias code='cursor'
+
+# === Podman/Docker ===
+export DOCKER_HOST=unix://$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')
+
+# === NVM ===
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+
+# === Android SDK ===
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
+
+# === ImageMagick ===
+export PATH="/usr/local/bin/convert:$PATH"
+
+# === libpq (PostgreSQL client) ===
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# === macOS Quick Actions ===
+quickaction() {
+  if [ $# -ne 2 ]; then
+    echo "Usage: quickaction \"Service Name\" file"
+    echo "Available services:"
+    ls -1 ~/Library/Services/ | sed 's/\.workflow$//'
+    return 1
+  fi
+
+  local service_name="$1"
+  local input_file="$2"
+
+  if [ ! -d ~/Library/Services/"$service_name.workflow" ]; then
+    echo "Service '$service_name' not found"
+    echo "Available services:"
+    ls -1 ~/Library/Services/ | sed 's/\.workflow$//'
+    return 1
+  fi
+  local absolute_path
+  
+  # Convert relative path to absolute path
+  if [[ "$input_file" = /* ]]; then
+    absolute_path="$input_file"
+  else
+    absolute_path="$(cd "$(dirname "$input_file")" && pwd)/$(basename "$input_file")"
+  fi
+  
+  automator -i "$absolute_path" ~/Library/Services/"$service_name.workflow"
+}
+
+git-lfs-dl() {
+  for input_file in "$@"; do
+    quickaction "Download from Git LFS" "$input_file"
+  done
+}

@@ -104,18 +104,18 @@
       "terminal.selectionBackground": "#B39AFF",
       "terminalCursor.foreground": "#8217FF",
       "terminalCursor.background": "#F3F0DF",
-      "terminal.findMatchBackground": "#FFD44F"
+      "terminal.findMatchBackground": "#FFD44F",
     },
-    "terminal.background": "#00000000"
+    "terminal.background": "#00000000",
   },
   "terminal.integrated.drawBoldTextInBrightColors": true,
   "redhat.telemetry.enabled": false,
   "[github-actions-workflow]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "remote.SSH.remotePlatform": {
     "Simply-Workstation": "linux",
-    "Simply-Workstation-TailScale": "linux"
+    "Simply-Workstation-TailScale": "linux",
   },
   "workbench.settings.openDefaultKeybindings": true,
   "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
