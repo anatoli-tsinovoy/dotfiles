@@ -73,9 +73,9 @@ fi
 alias vim="nvim"
 alias ls="eza -la --icons --group-directories-first"
 
-# bat theming
-alias bat="$_bat_cmd --color=always --theme auto:system --theme-dark default --theme-light GitHub"
-fbat="$_bat_cmd --color=always --theme auto:system --theme-dark default --theme-light GitHub"
+# bat theming (base config; macOS overrides with --theme auto:system)
+alias bat="$_bat_cmd --color=always"
+fbat="$_bat_cmd --color=always"
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | $_bat_cmd -p -lman'"
 

@@ -24,12 +24,16 @@ package "tzdata"
 # === Modern CLI tools ===
 package "ripgrep"
 package "fd-find"      # NOTE: Binary is 'fdfind', alias to 'fd' in zshrc
-package "bat"          # NOTE: On Ubuntu <23.04, binary is 'batcat', alias in zshrc
+package "bat"          # NOTE: Binary is 'batcat', alias to 'bat' in zshrc
 package "eza"
 package "btop"
-package "glow"
+# NOTE: glow installed via GitHub releases in install-binaries.sh (apt version lags behind)
 package "fzf"
 package "zoxide"
+
+# === Node.js ===
+package "nodejs"
+package "npm"
 
 # === Git tools ===
 package "git-lfs"
