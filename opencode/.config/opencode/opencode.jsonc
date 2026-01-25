@@ -1,9 +1,11 @@
 {
+  "$schema": "https://opencode.ai/config.json",
+  "theme": "system",
+  "small_model": "github-copilot/claude-sonnet-4.5",
   "plugin": [
     "oh-my-opencode",
     "opencode-openai-codex-auth"
   ],
-  "$schema": "https://opencode.ai/config.json",
   "lsp": {
     "ty": {
       "command": ["ty", "server"],

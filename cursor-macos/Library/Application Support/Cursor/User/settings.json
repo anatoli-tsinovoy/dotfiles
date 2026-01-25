@@ -13,9 +13,9 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
-      "source.organizeImports": "explicit"
+      "source.organizeImports": "explicit",
     },
-    "editor.defaultFormatter": "charliermarsh.ruff"
+    "editor.defaultFormatter": "charliermarsh.ruff",
   },
   "editor.fontSize": 26,
   "jupyter.themeMatplotlibPlots": true,
@@ -52,7 +52,7 @@
   "vscode_vibrancy.preferedDarkTheme": "Default Dark",
   "vscode_vibrancy.preferedLightTheme": "Default Light",
   "vscode_vibrancy.imports": [
-    "/Users/anatoli/Documents/dotfiles/cursor-macos/Library/Application Support/Cursor/User/LightModified.css"
+    "/Users/anatoli/Documents/dotfiles/cursor-macos/Library/Application Support/Cursor/User/LightModified.css",
   ],
   "workbench.preferredDarkColorTheme": "Default Dark+",
   "workbench.preferredLightColorTheme": "Default Light+",
@@ -80,7 +80,7 @@
       "terminal.selectionBackground": "#330D81",
       "terminalCursor.foreground": "#8217FF",
       "terminalCursor.background": "#110034",
-      "terminal.findMatchBackground": "#FFD44F"
+      "terminal.findMatchBackground": "#FFD44F",
     },
     "[Default Light+]": {
       "terminal.ansiBlack": "#110034",
@@ -133,7 +133,8 @@
     "#33BCA7", // Green
     "#B8953E", // Yellow
     "#6D50B5", // Purple
-    "#E69AB3" // Pink
+    "#E69AB3", // Pink
   ],
-  "terminal.integrated.gpuAcceleration": "off"
+  "terminal.integrated.gpuAcceleration": "off",
+  "workbench.colorTheme": "Default Dark+",
 }
