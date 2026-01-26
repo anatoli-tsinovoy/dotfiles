@@ -41,6 +41,34 @@ is_inside_container() {
   [[ -f /.dockerenv ]] || [[ -n "${container:-}" ]] || grep -q docker /proc/1/cgroup 2>/dev/null
 }
 
+# Fetch latest GitHub release version with rate limit detection
+# Usage: get_github_release_version "owner/repo"
+# Returns: version string (without 'v' prefix) or exits with error message
+get_github_release_version() {
+  local repo="$1"
+  local response
+  local version
+
+  response=$(curl -sSf "https://api.github.com/repos/${repo}/releases/latest" 2>&1) || {
+    if echo "$response" | grep -qi "rate limit\|API rate limit"; then
+      log_warn "GitHub API rate limit exceeded!"
+      log_warn "Wait a bit, then run: ./install.sh"
+      log_warn "Or set GITHUB_TOKEN env var for higher limits"
+      return 2
+    fi
+    log_warn "Failed to fetch release info for $repo: $response"
+    return 1
+  }
+
+  version=$(echo "$response" | grep -Po '"tag_name": "v?\K[0-9.]+' | head -1)
+  if [[ -z "$version" ]]; then
+    log_warn "Could not parse version from GitHub response for $repo"
+    return 1
+  fi
+
+  echo "$version"
+}
+
 # === Installation functions ===
 
 install_neovim() {
@@ -126,7 +154,7 @@ install_glow() {
 
   log_info "Installing glow from GitHub releases..."
   local version arch arch_name
-  version=$(curl -s "https://api.github.com/repos/charmbracelet/glow/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+  version=$(get_github_release_version "charmbracelet/glow") || return 1
   arch=$(get_arch)
 
   case "$arch" in
@@ -158,7 +186,7 @@ install_dua() {
   fi
   log_info "Installing dua-cli..."
   local version arch
-  version=$(curl -s "https://api.github.com/repos/Byron/dua-cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+  version=$(get_github_release_version "Byron/dua-cli") || return 1
   arch=$(get_arch)
 
   curl -LSfs https://raw.githubusercontent.com/Byron/dua-cli/master/ci/install.sh |
@@ -178,7 +206,7 @@ install_tlrc() {
   if [[ "$arch" == "x86_64" ]]; then
     log_info "Installing tlrc from prebuilt binary..."
     local version
-    version=$(curl -s "https://api.github.com/repos/tldr-pages/tlrc/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+    version=$(get_github_release_version "tldr-pages/tlrc") || return 1
 
     local target="x86_64-unknown-linux-musl"
     local tmpdir
@@ -302,7 +330,7 @@ install_lazydocker() {
 
   log_info "Installing lazydocker..."
   local version arch
-  version=$(curl -s "https://api.github.com/repos/jesseduffield/lazydocker/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+  version=$(get_github_release_version "jesseduffield/lazydocker") || return 1
   arch=$(get_arch)
 
   local arch_name
