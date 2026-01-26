@@ -4,7 +4,7 @@
 # Requires: https://github.com/seatgeek/bash-aptfile
 #
 # NOTE: PPAs are NOT supported - they only work on Ubuntu, not Debian.
-# For latest neovim, install via GitHub releases in install-binaries.sh
+# For latest neovim, install via GitHub releases in shims/linux/install-binaries.sh
 
 update
 
@@ -27,13 +27,8 @@ package "fd-find"      # NOTE: Binary is 'fdfind', alias to 'fd' in zshrc
 package "bat"          # NOTE: Binary is 'batcat', alias to 'bat' in zshrc
 package "eza"
 package "btop"
-# NOTE: glow installed via GitHub releases in install-binaries.sh (apt version lags behind)
 package "fzf"
 package "zoxide"
-
-# === Node.js ===
-package "nodejs"
-package "npm"
 
 # === Git tools ===
 package "git-lfs"
@@ -44,7 +39,7 @@ package "gitleaks"
 
 # === Editors ===
 package "vim"
-# NOTE: neovim installed via GitHub releases in install-binaries.sh for latest version
+# NOTE: neovim installed via GitHub releases in shims/linux/install-binaries.sh for latest version
 # (apt version is often outdated, and PPAs don't work on Debian)
 
 # === Process management (for dev containers) ===
@@ -53,5 +48,5 @@ package "supervisor"
 echo "✅ Apt packages installed successfully"
 echo ""
 echo "📦 Next steps:"
-echo "   1. Run ./install-binaries.sh for tools not available via apt"
+echo "   1. Run ./shims/linux/install-binaries.sh for tools not available via apt"
 echo "   2. Run git lfs install to initialize git-lfs"

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Shim: route 'node' calls to bun (Node.js compatible runtime)
+# This enables bun-installed packages with #!/usr/bin/env node shebangs
+exec "$HOME/.bun/bin/bun" "$@"

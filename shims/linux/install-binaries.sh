@@ -268,13 +268,12 @@ install_emojify() {
     log_skip "emojify already installed"
     return 0
   fi
-  if ! command_exists bun; then
-    log_warn "bun not found, skipping emojify installation"
-    return 1
-  fi
-  log_info "Installing emojify via bun..."
-  bun install -g emojify
-  log_ok "emojify installed"
+  log_info "Installing emojify (shell emoji converter)..."
+  local install_dir="${HOME}/.local/bin"
+  mkdir -p "$install_dir"
+  curl -fsSL https://raw.githubusercontent.com/mrowa44/emojify/master/emojify -o "${install_dir}/emojify"
+  chmod +x "${install_dir}/emojify"
+  log_ok "emojify installed to ${install_dir}/emojify"
 }
 
 install_opencode() {

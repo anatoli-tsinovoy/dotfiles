@@ -134,7 +134,7 @@ main() {
     brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
     
     log_info "Applying macOS defaults..."
-    bash "$SCRIPT_DIR/macos-defaults.sh"
+    bash "$SCRIPT_DIR/shims/macos/macos-defaults.sh"
     
   elif [[ "$os" == "linux" ]]; then
     # === Linux Setup ===
@@ -151,7 +151,7 @@ main() {
     fi
     
     log_info "Installing binary tools..."
-    bash "$SCRIPT_DIR/install-binaries.sh"
+    bash "$SCRIPT_DIR/shims/linux/install-binaries.sh"
   fi
 
   # === Common Setup (both OS) ===
@@ -199,8 +199,9 @@ main() {
         -o "$SCRIPT_DIR/aerospace/.config/aerospace/winbounds"
     fi
     
-    # Apply podman shim (macOS uses podman, shim provides 'docker' command)
-    cp "$SCRIPT_DIR/docker-shim.sh" /opt/homebrew/bin/docker
+    # Stow macOS shims (podman -> docker)
+    log_info "Stowing macOS shims..."
+    stow -t ~ -d shims macos
     
   elif [[ "$os" == "linux" ]]; then
     # Linux-specific setup
@@ -209,7 +210,9 @@ main() {
     # Create empty gitconfig.local (no OS-specific overrides needed)
     touch "$HOME/.gitconfig.local"
     
-    # No docker shim needed on Linux (native Docker)
+    # Stow Linux shims (bun -> node)
+    log_info "Stowing Linux shims..."
+    stow -t ~ -d shims linux
   fi
 
   log_ok "Bootstrap complete! Open a new shell to apply changes."

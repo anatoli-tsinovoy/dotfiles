@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # macOS defaults configuration
-# Run with: ./macos-defaults.sh
+# Run with: ./shims/macos/macos-defaults.sh
 #
 # Based on actual preferences extracted from the system.
 # Only includes persistent settings, not ephemeral state.
