@@ -188,7 +188,10 @@ automatically-unhide-macos-hidden-apps = true
       'move-node-to-monitor --wrap-around next --focus-follows-window',
       'exec-and-forget /usr/bin/env bash -c "sketchybar --trigger aerospace_monitor_move"', 
     ]
-    ctrl-alt-up = 'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh toggle'
+    ctrl-alt-up = [
+      'fullscreen',
+      'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh'
+    ]
     alt-shift-s = 'exec-and-forget screencapture -i -c'
  
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
