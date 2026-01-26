@@ -218,6 +218,51 @@ install_thefuck() {
   log_ok "thefuck installed"
 }
 
+install_ruff() {
+  if command_exists ruff; then
+    log_skip "ruff already installed ($(ruff --version))"
+    return 0
+  fi
+  if ! command_exists uv; then
+    log_warn "uv not found, skipping ruff installation"
+    return 1
+  fi
+
+  log_info "Installing ruff via uv..."
+  uv tool install ruff
+  log_ok "ruff installed"
+}
+
+install_ty() {
+  if command_exists ty; then
+    log_skip "ty already installed ($(ty --version))"
+    return 0
+  fi
+  if ! command_exists uv; then
+    log_warn "uv not found, skipping ty installation"
+    return 1
+  fi
+
+  log_info "Installing ty via uv..."
+  uv tool install ty
+  log_ok "ty installed"
+}
+
+install_yt_dlp() {
+  if command_exists yt-dlp; then
+    log_skip "yt-dlp already installed ($(yt-dlp --version))"
+    return 0
+  fi
+  if ! command_exists uv; then
+    log_warn "uv not found, skipping yt-dlp installation"
+    return 1
+  fi
+
+  log_info "Installing yt-dlp via uv..."
+  uv tool install yt-dlp
+  log_ok "yt-dlp installed"
+}
+
 install_emojify() {
   if command_exists emojify; then
     log_skip "emojify already installed"
@@ -359,6 +404,9 @@ main() {
 
   # Tools that depend on uv/bun
   install_thefuck
+  install_ruff
+  install_ty
+  install_yt_dlp
   install_emojify
   install_opencode
 
