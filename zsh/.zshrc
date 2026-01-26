@@ -55,11 +55,7 @@ autoload -Uz compinit && compinit
 source $ZSH/oh-my-zsh.sh
 
 # === Editor ===
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='nvim'
-fi
+export EDITOR='nvim'
 
 # === Common Aliases ===
 alias vim="nvim"

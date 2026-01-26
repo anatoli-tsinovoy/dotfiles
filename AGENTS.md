@@ -8,13 +8,16 @@ Personal dotfiles for macOS and Linux using GNU Stow for symlink management.
 dotfiles/
 ├── install.sh             # Main setup script (entry point)
 ├── Brewfile / Aptfile     # Package lists (macOS / Linux)
-├── shims/                  # OS-specific scripts and stow packages
+├── scripts/                # OS-specific setup scripts (executed, not symlinked)
 │   ├── linux/
-│   │   ├── .local/bin/         # Shims: bat→batcat, fd→fdfind, node→bun
-│   │   └── install-binaries.sh # Binary tool installer (neovim, fzf, etc.)
+│   │   └── install-binaries.sh  # Binary tool installer (neovim, fzf, etc.)
 │   └── macos/
-│       ├── .local/bin/docker   # podman→docker shim
-│       └── macos-defaults.sh   # System preferences script
+│       └── macos-defaults.sh    # System preferences script
+├── shims/                  # OS-specific stow packages (symlinked)
+│   ├── linux/
+│   │   └── .local/bin/          # Shims: bat→batcat, fd→fdfind, node→bun
+│   └── macos/
+│       └── .local/bin/docker    # podman→docker shim
 ├── git/                   # Git configuration (.gitconfig + .gitconfig.macos)
 ├── nvim/                  # Neovim config (LazyVim-based, Tokyonight)
 ├── zsh/                   # Unified zsh config (ORDER-SENSITIVE)
@@ -29,8 +32,8 @@ dotfiles/
 
 ```bash
 ./install.sh                            # Full bootstrap (packages + stow)
-./shims/macos/macos-defaults.sh         # macOS: system preferences
-./shims/linux/install-binaries.sh       # Linux: binary tools
+./scripts/macos/macos-defaults.sh       # macOS: system preferences
+./scripts/linux/install-binaries.sh     # Linux: binary tools
 
 # Manual stow
 stow -t ~ <package>                     # Link package to home
@@ -61,7 +64,7 @@ install_tool() {
 }
 
 # Helpers: run_privileged, detect_os, is_inside_container, get_arch
-# See install.sh or shims/linux/install-binaries.sh for implementations
+# See install.sh or scripts/linux/install-binaries.sh for implementations
 ```
 
 **Quoting:** Always `"$var"`, `"$@"`. Use `${var:-default}` for defaults.

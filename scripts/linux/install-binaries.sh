@@ -193,11 +193,8 @@ install_tlrc() {
     rm -rf "$tmpdir"
     log_ok "tlrc installed to $bindir/tldr"
   else
-    if ! command_exists cargo; then
-      log_warn "tlrc: no ARM64 prebuilt available and cargo not found, skipping"
-      return 0
-    fi
     log_info "Installing tlrc via cargo (no ARM64 prebuilt available)..."
+    install_cargo
     cargo install tlrc
     log_ok "tlrc installed via cargo"
   fi
@@ -381,16 +378,15 @@ main() {
   mkdir -p "$HOME/.local/bin"
   export PATH="$HOME/.local/bin:$PATH"
 
-  # Order matters: uv, bun, and cargo are needed for later tools
+  # Order matters: uv and bun are needed for later tools
   install_neovim
   install_uv
   install_bun
-  install_cargo
 
-  # Tools that depend on nothing (or cargo for ARM64)
+  # Tools with prebuilt binaries
   install_glow
   install_dua
-  install_tlrc
+  install_tlrc  # installs cargo on ARM64 only (no prebuilt available)
   install_lazydocker
   install_fzf
 

@@ -30,7 +30,7 @@ install_stow() {
     log_ok "stow already installed"
     return 0
   fi
-  
+
   log_info "Installing stow..."
   if [[ "$os" == "mac" ]]; then
     brew install stow
@@ -44,7 +44,7 @@ install_aptfile() {
     log_ok "aptfile already installed"
     return 0
   fi
-  
+
   log_info "Installing aptfile (Brewfile equivalent for apt)..."
   run_privileged curl -o /usr/local/bin/aptfile https://raw.githubusercontent.com/seatgeek/bash-aptfile/master/bin/aptfile
   run_privileged chmod +x /usr/local/bin/aptfile
@@ -54,7 +54,7 @@ install_aptfile() {
 setup_ohmyzsh() {
   local OMZ="$HOME/.oh-my-zsh"
   local OMZ_CUSTOM="${OMZ}/custom"
-  
+
   if [[ ! -d $OMZ ]]; then
     log_info "Installing oh-my-zsh (unattended)…"
     RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
@@ -68,7 +68,7 @@ setup_ohmyzsh() {
 setup_p10k() {
   local OMZ_CUSTOM="$HOME/.oh-my-zsh/custom"
   local P10K_DIR="$OMZ_CUSTOM/themes/powerlevel10k"
-  
+
   if [[ ! -d "$P10K_DIR" ]]; then
     log_info "Installing powerlevel10k..."
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR"
@@ -79,7 +79,7 @@ setup_p10k() {
 
 setup_zsh_plugins() {
   local OMZ_CUSTOM="$HOME/.oh-my-zsh/custom"
-  
+
   local plugin_dir="$OMZ_CUSTOM/plugins/zsh-syntax-highlighting"
   if [[ -d "$plugin_dir/.git" ]]; then
     log_ok "zsh-syntax-highlighting already installed"
@@ -88,7 +88,7 @@ setup_zsh_plugins() {
     log_info "Installing zsh-syntax-highlighting..."
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir"
   fi
-  
+
   plugin_dir="$OMZ_CUSTOM/plugins/zsh-autosuggestions"
   if [[ -d "$plugin_dir/.git" ]]; then
     log_ok "zsh-autosuggestions already installed"
@@ -118,7 +118,7 @@ main() {
 
   if [[ "$os" == "mac" ]]; then
     # === macOS Setup ===
-    
+
     # Ensure Homebrew
     if ! command -v brew &>/dev/null; then
       if ! xcode-select -p &>/dev/null; then
@@ -129,87 +129,86 @@ main() {
       eval "$(/opt/homebrew/bin/brew shellenv)"
       eval "$(/opt/homebrew/bin/brew shellenv zsh)"
     fi
-    
+
     log_info "Installing Homebrew packages..."
     brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
-    
+
     log_info "Applying macOS defaults..."
-    bash "$SCRIPT_DIR/shims/macos/macos-defaults.sh"
-    
+    bash "$SCRIPT_DIR/scripts/macos/macos-defaults.sh"
+
   elif [[ "$os" == "linux" ]]; then
     # === Linux Setup ===
-    
+
     # Install aptfile tool
     install_aptfile
-    
+
     log_info "Installing apt packages via Aptfile..."
     run_privileged aptfile "$SCRIPT_DIR/Aptfile"
-    
+
     # Initialize git-lfs
     if command -v git-lfs &>/dev/null; then
       git lfs install
     fi
-    
+
     log_info "Installing binary tools..."
-    bash "$SCRIPT_DIR/shims/linux/install-binaries.sh"
+    bash "$SCRIPT_DIR/scripts/linux/install-binaries.sh"
   fi
 
   # === Common Setup (both OS) ===
-  
+
   install_stow "$os"
-  
+
   cd "$SCRIPT_DIR"
-  
+
   # Setup oh-my-zsh, powerlevel10k, and plugins
   setup_ohmyzsh
   setup_p10k
   setup_zsh_plugins
-  
+
   # Remove files that would conflict with stow
   # (oh-my-zsh creates a default .zshrc that we don't want)
   log_info "Removing conflicting files before stow..."
   rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.p10k.zsh
   rm -f ~/.gitconfig ~/.vimrc
   rm -rf ~/.config/nvim ~/.config/opencode
-  
+
   # Stow common packages (no --adopt: we want OUR files, not whatever exists)
   log_info "Stowing common dotfiles..."
   stow -t ~ nvim git opencode
-  
+
   # Stow unified zsh package (contains .zshrc, .zshrc.macos, .zshrc.linux, .p10k.zsh)
   log_info "Stowing zsh configuration..."
   stow -t ~ zsh
-  
+
   if [[ "$os" == "mac" ]]; then
     # Remove macOS-specific conflicts
     rm -rf ~/.config/aerospace ~/.config/iterm2
     rm -rf ~/Library/Application\ Support/Cursor/User
-    
+
     # macOS-specific stow packages
     log_info "Stowing macOS-specific dotfiles..."
-    stow -t ~ aerospace iterm2
-    stow --adopt -t ~ cursor-macos
-    
+    stow -t ~ aerospace iterm2 cursor-macos
+
     # Create macOS-specific gitconfig.local
     cp "$SCRIPT_DIR/git/.gitconfig.macos" "$HOME/.gitconfig.local"
-    
+
     # Compile Swift helpers
     if command -v swiftc &>/dev/null; then
       swiftc "$SCRIPT_DIR/aerospace/.config/aerospace/winbounds.swift" \
         -o "$SCRIPT_DIR/aerospace/.config/aerospace/winbounds"
     fi
-    
+
     # Stow macOS shims (podman -> docker)
     log_info "Stowing macOS shims..."
     stow -t ~ -d shims macos
-    
+
   elif [[ "$os" == "linux" ]]; then
     # Linux-specific setup
     log_info "Applying Linux-specific settings..."
-    
+
     # Create empty gitconfig.local (no OS-specific overrides needed)
     touch "$HOME/.gitconfig.local"
-    
+
     # Stow Linux shims (bun -> node)
     log_info "Stowing Linux shims..."
     stow -t ~ -d shims linux
