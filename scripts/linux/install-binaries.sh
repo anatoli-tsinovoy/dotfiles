@@ -316,6 +316,39 @@ install_opencode() {
   log_ok "opencode installed"
 }
 
+install_viu() {
+  if command_exists viu; then
+    log_skip "viu already installed ($(viu --version 2>&1 | head -1))"
+    return 0
+  fi
+
+  log_info "Installing viu from GitHub releases..."
+  local version arch
+  version=$(curl -s "https://api.github.com/repos/atanunq/viu/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+  arch=$(get_arch)
+
+  local target
+  case "$arch" in
+  x86_64) target="x86_64-unknown-linux-musl" ;;
+  aarch64) target="aarch64-unknown-linux-musl" ;;
+  *)
+    log_warn "Unsupported architecture for viu: $arch"
+    return 1
+    ;;
+  esac
+
+  local tmpdir
+  tmpdir=$(mktemp -d)
+  curl -LSsf "https://github.com/atanunq/viu/releases/download/v${version}/viu-${target}" -o "$tmpdir/viu"
+
+  local bindir="$HOME/.local/bin"
+  mkdir -p "$bindir"
+  mv "$tmpdir/viu" "$bindir/"
+  chmod +x "$bindir/viu"
+  rm -rf "$tmpdir"
+  log_ok "viu installed to $bindir/viu"
+}
+
 install_lazydocker() {
   # Only install if NOT inside a container
   if is_inside_container; then
@@ -417,6 +450,7 @@ main() {
   install_tlrc  # installs cargo on ARM64 only (no prebuilt available)
   install_lazydocker
   install_fzf
+  install_viu
 
   # Tools that depend on uv/bun
   install_thefuck
