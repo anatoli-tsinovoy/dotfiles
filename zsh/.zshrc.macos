@@ -4,9 +4,7 @@
 # === fzf shell integration (Homebrew) ===
 source <(fzf --zsh)
 
-# === bat theming (macOS-only auto:system support) ===
-alias bat="bat --color=always --theme auto:system --theme-dark default --theme-light GitHub"
-fbat="bat --color=always --theme auto:system --theme-dark default --theme-light GitHub"
+# === bat theming (removed - using ansi theme from base .zshrc) ===
 
 # === Homebrew ===
 HOMEBREW_AUTO_UPDATE_SECS=86400  # one day

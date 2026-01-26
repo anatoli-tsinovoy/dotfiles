@@ -1,0 +1,3 @@
+#!/bin/sh
+# Shim: route 'fd' calls to fdfind (Debian/Ubuntu package name)
+exec fdfind "$@"

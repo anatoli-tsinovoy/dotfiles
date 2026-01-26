@@ -31,19 +31,6 @@ if [[ -d "$HOME/.cargo/bin" ]]; then
   export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-# === Linux-specific setup (must be before bat/fzf config below) ===
-if [[ "$(uname -s)" == "Linux" ]]; then
-  # fd-find is named 'fdfind' on Debian/Ubuntu
-  if command -v fdfind &>/dev/null && ! command -v fd &>/dev/null; then
-    alias fd="fdfind"
-  fi
-  # bat is named 'batcat' on Debian/Ubuntu - set variable for use below
-  if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
-    _bat_cmd="batcat"
-  fi
-fi
-: ${_bat_cmd:=bat}
-
 # === Oh My Zsh ===
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -78,11 +65,11 @@ fi
 alias vim="nvim"
 alias ls="eza -la --icons --group-directories-first"
 
-# bat theming (base config; macOS overrides with --theme auto:system)
-alias bat="$_bat_cmd --color=always"
-fbat="$_bat_cmd --color=always"
-alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
-export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | $_bat_cmd -p -lman'"
+# bat theming (ansi theme uses terminal colors)
+alias bat="bat --color=always --theme=ansi"
+fbat="bat --color=always --theme=ansi"
+alias -g -- --help='--help 2>&1 | bat --language=help --style=plain --theme=ansi'
+export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
 
 # fzf with bat preview
 alias fzf='fzf --preview-window=right:60%:wrap --preview "${fbat} --style=numbers {} 2>/dev/null || printf %s "{}" | ${fbat} --wrap=auto -l zsh -p"'

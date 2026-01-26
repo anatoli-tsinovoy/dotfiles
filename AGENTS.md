@@ -10,7 +10,10 @@ dotfiles/
 ├── Brewfile / Aptfile     # Package lists (macOS / Linux)
 ├── shims/                  # OS-specific scripts and stow packages
 │   ├── linux/
-│   │   ├── .local/bin/node     # bun→node shim (stowed)
+│   │   ├── .local/bin/         # Shims for Debian/Ubuntu naming
+│   │   │   ├── bat             # batcat→bat shim
+│   │   │   ├── fd              # fdfind→fd shim
+│   │   │   └── node            # bun→node shim
 │   │   └── install-binaries.sh # Binary tool installer
 │   └── macos/
 │       ├── .local/bin/docker   # podman→docker shim (stowed)
@@ -117,25 +120,29 @@ return {
 
 The `.zshrc` is **order-sensitive**. Sections must execute in this sequence:
 
-1. **PATH setup** - tools available for rest of config
-2. **Linux aliases** (fd→fdfind, bat→batcat) - before they're used
-3. **Oh My Zsh** - loads plugins
-4. **Tool aliases** (bat theming, fzf preview)
-5. **Vi-mode keybindings** - resets some bindings
-6. **fzf keybindings** - MUST be after vi-mode or Tab breaks
+1. **PATH setup** - tools available for rest of config (shims in `~/.local/bin`)
+2. **Oh My Zsh** - loads plugins
+3. **Tool aliases** (bat theming, fzf preview)
+4. **Vi-mode keybindings** - resets some bindings
+5. **fzf keybindings** - MUST be after vi-mode or Tab breaks
 
 OS-specific files sourced at END for post-init config only.
 
-## Linux Binary Name Differences
+## Linux Binary Name Shims
+
+Debian/Ubuntu uses different binary names. Handled via shims in `shims/linux/.local/bin/`:
 
 ```bash
-# Set _bat_cmd BEFORE bat alias uses it
-if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
-  _bat_cmd="batcat"
-fi
-: ${_bat_cmd:=bat}
-alias bat="$_bat_cmd --color=always"
+# shims/linux/.local/bin/bat
+#!/bin/sh
+exec batcat "$@"
+
+# shims/linux/.local/bin/fd  
+#!/bin/sh
+exec fdfind "$@"
 ```
+
+Shims work in scripts AND interactive shells (unlike aliases).
 
 ## Stow Package Layout
 

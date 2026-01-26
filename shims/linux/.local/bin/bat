@@ -1,0 +1,3 @@
+#!/bin/sh
+# Shim: route 'bat' calls to batcat (Debian/Ubuntu package name)
+exec batcat "$@"
