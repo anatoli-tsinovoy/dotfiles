@@ -354,26 +354,19 @@ install_lazyvim() {
   log_ok "LazyVim installed"
 }
 
-install_fzf_keybindings() {
-  # fzf from apt doesn't always set up keybindings
+install_fzf() {
   local fzf_dir="$HOME/.fzf"
   if [[ -d "$fzf_dir" ]]; then
-    log_skip "fzf keybindings already configured"
-    return 0
+    log_info "Updating fzf..."
+    git -C "$fzf_dir" pull --quiet
+    "$fzf_dir/install" --bin --no-bash --no-fish --no-update-rc
+    log_ok "fzf updated"
+  else
+    log_info "Installing fzf from git..."
+    git clone --depth 1 https://github.com/junegunn/fzf.git "$fzf_dir"
+    "$fzf_dir/install" --all --no-bash --no-fish
+    log_ok "fzf installed to $fzf_dir"
   fi
-
-  if command_exists fzf; then
-    # Try to source keybindings from apt install location
-    if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
-      log_skip "fzf installed via apt, keybindings available"
-      return 0
-    fi
-  fi
-
-  log_info "Installing fzf with keybindings..."
-  git clone --depth 1 https://github.com/junegunn/fzf.git "$fzf_dir"
-  "$fzf_dir/install" --all --no-bash --no-fish
-  log_ok "fzf keybindings installed"
 }
 
 # === Main ===
@@ -399,7 +392,7 @@ main() {
   install_dua
   install_tlrc
   install_lazydocker
-  install_fzf_keybindings
+  install_fzf
 
   # Tools that depend on uv/bun
   install_thefuck

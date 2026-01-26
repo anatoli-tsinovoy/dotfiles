@@ -21,6 +21,11 @@ fi
 # === PATH setup (early, so tools are available for rest of config) ===
 export PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 
+# fzf from git (prefer over system fzf for latest features)
+if [[ -d "$HOME/.fzf/bin" ]]; then
+  export PATH="$HOME/.fzf/bin:$PATH"
+fi
+
 # Cargo (Linux installs tldr, dua via cargo)
 if [[ -d "$HOME/.cargo/bin" ]]; then
   export PATH="$HOME/.cargo/bin:$PATH"
@@ -135,21 +140,6 @@ bindkey -M vicmd '^E' end-of-line
 bindkey -M vicmd '^R' vi-redo
 bindkey -M viins '^[f' forward-word
 bindkey -M viins '^[b' backward-word
-
-# === fzf keybindings (MUST be after vi-mode to preserve Tab binding) ===
-if command -v fzf &>/dev/null; then
-  if fzf --zsh >/dev/null 2>&1; then
-    source <(fzf --zsh)
-  elif [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
-    source /usr/share/doc/fzf/examples/key-bindings.zsh
-    [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && source /usr/share/doc/fzf/examples/completion.zsh
-  elif [[ -f "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/key-bindings.zsh" ]]; then
-    source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/key-bindings.zsh"
-    source "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/shell/completion.zsh"
-  elif [[ -f "$HOME/.fzf.zsh" ]]; then
-    source "$HOME/.fzf.zsh"
-  fi
-fi
 
 # === OS-specific configuration ===
 # Detect OS and source appropriate config

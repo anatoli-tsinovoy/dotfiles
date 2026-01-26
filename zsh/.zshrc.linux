@@ -3,6 +3,9 @@
 # NOTE: Most Linux-specific config is now in .zshrc (before oh-my-zsh loads)
 #       This file is for post-initialization Linux-specific settings only.
 
+# fzf shell integration (installed via git to ~/.fzf)
+[[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+
 # code -> cursor alias (if cursor exists but code doesn't)
 if ! command -v code &>/dev/null && command -v cursor &>/dev/null; then
   alias code="cursor"

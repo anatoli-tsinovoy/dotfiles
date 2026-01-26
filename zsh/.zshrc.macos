@@ -1,6 +1,9 @@
 # macOS-specific zsh configuration
 # Sourced from ~/.zshrc on Darwin systems
 
+# === fzf shell integration (Homebrew) ===
+source <(fzf --zsh)
+
 # === bat theming (macOS-only auto:system support) ===
 alias bat="bat --color=always --theme auto:system --theme-dark default --theme-light GitHub"
 fbat="bat --color=always --theme auto:system --theme-dark default --theme-light GitHub"
