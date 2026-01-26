@@ -141,7 +141,7 @@ install_glow() {
   local tmpdir
   tmpdir=$(mktemp -d)
   curl -LSsf "https://github.com/charmbracelet/glow/releases/download/v${version}/glow_${version}_Linux_${arch_name}.tar.gz" -o "$tmpdir/glow.tar.gz"
-  tar -xzf "$tmpdir/glow.tar.gz" -C "$tmpdir"
+  tar -xzf "$tmpdir/glow.tar.gz" -C "$tmpdir" --strip-components=1
 
   local bindir="$HOME/.local/bin"
   mkdir -p "$bindir"
