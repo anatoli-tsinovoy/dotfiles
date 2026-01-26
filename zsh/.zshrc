@@ -65,14 +65,14 @@ fi
 alias vim="nvim"
 alias ls="eza -la --icons --group-directories-first"
 
-# bat theming (ansi theme uses terminal colors)
-alias bat="bat --color=always --theme=ansi"
-fbat="bat --color=always --theme=ansi"
-alias -g -- --help='--help 2>&1 | bat --language=help --style=plain --theme=ansi'
+# bat theming (ansi theme uses terminal colors, also used by git-delta)
+export BAT_THEME="ansi"
+alias bat="bat --color=always"
+alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
 
 # fzf with bat preview
-alias fzf='fzf --preview-window=right:60%:wrap --preview "${fbat} --style=numbers {} 2>/dev/null || printf %s "{}" | ${fbat} --wrap=auto -l zsh -p"'
+alias fzf='fzf --preview-window=right:60%:wrap --preview "bat --color=always --style=numbers {} 2>/dev/null || printf %s "{}" | bat --color=always --wrap=auto -l zsh -p"'
 
 # lazydocker (only outside containers)
 if ! is_inside_container && command -v lazydocker &>/dev/null; then
