@@ -41,6 +41,7 @@ default-root-container-orientation = 'auto'
 on-focus-changed = [
   'move-mouse window-lazy-center',
   'exec-and-forget sketchybar --trigger aerospace_focus_change',
+  'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh sync',
 ]
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
@@ -187,7 +188,7 @@ automatically-unhide-macos-hidden-apps = true
       'move-node-to-monitor --wrap-around next --focus-follows-window',
       'exec-and-forget /usr/bin/env bash -c "sketchybar --trigger aerospace_monitor_move"', 
     ]
-    ctrl-alt-up = 'fullscreen'
+    ctrl-alt-up = 'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh toggle'
     alt-shift-s = 'exec-and-forget screencapture -i -c'
  
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
@@ -213,7 +214,7 @@ automatically-unhide-macos-hidden-apps = true
     ]
     r = ['flatten-workspace-tree', 'mode main'] # reset layout
     f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
-    shift-f = ['fullscreen', 'mode main']
+    shift-f = ['exec-and-forget ~/.config/aerospace/fullscreen-borders.sh toggle', 'mode main']
     backspace = ['close-all-windows-but-current', 'mode main']
 
     # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
@@ -232,7 +233,7 @@ automatically-unhide-macos-hidden-apps = true
     
     # Refresh janky borders and sketchybar
     alt-shift-b = [
-        'exec-and-forget borders active_color="gradient(top_left=0xff00C8AB,bottom_right=0xff8217FF)" inactive_color="gradient(top_left=0x00FFC9D7,bottom_right=0xffF3F0DF" width=6',
+        'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh sync',
         'exec-and-forget brew services restart sketchybar',
         'mode main'
     ]
@@ -289,4 +290,3 @@ run = ['move-node-to-workspace 3']
 # [[on-window-detected]]
 # if.app-name-regex-substring = 'Xcode'
 # run = ['move-node-to-workspace 9']
-
