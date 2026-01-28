@@ -61,6 +61,7 @@ export EDITOR='nvim'
 alias vim="nvim"
 alias ls="eza -la --icons --group-directories-first"
 alias oc="opencode"
+export OPENCODE_EXPERIMENTAL_MARKDOWN=1
 
 # bat theming (ansi theme uses terminal colors, also used by git-delta)
 export BAT_THEME="ansi"

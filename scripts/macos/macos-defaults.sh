@@ -246,6 +246,11 @@ defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 120 '{ e
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 '{ enabled = 0; }'
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 '{ enabled = 0; }'
 
+# Disable Cmd+M minimize shortcut (remap to null)
+# Include both American and British spellings
+defaults write -g NSUserKeyEquivalents -dict-add 'Minimize' '\0'
+defaults write -g NSUserKeyEquivalents -dict-add 'Minimise' '\0'
+
 ###############################################################################
 # Text Input                                                                  #
 ###############################################################################

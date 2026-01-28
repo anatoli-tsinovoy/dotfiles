@@ -2,49 +2,42 @@
 
 Personal dotfiles for macOS and Linux using GNU Stow for symlink management.
 
+## Quick Reference
+
+```bash
+# Bootstrap
+./install.sh                            # Full setup (packages + stow)
+./install.sh --force                    # Force: remove conflicting targets
+
+# Verification (NO AUTOMATED TESTS)
+bash -n script.sh                       # Syntax check bash
+shellcheck script.sh                    # Lint bash (if installed)
+zsh -n ~/.zshrc                         # Syntax check zsh after stow
+stylua --check nvim/                    # Check lua formatting
+
+# Container testing (recommended for Linux changes)
+podman run -it -v ./:/root/dotfiles:ro python:3.13-slim bash
+```
+
 ## Project Structure
 
 ```
 dotfiles/
-├── install.sh             # Main setup script (entry point)
+├── install.sh             # Entry point (packages + stow + oh-my-zsh)
 ├── Brewfile / Aptfile     # Package lists (macOS / Linux)
-├── scripts/                # OS-specific setup scripts (executed, not symlinked)
-│   ├── linux/
-│   │   └── install-binaries.sh  # Binary tool installer (neovim, fzf, etc.)
+├── scripts/               # OS-specific setup (executed, NOT symlinked)
+│   ├── linux/install-binaries.sh   # Binary tools (neovim, fzf, etc.)
 │   └── macos/
-│       └── macos-defaults.sh    # System preferences script
-├── shims/                  # OS-specific stow packages (symlinked)
-│   ├── linux/
-│   │   └── .local/bin/          # Shims: bat→batcat, fd→fdfind, node→bun
-│   └── macos/
-│       └── .local/bin/docker    # podman→docker shim
-├── git/                   # Git configuration (.gitconfig + .gitconfig.macos)
-├── nvim/                  # Neovim config (LazyVim-based, Tokyonight)
+│       ├── macos-defaults.sh       # System preferences
+│       └── open-in-neovim/         # App: opens files in iTerm+Neovim
+├── shims/                 # OS-specific stow packages (symlinked)
+│   ├── linux/.local/bin/  # bat->batcat, fd->fdfind, node->bun
+│   └── macos/.local/bin/  # docker->podman
+├── git/                   # .gitconfig + .gitconfig.macos
+├── nvim/                  # LazyVim-based Neovim config
 ├── zsh/                   # Unified zsh config (ORDER-SENSITIVE)
-│   ├── .zshrc             # Common config
-│   ├── .zshrc.macos       # macOS post-init
-│   └── .zshrc.linux       # Linux post-init
-├── aerospace/             # Tiling WM (macOS only)
-└── opencode/              # OpenCode AI config
-```
-
-## Commands
-
-```bash
-./install.sh                            # Full bootstrap (packages + stow)
-./scripts/macos/macos-defaults.sh       # macOS: system preferences
-./scripts/linux/install-binaries.sh     # Linux: binary tools
-
-# Manual stow
-stow -t ~ <package>                     # Link package to home
-stow -t ~ -d shims <os>                 # Link OS-specific (linux/macos)
-stow -D -t ~ <package>                  # Unlink package
-
-# Verification (NO AUTOMATED TESTS)
-bash -n script.sh                       # Syntax check bash
-zsh -n ~/.zshrc                         # Syntax check zsh
-ls -la ~ | grep "^l"                    # Check symlinks
-podman run -it -v ./:/root/dotfiles:ro python:3.13-slim bash  # Container test
+├── aerospace/             # Tiling WM + sketchybar (macOS only)
+└── opencode/              # OpenCode AI configuration
 ```
 
 ## Shell Script Style
@@ -145,3 +138,20 @@ Shims work in scripts AND interactive shells (unlike aliases).
 4. **Order matters** - especially in `.zshrc`
 5. **Idempotency** - all install functions must be safe to run multiple times
 6. **Container detection** - skip lazydocker/docker plugin when inside containers
+
+## Common Patterns
+
+### Adding a new tool (Linux)
+1. Add to `Aptfile` if available via apt
+2. Otherwise add install function to `scripts/linux/install-binaries.sh`
+3. If binary name differs, add shim to `shims/linux/.local/bin/`
+
+### Adding a new tool (macOS)
+1. Add to `Brewfile` (brew or cask)
+2. If podman-related, may need shim in `shims/macos/.local/bin/`
+
+### Adding new dotfiles
+1. Create package: `mkdir -p newpkg/.config/newpkg`
+2. Add config files mirroring home structure
+3. Add `run_stow -t ~ newpkg` to `install.sh`
+4. Verify: `stow -n -t ~ newpkg` (dry-run)
