@@ -1,0 +1,35 @@
+# Termux colors.properties - Simply Brand theme LIGHT (from Cursor)
+# Place in ~/.termux/colors.properties then run: termux-reload-settings
+
+# Special colors
+foreground=#110034
+background=#E5E1CC
+cursor=#8217FF
+
+# Normal colors (0-7)
+color0=#110034
+color1=#CC3E34
+color2=#009A81
+color3=#CD9A1B
+color4=#330D81
+color5=#E69AB3
+color6=#00B39A
+color7=#F3F0DF
+
+# Bright colors (8-15)
+color8=#330D81
+color9=#CC3E34
+color10=#00B39A
+color11=#E6B334
+color12=#6734CD
+color13=#E69AB3
+color14=#009A81
+color15=#F3F0DF
+
+# Extended colors (16-21)
+color16=#CC3E34
+color17=#E69AB3
+color18=#6734CD
+color19=#00B39A
+color20=#009A81
+color21=#E6B334

@@ -1,0 +1,29 @@
+# Place in ~/.termux/colors.properties then run: termux-reload-settings
+
+# Special colors
+foreground=#F3F0DF
+background=#110034
+cursor=#8217FF
+
+# Normal colors (0-7)                           color0=#110034                                  color1=#FF4F44
+color2=#00C8AB
+color3=#FFD44F                                  color4=#8217FF                                  color5=#FFC9D7
+color6=#00E6BB
+color7=#F3F0DF
+
+# Bright colors (8-15)
+color8=#330D81
+color9=#FF6767
+color10=#00E6BB                                 color11=#FFE680
+color12=#9A67FF
+color13=#FFC9D7
+color14=#00E6CC
+color15=#F3F0DF
+
+# Extended colors (16-21)
+color16=#FF6767
+color17=#FFC9D7
+color18=#9A67FF
+color19=#00E6BB
+color20=#00E6CC
+color21=#FFE680
