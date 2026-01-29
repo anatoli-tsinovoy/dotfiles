@@ -24,10 +24,11 @@ get_current_theme() {
   local target
   target="$(readlink "$COLORS_FILE")"
   
-  case "$target" in
-    *light*) echo "light" ;;
-    *dark*)  echo "dark" ;;
-    *)       echo "unknown" ;;
+  # Use basename for reliable matching (works with both absolute and relative symlinks)
+  case "$(basename "$target")" in
+    colors.properties.light) echo "light" ;;
+    colors.properties.dark)  echo "dark" ;;
+    *)                       echo "unknown" ;;
   esac
 }
 
@@ -52,8 +53,9 @@ set_theme() {
   # Remove existing colors.properties (file or symlink)
   rm -f "$COLORS_FILE"
   
-  # Create symlink to theme file
-  ln -s "$target_file" "$COLORS_FILE"
+  # Create RELATIVE symlink to theme file (just filename, same directory)
+  # This ensures get_current_theme() can reliably detect the theme via basename
+  ln -s "$(basename "$target_file")" "$COLORS_FILE"
   
   # Reload Termux settings if command is available
   if command -v termux-reload-settings &>/dev/null; then

@@ -28,10 +28,10 @@ main() {
     exit 1
   fi
 
-  # Update package lists
-  log_info "Updating package lists..."
-  pkg update -y
-  log_ok "Package lists updated"
+  # Upgrade all packages first (fixes SSL/curl library issues)
+  log_info "Upgrading all packages..."
+  pkg upgrade -y
+  log_ok "Packages upgraded"
 
   # Read packages from TermuxPkgfile (skip comments and empty lines)
   local packages=()

@@ -145,11 +145,42 @@ install_linux_prerequisites() {
 }
 
 install_termux_prerequisites() {
-  if ! command -v curl &>/dev/null || ! command -v git &>/dev/null; then
-    log_info "Installing prerequisites (curl, git)..."
+  if ! command -v curl &>/dev/null || ! command -v git &>/dev/null || ! command -v unzip &>/dev/null; then
+    log_info "Installing prerequisites (curl, git, unzip)..."
     pkg update -y
-    pkg install -y curl git
+    pkg install -y curl git unzip
   fi
+}
+
+install_termux_font() {
+  local font_file="$HOME/.termux/font.ttf"
+  local hack_version="v3.003"
+  local hack_url="https://github.com/source-foundry/Hack/releases/download/${hack_version}/Hack-${hack_version}-ttf.zip"
+  local tmp_dir
+
+  if [[ -f "$font_file" ]]; then
+    log_ok "Termux font already installed"
+    return 0
+  fi
+
+  log_info "Installing Hack font for Termux..."
+  mkdir -p "$HOME/.termux"
+
+  tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"' EXIT
+
+  curl -fsSL "$hack_url" -o "$tmp_dir/hack.zip"
+  unzip -q "$tmp_dir/hack.zip" -d "$tmp_dir"
+
+  # Use Regular weight as the terminal font
+  cp "$tmp_dir/ttf/Hack-Regular.ttf" "$font_file"
+
+  # Reload settings if available
+  if command -v termux-reload-settings &>/dev/null; then
+    termux-reload-settings
+  fi
+
+  log_ok "Hack font installed"
 }
 
 stow_force_cleanup() {
@@ -237,6 +268,9 @@ main() {
     # === Termux Setup ===
     log_info "Installing Termux packages..."
     bash "$SCRIPT_DIR/scripts/termux/install-packages.sh"
+
+    log_info "Installing Termux font..."
+    install_termux_font
   fi
 
   # === Common Setup (both OS) ===
