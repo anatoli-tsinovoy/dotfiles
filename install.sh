@@ -199,9 +199,6 @@ main() {
     log_info "Applying macOS defaults..."
     bash "$SCRIPT_DIR/scripts/macos/macos-defaults.sh"
 
-    log_info "Optional: Tailscale SSH setup (requires confirmation)..."
-    bash "$SCRIPT_DIR/scripts/macos/tailscale-ssh.sh" || true
-
   elif [[ "$os" == "linux" ]]; then
     # === Linux Setup ===
 
@@ -280,6 +277,9 @@ main() {
     log_info "Stowing Linux shims..."
     run_stow -t ~ -d shims linux
   fi
+
+  log_info "Optional: Tailscale + Eternal Terminal setup (requires confirmation)..."
+  bash "$SCRIPT_DIR/scripts/tailscale-et.sh" || true
 
   log_ok "Bootstrap complete! Open a new shell to apply changes."
 }

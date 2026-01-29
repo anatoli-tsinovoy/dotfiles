@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 #
-# Tailscale SSH and Eternal Terminal setup for macOS
+# Tailscale + Eternal Terminal (ET) remote access setup
+# Supports: macOS (brew services) and Linux (systemd)
 #
-# This script enables remote SSH access via Tailscale network.
-# Only run if you want this machine accessible over Tailscale SSH.
+# Tailscale: VPN mesh network for secure connectivity
+# ET: Persistent terminal sessions that survive network interruptions
 #
-# SECURITY WARNING:
-# - Tailscale SSH exposes this machine to your tailnet
-# - ET (Eternal Terminal) allows persistent remote sessions
-# - Both run as root services
+# SECURITY WARNING: Both services run as root and expose this machine to your tailnet
 #
 set -euo pipefail
 
@@ -27,8 +25,18 @@ run_privileged() {
   fi
 }
 
-if [[ "$(uname -s)" != "Darwin" ]]; then
-  log_warn "This script is for macOS only"
+detect_os() {
+  case "$(uname -s)" in
+    Darwin) echo "mac" ;;
+    Linux) echo "linux" ;;
+    *) echo "other" ;;
+  esac
+}
+
+OS="$(detect_os)"
+
+if [[ "$OS" == "other" ]]; then
+  log_warn "This script only supports macOS and Linux"
   exit 1
 fi
 
@@ -46,7 +54,7 @@ echo "╚═══════════════════════�
 echo ""
 read -rp "Do you want to proceed? [y/N] " response
 if [[ ! "$response" =~ ^[Yy]$ ]]; then
-  log_skip "Skipped Tailscale SSH setup"
+  log_skip "Skipped Tailscale + ET setup"
   exit 0
 fi
 
@@ -55,22 +63,36 @@ fi
 ###############################################################################
 
 if ! command_exists tailscale; then
-  log_warn "tailscale not found. Install with: brew install tailscale"
+  if [[ "$OS" == "mac" ]]; then
+    log_warn "tailscale not found. Install with: brew install tailscale"
+  else
+    log_warn "tailscale not found. Install with: curl -fsSL https://tailscale.com/install.sh | sh"
+  fi
   exit 1
 fi
 
 # Create isolated bin directory with only etterminal symlink (minimal attack surface)
 ET_BIN_DIR="/usr/local/et-bin"
-HOMEBREW_ETTERMINAL="/opt/homebrew/bin/etterminal"
 
-if [[ -x "$HOMEBREW_ETTERMINAL" ]]; then
+if [[ "$OS" == "mac" ]]; then
+  ETTERMINAL_PATH="/opt/homebrew/bin/etterminal"
+else
+  # Linux: etterminal is typically in /usr/bin after apt install
+  ETTERMINAL_PATH="/usr/bin/etterminal"
+fi
+
+if [[ -x "$ETTERMINAL_PATH" ]]; then
   run_privileged mkdir -p "$ET_BIN_DIR"
-  run_privileged ln -sf "$HOMEBREW_ETTERMINAL" "$ET_BIN_DIR/etterminal"
+  run_privileged ln -sf "$ETTERMINAL_PATH" "$ET_BIN_DIR/etterminal"
   log_ok "etterminal symlink created in $ET_BIN_DIR"
 fi
 
 log_info "Starting tailscale service..."
-run_privileged brew services start tailscale
+if [[ "$OS" == "mac" ]]; then
+  run_privileged brew services start tailscale
+else
+  run_privileged systemctl enable --now tailscaled
+fi
 
 log_info "Connecting to tailnet (this may open a browser for auth)..."
 run_privileged tailscale up
@@ -82,12 +104,22 @@ log_ok "Tailscale connected"
 ###############################################################################
 
 if ! command_exists etserver; then
-  log_warn "ET not found. Install with: brew install mistertea/et/et"
+  if [[ "$OS" == "mac" ]]; then
+    log_warn "ET not found. Install with: brew install mistertea/et/et"
+  else
+    log_warn "ET not found. Install with:"
+    log_warn "  Ubuntu: sudo add-apt-repository ppa:jgmath2000/et && sudo apt install et"
+    log_warn "  Debian: See https://eternalterminal.dev/download/"
+  fi
   exit 1
 fi
 
 log_info "Starting ET service..."
-run_privileged brew services start mistertea/et/et
+if [[ "$OS" == "mac" ]]; then
+  run_privileged brew services start mistertea/et/et
+else
+  run_privileged systemctl enable --now et
+fi
 
 log_ok "ET (Eternal Terminal) configured"
 
@@ -100,7 +132,11 @@ echo "════════════════════════�
 echo "  Setup complete!"
 echo ""
 echo "  Tailscale status:  tailscale status"
-echo "  ET service status: sudo brew services list | grep et"
+if [[ "$OS" == "mac" ]]; then
+  echo "  ET service status: sudo brew services list | grep et"
+else
+  echo "  ET service status: systemctl status et"
+fi
 echo ""
 echo "  To connect from another machine:"
 echo "    et <your-tailscale-hostname>"
