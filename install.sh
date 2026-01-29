@@ -341,11 +341,13 @@ main() {
     touch "$HOME/.gitconfig.local"
 
     # Stow Termux config (theme files, theme toggle script)
-    # Only remove stow targets if they're regular files (preserve colors.properties, font.ttf, .current-theme)
+    # Only remove regular files (not symlinks) - stow doesn't conflict with its own symlinks
+    # Preserve user files: colors.properties, font.ttf, .current-theme
     log_info "Stowing Termux configuration..."
     mkdir -p ~/.termux ~/.local/bin
-    rm -f ~/.termux/colors.properties.light ~/.termux/colors.properties.dark
-    rm -f ~/.local/bin/termux-theme-toggle
+    [[ -f ~/.termux/colors.properties.light && ! -L ~/.termux/colors.properties.light ]] && rm -f ~/.termux/colors.properties.light
+    [[ -f ~/.termux/colors.properties.dark && ! -L ~/.termux/colors.properties.dark ]] && rm -f ~/.termux/colors.properties.dark
+    [[ -f ~/.local/bin/termux-theme-toggle && ! -L ~/.local/bin/termux-theme-toggle ]] && rm -f ~/.local/bin/termux-theme-toggle
     run_stow -t ~ termux
 
     # Initialize colors.properties with dark theme (uses copy, not symlink)
