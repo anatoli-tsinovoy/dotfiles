@@ -17,6 +17,10 @@ log_skip() { echo "⏭️  $*"; }
 
 command_exists() { command -v "$1" &>/dev/null; }
 
+is_inside_container() {
+  [[ -f /.dockerenv ]] || [[ -n "${container:-}" ]] || grep -q docker /proc/1/cgroup 2>/dev/null
+}
+
 run_privileged() {
   if [[ $EUID -eq 0 ]]; then
     "$@"
@@ -38,6 +42,11 @@ OS="$(detect_os)"
 if [[ "$OS" == "other" ]]; then
   log_warn "This script only supports macOS and Linux"
   exit 1
+fi
+
+if is_inside_container; then
+  log_skip "Inside container, skipping Tailscale + ET setup (requires systemd)"
+  exit 0
 fi
 
 echo ""
@@ -71,20 +80,14 @@ if ! command_exists tailscale; then
   exit 1
 fi
 
-# Create isolated bin directory with only etterminal symlink (minimal attack surface)
-ET_BIN_DIR="/usr/local/et-bin"
-
 if [[ "$OS" == "mac" ]]; then
+  ET_BIN_DIR="/usr/local/et-bin"
   ETTERMINAL_PATH="/opt/homebrew/bin/etterminal"
-else
-  # Linux: etterminal is typically in /usr/bin after apt install
-  ETTERMINAL_PATH="/usr/bin/etterminal"
-fi
-
-if [[ -x "$ETTERMINAL_PATH" ]]; then
-  run_privileged mkdir -p "$ET_BIN_DIR"
-  run_privileged ln -sf "$ETTERMINAL_PATH" "$ET_BIN_DIR/etterminal"
-  log_ok "etterminal symlink created in $ET_BIN_DIR"
+  if [[ -x "$ETTERMINAL_PATH" ]]; then
+    run_privileged mkdir -p "$ET_BIN_DIR"
+    run_privileged ln -sf "$ETTERMINAL_PATH" "$ET_BIN_DIR/etterminal"
+    log_ok "etterminal symlink created in $ET_BIN_DIR"
+  fi
 fi
 
 log_info "Starting tailscale service..."
