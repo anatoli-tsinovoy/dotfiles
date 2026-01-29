@@ -47,6 +47,11 @@ run_privileged() {
 }
 
 detect_os() {
+  # Check Termux BEFORE Linux (Termux also returns "Linux" from uname)
+  if [[ -n "${TERMUX_VERSION:-}" ]] || [[ "${PREFIX:-}" == *"com.termux"* ]]; then
+    echo "termux"
+    return
+  fi
   case "$(uname -s)" in
     Darwin) echo "mac" ;;
     Linux) echo "linux" ;;
@@ -64,6 +69,8 @@ install_stow() {
   log_info "Installing stow..."
   if [[ "$os" == "mac" ]]; then
     brew install stow
+  elif [[ "$os" == "termux" ]]; then
+    pkg install -y stow
   elif [[ "$os" == "linux" ]]; then
     run_privileged apt-get update && run_privileged apt-get install -y stow
   fi
@@ -137,6 +144,14 @@ install_linux_prerequisites() {
   fi
 }
 
+install_termux_prerequisites() {
+  if ! command -v curl &>/dev/null || ! command -v git &>/dev/null; then
+    log_info "Installing prerequisites (curl, git)..."
+    pkg update -y
+    pkg install -y curl git
+  fi
+}
+
 stow_force_cleanup() {
   local args=("$@")
   local target="$HOME"
@@ -177,6 +192,8 @@ main() {
 
   if [[ "$os" == "linux" ]]; then
     install_linux_prerequisites
+  elif [[ "$os" == "termux" ]]; then
+    install_termux_prerequisites
   fi
 
   if [[ "$os" == "mac" ]]; then
@@ -215,6 +232,11 @@ main() {
 
     log_info "Installing binary tools..."
     bash "$SCRIPT_DIR/scripts/linux/install-binaries.sh"
+
+  elif [[ "$os" == "termux" ]]; then
+    # === Termux Setup ===
+    log_info "Installing Termux packages..."
+    bash "$SCRIPT_DIR/scripts/termux/install-packages.sh"
   fi
 
   # === Common Setup (both OS) ===
@@ -232,7 +254,7 @@ main() {
   # (oh-my-zsh creates a default .zshrc that we don't want)
   log_info "Removing conflicting files before stow..."
   rm -f ~/.zshenv ~/.zshenv.macos ~/.zshenv.linux
-  rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.p10k.zsh
+  rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.zshrc.termux ~/.p10k.zsh
   rm -f ~/.gitconfig ~/.vimrc
   rm -rf ~/.config/nvim ~/.config/opencode
 
@@ -276,10 +298,25 @@ main() {
     # Stow Linux shims (bun -> node)
     log_info "Stowing Linux shims..."
     run_stow -t ~ -d shims linux
+
+  elif [[ "$os" == "termux" ]]; then
+    # Termux-specific setup
+    log_info "Applying Termux-specific settings..."
+
+    # Create empty gitconfig.local (no OS-specific overrides needed)
+    touch "$HOME/.gitconfig.local"
+
+    # Stow Termux config (colors, theme toggle)
+    log_info "Stowing Termux configuration..."
+    rm -rf ~/.termux ~/.local/bin/termux-theme-toggle
+    run_stow -t ~ termux
   fi
 
-  log_info "Optional: Tailscale + Eternal Terminal setup (requires confirmation)..."
-  bash "$SCRIPT_DIR/scripts/tailscale-et.sh" || true
+  # Tailscale + ET setup (skip on Termux - requires systemd)
+  if [[ "$os" != "termux" ]]; then
+    log_info "Optional: Tailscale + Eternal Terminal setup (requires confirmation)..."
+    bash "$SCRIPT_DIR/scripts/tailscale-et.sh" || true
+  fi
 
   log_ok "Bootstrap complete! Open a new shell to apply changes."
 }

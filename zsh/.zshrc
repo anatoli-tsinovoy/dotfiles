@@ -31,6 +31,14 @@ if [[ -d "$HOME/.cargo/bin" ]]; then
   export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
+# Termux-specific config (must be before compinit for completions)
+is_termux() {
+  [[ -n "${TERMUX_VERSION:-}" ]] || [[ "${PREFIX:-}" == *"com.termux"* ]]
+}
+if is_termux && [[ -f ~/.zshrc.termux ]]; then
+  source ~/.zshrc.termux
+fi
+
 # === Oh My Zsh ===
 export ZSH="$HOME/.oh-my-zsh"
 

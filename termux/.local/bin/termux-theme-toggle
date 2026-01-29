@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# termux-theme-toggle - Switch Termux color theme between light and dark
+# Usage: termux-theme-toggle [light|dark]
+#   No args: toggle between light and dark
+#   light:   switch to light theme
+#   dark:    switch to dark theme
+set -euo pipefail
+
+TERMUX_DIR="$HOME/.termux"
+COLORS_FILE="$TERMUX_DIR/colors.properties"
+LIGHT_THEME="$TERMUX_DIR/colors.properties.light"
+DARK_THEME="$TERMUX_DIR/colors.properties.dark"
+
+log_info() { echo "ℹ️  $*"; }
+log_ok() { echo "✅ $*"; }
+log_warn() { echo "⚠️  $*"; }
+
+get_current_theme() {
+  if [[ ! -L "$COLORS_FILE" ]]; then
+    echo "unknown"
+    return
+  fi
+  
+  local target
+  target="$(readlink "$COLORS_FILE")"
+  
+  case "$target" in
+    *light*) echo "light" ;;
+    *dark*)  echo "dark" ;;
+    *)       echo "unknown" ;;
+  esac
+}
+
+set_theme() {
+  local theme="$1"
+  local target_file
+  
+  case "$theme" in
+    light) target_file="$LIGHT_THEME" ;;
+    dark)  target_file="$DARK_THEME" ;;
+    *)
+      log_warn "Unknown theme: $theme (use 'light' or 'dark')"
+      exit 1
+      ;;
+  esac
+  
+  if [[ ! -f "$target_file" ]]; then
+    log_warn "Theme file not found: $target_file"
+    exit 1
+  fi
+  
+  # Remove existing colors.properties (file or symlink)
+  rm -f "$COLORS_FILE"
+  
+  # Create symlink to theme file
+  ln -s "$target_file" "$COLORS_FILE"
+  
+  # Reload Termux settings if command is available
+  if command -v termux-reload-settings &>/dev/null; then
+    termux-reload-settings
+  fi
+  
+  log_ok "Theme set to: $theme"
+}
+
+main() {
+  # Ensure .termux directory exists
+  if [[ ! -d "$TERMUX_DIR" ]]; then
+    log_warn "Termux directory not found: $TERMUX_DIR"
+    exit 1
+  fi
+  
+  # Check theme files exist
+  if [[ ! -f "$LIGHT_THEME" ]] || [[ ! -f "$DARK_THEME" ]]; then
+    log_warn "Theme files not found. Expected:"
+    log_warn "  $LIGHT_THEME"
+    log_warn "  $DARK_THEME"
+    exit 1
+  fi
+  
+  local requested_theme="${1:-}"
+  
+  if [[ -n "$requested_theme" ]]; then
+    # Explicit theme requested
+    set_theme "$requested_theme"
+  else
+    # Toggle mode
+    local current
+    current="$(get_current_theme)"
+    
+    case "$current" in
+      light) set_theme "dark" ;;
+      dark)  set_theme "light" ;;
+      *)
+        # Unknown state, default to dark
+        log_info "Current theme unknown, defaulting to dark"
+        set_theme "dark"
+        ;;
+    esac
+  fi
+}
+
+main "$@"

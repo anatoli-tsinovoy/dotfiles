@@ -1,0 +1,30 @@
+# TermuxPkgfile - Package list for Termux (Android terminal emulator)
+# Install with: scripts/termux/install-packages.sh
+#
+# NOTE: Termux uses pkg (apt wrapper). Packages are installed to $PREFIX.
+# Install Termux from F-Droid, not the Play Store.
+
+# === Core utilities ===
+curl
+git
+zsh
+openssh
+
+# === Modern CLI tools ===
+ripgrep
+fd
+bat
+eza
+fzf
+zoxide
+neovim
+
+# === Remote access ===
+et
+lftp
+
+# === System tools ===
+proot
+
+# === Shell enhancements ===
+zsh-completions

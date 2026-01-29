@@ -1,0 +1,10 @@
+# Termux-specific zsh configuration
+# Sourced by .zshrc when running in Termux
+
+# Add Termux zsh-completions to fpath (must be before compinit)
+if [[ -d "$PREFIX/share/zsh-completions" ]]; then
+  fpath=("$PREFIX/share/zsh-completions" $fpath)
+fi
+
+# Termux theme toggle alias
+alias termux-theme='termux-theme-toggle'
