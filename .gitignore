@@ -1,5 +1,9 @@
 aerospace/.config/sketchybar/helper/helper
 aerospace/.config/aerospace/winbounds
 
-# Termux colors.properties is generated from themes, not tracked
+# Termux user files (not tracked, created at runtime)
 termux/.termux/colors.properties
+termux/.termux/font.ttf
+termux/.termux/termux.properties
+termux/.termux/shell
+termux/.termux/.current-theme

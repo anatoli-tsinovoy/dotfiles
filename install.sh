@@ -340,19 +340,15 @@ main() {
     # Create empty gitconfig.local (no OS-specific overrides needed)
     touch "$HOME/.gitconfig.local"
 
-    # Stow Termux config (theme files, theme toggle script)
-    # Only remove regular files (not symlinks) - stow doesn't conflict with its own symlinks
-    # Preserve user files: colors.properties, font.ttf, .current-theme
+    # Stow Termux config with --no-folding to create file symlinks (not directory symlink)
+    # This allows user files (font.ttf, colors.properties, etc.) to coexist with stowed themes
     log_info "Stowing Termux configuration..."
     mkdir -p ~/.termux ~/.local/bin
-    [[ -f ~/.termux/colors.properties.light && ! -L ~/.termux/colors.properties.light ]] && rm -f ~/.termux/colors.properties.light
-    [[ -f ~/.termux/colors.properties.dark && ! -L ~/.termux/colors.properties.dark ]] && rm -f ~/.termux/colors.properties.dark
-    [[ -f ~/.local/bin/termux-theme-toggle && ! -L ~/.local/bin/termux-theme-toggle ]] && rm -f ~/.local/bin/termux-theme-toggle
-    run_stow -t ~ termux
+    run_stow --no-folding -t ~ termux
 
     # Initialize colors.properties with dark theme (uses copy, not symlink)
     if [[ ! -f "$HOME/.termux/colors.properties" ]]; then
-      cp "$SCRIPT_DIR/termux/.termux/colors.properties.dark" "$HOME/.termux/colors.properties"
+      cp "$HOME/.termux/colors.properties.dark" "$HOME/.termux/colors.properties"
       echo "dark" > "$HOME/.termux/.current-theme"
       log_ok "Initialized Termux theme to dark"
     fi
