@@ -343,13 +343,14 @@ main() {
     # Stow Termux config (theme files, theme toggle script)
     # Only remove stow targets if they're regular files (preserve colors.properties, font.ttf, .current-theme)
     log_info "Stowing Termux configuration..."
+    mkdir -p ~/.termux ~/.local/bin
     rm -f ~/.termux/colors.properties.light ~/.termux/colors.properties.dark
     rm -f ~/.local/bin/termux-theme-toggle
     run_stow -t ~ termux
 
     # Initialize colors.properties with dark theme (uses copy, not symlink)
     if [[ ! -f "$HOME/.termux/colors.properties" ]]; then
-      cp "$HOME/.termux/colors.properties.dark" "$HOME/.termux/colors.properties"
+      cp "$SCRIPT_DIR/termux/.termux/colors.properties.dark" "$HOME/.termux/colors.properties"
       echo "dark" > "$HOME/.termux/.current-theme"
       log_ok "Initialized Termux theme to dark"
     fi
