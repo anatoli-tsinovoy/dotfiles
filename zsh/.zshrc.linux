@@ -1,10 +1,12 @@
 # Linux-specific zsh configuration
-# Sourced from ~/.zshrc on Linux systems
-# NOTE: Most Linux-specific config is now in .zshrc (before oh-my-zsh loads)
-#       This file is for post-initialization Linux-specific settings only.
+# Sourced from ~/.zshrc on Linux systems (including Termux)
 
-# fzf shell integration (installed via git to ~/.fzf)
-[[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+# fzf shell integration
+if [[ -f "$HOME/.fzf.zsh" ]]; then
+  source "$HOME/.fzf.zsh"
+elif command -v fzf &>/dev/null; then
+  source <(fzf --zsh)
+fi
 
 # code -> cursor alias (if cursor exists but code doesn't)
 if ! command -v code &>/dev/null && command -v cursor &>/dev/null; then

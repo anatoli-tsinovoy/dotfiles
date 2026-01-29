@@ -340,10 +340,26 @@ main() {
     # Create empty gitconfig.local (no OS-specific overrides needed)
     touch "$HOME/.gitconfig.local"
 
-    # Stow Termux config (colors, theme toggle)
+    # Stow Termux config (theme files, theme toggle script)
+    # Only remove stow targets if they're regular files (preserve colors.properties, font.ttf, .current-theme)
     log_info "Stowing Termux configuration..."
-    rm -rf ~/.termux ~/.local/bin/termux-theme-toggle
+    rm -f ~/.termux/colors.properties.light ~/.termux/colors.properties.dark
+    rm -f ~/.local/bin/termux-theme-toggle
     run_stow -t ~ termux
+
+    # Initialize colors.properties with dark theme (uses copy, not symlink)
+    if [[ ! -f "$HOME/.termux/colors.properties" ]]; then
+      cp "$HOME/.termux/colors.properties.dark" "$HOME/.termux/colors.properties"
+      echo "dark" > "$HOME/.termux/.current-theme"
+      log_ok "Initialized Termux theme to dark"
+    fi
+
+    # Set zsh as default shell
+    if [[ "$(basename "$SHELL")" != "zsh" ]]; then
+      log_info "Setting zsh as default shell..."
+      chsh -s zsh
+      log_ok "Default shell set to zsh (restart Termux to apply)"
+    fi
   fi
 
   # Tailscale + ET setup (skip on Termux - requires systemd)
