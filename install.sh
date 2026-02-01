@@ -9,13 +9,15 @@ log_ok() { echo "✅ $*"; }
 log_warn() { echo "⚠️  $*"; }
 
 STOW_FORCE=0
+STOW_ADOPT=0
 
 usage() {
   cat <<'EOF'
-Usage: ./install.sh [--force]
+Usage: ./install.sh [--force] [--adopt]
 
 Options:
   --force   Remove conflicting targets before stow
+  --adopt   Adopt existing files into stow packages
 EOF
 }
 
@@ -24,6 +26,10 @@ parse_args() {
     case "$1" in
       --force)
         STOW_FORCE=1
+        shift
+        ;;
+      --adopt)
+        STOW_ADOPT=1
         shift
         ;;
       -h|--help)
@@ -209,10 +215,14 @@ stow_force_cleanup() {
 }
 
 run_stow() {
+  local stow_args=()
+  if [[ $STOW_ADOPT -eq 1 ]]; then
+    stow_args+=(--adopt)
+  fi
   if [[ $STOW_FORCE -eq 1 ]]; then
     stow_force_cleanup "$@"
   fi
-  stow "$@"
+  stow "${stow_args[@]}" "$@"
 }
 
 main() {
