@@ -7,6 +7,9 @@
     "opencode-openai-codex-auth"
   ],
   "lsp": {
+    "pyright": {
+      "disabled": true
+    },
     "ty": {
       "command": ["ty", "server"],
       "extensions": [".py", ".pyi"]
