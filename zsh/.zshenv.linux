@@ -1,1 +1,12 @@
-# Linux-specific environment (placeholder)
+# Linux-specific environment
+
+_VIU="$(command -v viu)"
+
+viu() {
+  if is_inside_container; then
+    "$_VIU" "$@" | bat -p
+  else
+    "$_VIU" "$@"
+  fi
+}
+

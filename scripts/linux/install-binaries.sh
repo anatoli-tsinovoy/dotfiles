@@ -158,12 +158,12 @@ install_glow() {
   arch=$(get_arch)
 
   case "$arch" in
-    x86_64) arch_name="x86_64" ;;
-    aarch64) arch_name="arm64" ;;
-    *)
-      log_warn "Unsupported architecture for glow: $arch"
-      return 1
-      ;;
+  x86_64) arch_name="x86_64" ;;
+  aarch64) arch_name="arm64" ;;
+  *)
+    log_warn "Unsupported architecture for glow: $arch"
+    return 1
+    ;;
   esac
 
   local tmpdir
@@ -447,7 +447,7 @@ main() {
   # Tools with prebuilt binaries
   install_glow
   install_dua
-  install_tlrc  # installs cargo on ARM64 only (no prebuilt available)
+  install_tlrc # installs cargo on ARM64 only (no prebuilt available)
   install_lazydocker
   install_fzf
   install_viu
