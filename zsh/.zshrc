@@ -106,6 +106,11 @@ if command -v uv &>/dev/null; then
   eval "$(uv generate-shell-completion zsh)"
 fi
 
+# glow shell completion
+if command -v glow &>/dev/null; then
+  eval "$(glow completion zsh)"
+fi
+
 # thefuck
 if command -v thefuck &>/dev/null; then
   eval $(thefuck --alias)
