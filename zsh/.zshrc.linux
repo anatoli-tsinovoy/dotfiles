@@ -12,3 +12,30 @@ fi
 if ! command -v code &>/dev/null && command -v cursor &>/dev/null; then
   alias code="cursor"
 fi
+
+# viu wrapper: -q flag enables iTerm mode in containers (no bat pipe)
+viu() {
+  local assume_iterm=false
+  local args=()
+
+  for arg in "$@"; do
+    if [[ "$arg" == "-q" ]]; then
+      assume_iterm=true
+    else
+      args+=("$arg")
+    fi
+  done
+
+
+  if is_inside_container; then
+    if $assume_iterm; then
+      # Inside container with -q: use iTerm mode
+      TERM_PROGRAM=iTerm command viu "${args[@]}"
+    else
+      command viu "${args[@]}" | bat -p
+    fi
+  else
+    # Outside container or no -q: normal execution
+    command viu "${args[@]}"
+  fi
+}
