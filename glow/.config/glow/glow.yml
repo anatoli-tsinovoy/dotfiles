@@ -1,9 +1,0 @@
-# style is set via glow() shell function in .zshrc (auto light/dark detection)
-# mouse support (TUI-mode only)
-mouse: false
-# use pager to display markdown
-pager: true
-# word-wrap at width
-width: 80
-# show all files, including hidden and ignored.
-all: false

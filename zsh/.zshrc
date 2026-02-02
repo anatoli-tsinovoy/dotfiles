@@ -111,6 +111,11 @@ if command -v glow &>/dev/null; then
   eval "$(glow completion zsh)"
   _glow_select_style() {
     local style_dir="${XDG_CONFIG_HOME:-$HOME/.config}/glow"
+    if [[ "$(uname -s)" == "Darwin" ]] && defaults read -g AppleInterfaceStyle &>/dev/null 2>&1; then
+      echo "$style_dir/simply-dark.json"; return
+    elif [[ "$(uname -s)" == "Darwin" ]]; then
+      echo "$style_dir/simply-light.json"; return
+    fi
     if [[ -n "${COLORFGBG:-}" ]]; then
       local bg="${COLORFGBG##*;}"
       case "$bg" in
@@ -121,14 +126,9 @@ if command -v glow &>/dev/null; then
     if [[ -n "${TERMUX_VERSION:-}" ]] || [[ "${PREFIX:-}" == *"com.termux"* ]]; then
       [[ -f "$HOME/.termux/.current-theme" ]] && [[ "$(cat "$HOME/.termux/.current-theme")" == "light" ]] && echo "$style_dir/simply-light.json" && return
     fi
-    if [[ "$(uname -s)" == "Darwin" ]] && defaults read -g AppleInterfaceStyle &>/dev/null 2>&1; then
-      echo "$style_dir/simply-dark.json"; return
-    elif [[ "$(uname -s)" == "Darwin" ]]; then
-      echo "$style_dir/simply-light.json"; return
-    fi
     echo "$style_dir/simply-dark.json"
   }
-  glow() { command glow -s "$(_glow_select_style)" "$@"; }
+  glow() { command glow -p -s "$(_glow_select_style)" "$@"; }
 fi
 
 # thefuck

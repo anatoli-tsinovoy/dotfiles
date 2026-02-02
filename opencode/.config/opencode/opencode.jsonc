@@ -23,6 +23,10 @@
     "ruff": {
       "command": ["ruff", "format", "$FILE"],
       "extensions": [".py", ".pyi"]
+    },
+    "ruff_organize_imports": {
+      "command": ["ruff", "check", "--select", "I", "--fix-only", "$FILE"],
+      "extensions": [".py", ".pyi"]
     }
   },
   "provider": {
