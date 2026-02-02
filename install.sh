@@ -24,22 +24,22 @@ EOF
 parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --force)
-        STOW_FORCE=1
-        shift
-        ;;
-      --adopt)
-        STOW_ADOPT=1
-        shift
-        ;;
-      -h|--help)
-        usage
-        exit 0
-        ;;
-      *)
-        log_warn "Unknown argument: $1"
-        shift
-        ;;
+    --force)
+      STOW_FORCE=1
+      shift
+      ;;
+    --adopt)
+      STOW_ADOPT=1
+      shift
+      ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      log_warn "Unknown argument: $1"
+      shift
+      ;;
     esac
   done
 }
@@ -59,9 +59,9 @@ detect_os() {
     return
   fi
   case "$(uname -s)" in
-    Darwin) echo "mac" ;;
-    Linux) echo "linux" ;;
-    *) echo "other" ;;
+  Darwin) echo "mac" ;;
+  Linux) echo "linux" ;;
+  *) echo "other" ;;
   esac
 }
 
@@ -194,7 +194,7 @@ stow_force_cleanup() {
   local target="$HOME"
   local output
 
-  for ((i=0; i<${#args[@]}; i++)); do
+  for ((i = 0; i < ${#args[@]}; i++)); do
     if [[ "${args[$i]}" == "-t" || "${args[$i]}" == "--target" ]]; then
       target="${args[$((i + 1))]}"
     fi
@@ -211,7 +211,7 @@ stow_force_cleanup() {
       log_warn "Force: removing conflicting target $path"
       rm -rf "$path"
     fi
-  done <<< "$output"
+  done <<<"$output"
 }
 
 run_stow() {
@@ -304,7 +304,7 @@ main() {
 
   # Stow common packages (no --adopt: we want OUR files, not whatever exists)
   log_info "Stowing common dotfiles..."
-  run_stow -t ~ nvim git opencode
+  run_stow -t ~ nvim git opencode glow
 
   # Stow unified zsh package (contains .zshrc, .zshrc.macos, .zshrc.linux, .p10k.zsh)
   log_info "Stowing zsh configuration..."
@@ -359,7 +359,7 @@ main() {
     # Initialize colors.properties with dark theme (uses copy, not symlink)
     if [[ ! -f "$HOME/.termux/colors.properties" ]]; then
       cp "$HOME/.termux/colors.properties.dark" "$HOME/.termux/colors.properties"
-      echo "dark" > "$HOME/.termux/.current-theme"
+      echo "dark" >"$HOME/.termux/.current-theme"
       log_ok "Initialized Termux theme to dark"
     fi
 
