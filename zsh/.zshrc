@@ -106,29 +106,18 @@ if command -v uv &>/dev/null; then
   eval "$(uv generate-shell-completion zsh)"
 fi
 
-# glow with auto light/dark theme selection
+# glow with custom light/dark styles
 if command -v glow &>/dev/null; then
   eval "$(glow completion zsh)"
-  _glow_select_style() {
+  source ~/.zsh/detect-background.zsh
+  glow() {
     local style_dir="${XDG_CONFIG_HOME:-$HOME/.config}/glow"
-    if [[ "$(uname -s)" == "Darwin" ]] && defaults read -g AppleInterfaceStyle &>/dev/null 2>&1; then
-      echo "$style_dir/simply-dark.json"; return
-    elif [[ "$(uname -s)" == "Darwin" ]]; then
-      echo "$style_dir/simply-light.json"; return
-    fi
-    if [[ -n "${COLORFGBG:-}" ]]; then
-      local bg="${COLORFGBG##*;}"
-      case "$bg" in
-        0|1|2|3|4|5|6|8) echo "$style_dir/simply-dark.json"; return ;;
-        7|15) echo "$style_dir/simply-light.json"; return ;;
-      esac
-    fi
-    if [[ -n "${TERMUX_VERSION:-}" ]] || [[ "${PREFIX:-}" == *"com.termux"* ]]; then
-      [[ -f "$HOME/.termux/.current-theme" ]] && [[ "$(cat "$HOME/.termux/.current-theme")" == "light" ]] && echo "$style_dir/simply-light.json" && return
-    fi
-    echo "$style_dir/simply-dark.json"
+    local style="$style_dir/simply-dark.json"
+    [[ "$(_detect_background)" == "light" ]] && style="$style_dir/simply-light.json"
+    echo $(_detect_background)
+    echo $style
+    command glow -ps "$style" "$@"
   }
-  glow() { command glow -p -s "$(_glow_select_style)" "$@"; }
 fi
 
 # thefuck
