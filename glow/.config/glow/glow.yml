@@ -1,5 +1,4 @@
-# style name or JSON path (default "auto")
-style: "auto"
+# style is set via glow() shell function in .zshrc (auto light/dark detection)
 # mouse support (TUI-mode only)
 mouse: false
 # use pager to display markdown
