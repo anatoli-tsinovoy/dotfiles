@@ -316,6 +316,36 @@ install_opencode() {
   log_ok "opencode installed"
 }
 
+install_bash_language_server() {
+  if command_exists bash-language-server; then
+    log_skip "bash-language-server already installed"
+    return 0
+  fi
+  if ! command_exists bun; then
+    log_warn "bun not found, skipping bash-language-server installation"
+    return 1
+  fi
+
+  log_info "Installing bash-language-server via bun..."
+  bun install -g bash-language-server
+  log_ok "bash-language-server installed"
+}
+
+install_yaml_language_server() {
+  if command_exists yaml-language-server; then
+    log_skip "yaml-language-server already installed"
+    return 0
+  fi
+  if ! command_exists bun; then
+    log_warn "bun not found, skipping yaml-language-server installation"
+    return 1
+  fi
+
+  log_info "Installing yaml-language-server via bun..."
+  bun install -g yaml-language-server
+  log_ok "yaml-language-server installed"
+}
+
 install_viu() {
   if command_exists viu; then
     log_skip "viu already installed ($(viu --version 2>&1 | head -1))"
@@ -459,6 +489,8 @@ main() {
   install_yt_dlp
   install_emojify
   install_opencode
+  install_bash_language_server
+  install_yaml_language_server
 
   # Optional: LazyVim (only if nvim config doesn't exist)
   # Uncomment if you want LazyVim on fresh installs:

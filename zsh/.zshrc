@@ -114,8 +114,6 @@ if command -v glow &>/dev/null; then
     local style_dir="${XDG_CONFIG_HOME:-$HOME/.config}/glow"
     local style="$style_dir/simply-dark.json"
     [[ "$(_detect_background)" == "light" ]] && style="$style_dir/simply-light.json"
-    echo $(_detect_background)
-    echo $style
     command glow -ps "$style" "$@"
   }
 fi
