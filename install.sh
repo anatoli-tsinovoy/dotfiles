@@ -363,6 +363,10 @@ main() {
       log_ok "Initialized Termux theme to dark"
     fi
 
+    # Stow Termux shims (emojify passthrough)
+    log_info "Stowing Termux shims..."
+    run_stow -t ~ -d shims termux
+
     # Set zsh as default shell
     if [[ "$(basename "$SHELL")" != "zsh" ]]; then
       log_info "Setting zsh as default shell..."

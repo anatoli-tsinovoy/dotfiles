@@ -1,0 +1,4 @@
+#!/bin/sh
+# Shim: emojify is not available on Termux (Homebrew-only)
+# Pass stdin through unchanged so git pager "emojify | delta" works
+exec cat "$@"
