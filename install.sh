@@ -304,7 +304,7 @@ main() {
 
   # Stow common packages (no --adopt: we want OUR files, not whatever exists)
   log_info "Stowing common dotfiles..."
-  run_stow -t ~ nvim git opencode glow
+  run_stow -t ~ nvim git opencode glow tmux
 
   # Stow unified zsh package (contains .zshrc, .zshrc.macos, .zshrc.linux, .p10k.zsh)
   log_info "Stowing zsh configuration..."

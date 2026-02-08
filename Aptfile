@@ -29,6 +29,7 @@ package "eza"
 package "btop"
 package "fzf"
 package "zoxide"
+package "tmux"
 
 # === Git tools ===
 package "git-lfs"
