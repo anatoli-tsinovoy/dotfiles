@@ -32,6 +32,9 @@
       "model": "google/gemini-3-flash-preview"
     }
   },
+  "experimental": {
+    "preemptive_compaction": true
+  },
   "categories": {
     "visual-engineering": {
       "model": "google/gemini-3-pro-preview"
