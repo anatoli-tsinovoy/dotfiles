@@ -254,6 +254,9 @@ main() {
     log_info "Installing Homebrew packages..."
     brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
 
+    log_info "Installing opencode via bun..."
+    bun install -g opencode-ai@dev
+
     log_info "Applying macOS defaults..."
     bash "$SCRIPT_DIR/scripts/macos/macos-defaults.sh"
 

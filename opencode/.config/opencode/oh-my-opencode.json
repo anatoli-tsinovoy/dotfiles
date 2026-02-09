@@ -2,10 +2,10 @@
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "agents": {
     "sisyphus": {
-      "model": "amazon-bedrock/global.anthropic.claude-opus-4-6-v1"
+      "model": "anthropic/claude-opus-4-6"
     },
     "atlas": {
-      "model": "amazon-bedrock/global.anthropic.claude-opus-4-6-v1"
+      "model": "anthropic/claude-opus-4-6"
     },
     "prometheus": {
       "model": "openai/gpt-5.3-codex"
@@ -14,10 +14,10 @@
       "model": "openai/gpt-5.3-codex"
     },
     "metis": {
-      "model": "amazon-bedrock/global.anthropic.claude-sonnet-4-5-20250929-v1:0"
+      "model": "anthropic/claude-sonnet-4-5"
     },
     "momus": {
-      "model": "amazon-bedrock/global.anthropic.claude-opus-4-6-v1"
+      "model": "anthropic/claude-opus-4-6"
     },
     "oracle": {
       "model": "openai/gpt-5.3-codex"
@@ -46,13 +46,13 @@
       "model": "google/gemini-3-flash-preview"
     },
     "quick": {
-      "model": "amazon-bedrock/global.anthropic.claude-haiku-4-5-20251001-v1:0"
+      "model": "anthropic/claude-haiku-4-5"
     },
     "unspecified-low": {
-      "model": "amazon-bedrock/global.anthropic.claude-sonnet-4-5-20250929-v1:0"
+      "model": "anthropic/claude-sonnet-4-5"
     },
     "unspecified-high": {
-      "model": "amazon-bedrock/global.anthropic.claude-opus-4-6-v1"
+      "model": "anthropic/claude-opus-4-6"
     }
   }
 }
