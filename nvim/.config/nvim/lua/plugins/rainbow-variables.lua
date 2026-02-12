@@ -12,10 +12,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
         "#B8953E", -- Gold
         "#6D50B5", -- Purple
         "#E69AB3", -- Pink
-        "#4A8EC2", -- Steel Blue
-        "#CC7832", -- Orange
-        "#5EA868", -- Forest Green
-        "#9A67FF", -- Lavender
       },
       reduce_color_collisions = true,
       semantic_background_colors = false,
