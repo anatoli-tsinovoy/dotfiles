@@ -312,7 +312,7 @@ install_opencode() {
   fi
 
   log_info "Installing opencode via bun..."
-  bun install -g opencode-ai@latest
+  bun install -g opencode-ai@dev
   log_ok "opencode installed"
 }
 
