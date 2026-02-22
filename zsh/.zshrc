@@ -14,7 +14,8 @@ export LANGUAGE='en_US:en'
 export LC_ALL='en_US.UTF-8'
 
 # === TERM (Linux needs this early, macOS sets it via terminal app) ===
-if [[ "$(uname -s)" == "Linux" ]]; then
+# Only set TERM as a last-resort fallback; never override inside tmux
+if [[ "$(uname -s)" == "Linux" && -z "${TMUX-}" ]]; then
   export TERM=xterm-256color
 fi
 
