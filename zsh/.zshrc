@@ -134,6 +134,12 @@ if [ $IS_CURSOR_TERMINAL -eq 0 ]; then
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 fi
 
+# === AWS SSO Login with Profile ===
+awslogin() {
+  export AWS_PROFILE="$1"
+  aws sso login --profile "$1"
+}
+
 # === Vi-mode keybindings ===
 bindkey -v
 bindkey -v '^?' backward-delete-char
