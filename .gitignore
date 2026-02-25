@@ -7,3 +7,6 @@ termux/.termux/font.ttf
 termux/.termux/termux.properties
 termux/.termux/shell
 termux/.termux/.current-theme
+
+# Sensitive
+private-macos

@@ -320,7 +320,7 @@ main() {
 
     # macOS-specific stow packages
     log_info "Stowing macOS-specific dotfiles..."
-    run_stow -t ~ aerospace iterm2 cursor-macos
+    run_stow -t ~ aerospace iterm2 cursor-macos private-macos
 
     # Create macOS-specific gitconfig.local
     cp "$SCRIPT_DIR/git/.gitconfig.macos" "$HOME/.gitconfig.local"

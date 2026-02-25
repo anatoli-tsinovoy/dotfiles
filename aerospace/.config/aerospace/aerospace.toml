@@ -158,6 +158,8 @@ automatically-unhide-macos-hidden-apps = true
     alt-s = 'exec-and-forget open -a "Slack"'
     alt-y = 'exec-and-forget open -a "YouTube"'
     alt-f = 'exec-and-forget open -a "Finder"'
+    cmd-alt-shift-l = 'exec-and-forget open -a "Google Chrome" "$HOME/.private/redirect1.html"'
+    ctrl-cmd-alt-shift-l = 'exec-and-forget open -a "Google Chrome" "$HOME/.private/redirect2.html"'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
     alt-shift-1 = ['move-node-to-workspace 1', 'workspace 1']# , 'exec-and-forget "aerospace focus --window-id ${AEROSPACE_PREV_WINDOW_ID:-$AEROSPACE_FOCUSED_WINDOW_ID}"']
