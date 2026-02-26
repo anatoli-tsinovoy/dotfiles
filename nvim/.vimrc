@@ -65,3 +65,9 @@ set number
 
 set nocompatible
 set rtp+=/opt/homebrew/opt/fzf
+
+" Turning off the arrow keys to get used to hjkl
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>

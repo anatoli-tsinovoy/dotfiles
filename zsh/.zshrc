@@ -153,6 +153,22 @@ bindkey -M vicmd '^R' vi-redo
 bindkey -M viins '^[f' forward-word
 bindkey -M viins '^[b' backward-word
 
+# === Fancy ^Z ===
+# Source - https://superuser.com/a/378045
+# Posted by Gilles 'SO- stop being evil', modified by community. See post 'Timeline' for change history
+# Retrieved 2026-02-25, License - CC BY-SA 3.0
+
+fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    bg
+    zle redisplay
+  else
+    zle push-input
+  fi
+}
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
+
 # === OS-specific configuration ===
 # Detect OS and source appropriate config
 case "$(uname -s)" in
