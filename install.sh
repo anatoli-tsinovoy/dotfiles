@@ -87,6 +87,56 @@ detect_linux_distro() {
   fi
 }
 
+detect_linux_version() {
+  if [ ! -f /etc/os-release ]; then
+    echo "unknown"
+    return
+  fi
+
+  os_version=$(sed -n 's/^VERSION_ID=//p' /etc/os-release | head -n 1)
+  os_version=${os_version#\"}
+  os_version=${os_version%\"}
+
+  if [ -n "$os_version" ]; then
+    echo "$os_version"
+  else
+    echo "unknown"
+  fi
+}
+
+print_alpine_upgrade_guide() {
+  echo ""
+  echo "╔══════════════════════════════════════════════════════════════════╗"
+  echo "║                     Alpine upgrade required                    ║"
+  echo "╠══════════════════════════════════════════════════════════════════╣"
+  echo "║ Bun needs a newer Alpine release than 3.14.                    ║"
+  echo "║ Upgrade this machine to Alpine 3.20+ and rerun ./install.sh.   ║"
+  echo "╚══════════════════════════════════════════════════════════════════╝"
+  echo ""
+  log_warn "Recommended upgrade flow:"
+  echo "  1. Back up important data and confirm you can restore access."
+  echo "  2. Update every v3.14 entry in /etc/apk/repositories to v3.20."
+  echo "  3. Run: apk update"
+  echo "  4. Run: apk upgrade --available"
+  echo "  5. Reboot the machine."
+  echo "  6. Re-run: sh ./install.sh"
+  echo ""
+  log_warn "Continuing install, but Bun and Bun-based tools will be skipped on Alpine 3.14.x."
+}
+
+require_supported_alpine() {
+  linux_distro="$1"
+  linux_version="$2"
+
+  if [ "$linux_distro" = "alpine" ]; then
+    case "$linux_version" in
+    3.14*)
+      print_alpine_upgrade_guide
+      ;;
+    esac
+  fi
+}
+
 install_alpine_packages() {
   log_info "Installing Alpine packages..."
   run_privileged apk add --no-cache \
@@ -300,13 +350,18 @@ main() {
   parse_args "$@"
   os="$(detect_os)"
   linux_distro="unknown"
+  linux_version="unknown"
   if [ "$os" = "linux" ]; then
     linux_distro="$(detect_linux_distro)"
+    linux_version="$(detect_linux_version)"
   fi
   log_info "Detected OS: $os"
   if [ "$os" = "linux" ]; then
     log_info "Detected Linux distro: $linux_distro"
+    log_info "Detected Linux version: $linux_version"
   fi
+
+  require_supported_alpine "$linux_distro" "$linux_version"
 
   if [ "$os" = "linux" ]; then
     install_linux_prerequisites "$linux_distro"

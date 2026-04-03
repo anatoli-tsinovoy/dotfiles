@@ -60,6 +60,40 @@ detect_linux_distro() {
   fi
 }
 
+detect_linux_version() {
+  local os_version
+
+  if [[ ! -f /etc/os-release ]]; then
+    echo "unknown"
+    return
+  fi
+
+  os_version=$(sed -n 's/^VERSION_ID=//p' /etc/os-release | head -1)
+  os_version=${os_version#\"}
+  os_version=${os_version%\"}
+
+  if [[ -n "$os_version" ]]; then
+    echo "$os_version"
+  else
+    echo "unknown"
+  fi
+}
+
+alpine_supports_bun() {
+  local linux_distro="$1"
+  local linux_version="$2"
+
+  if [[ "$linux_distro" != "alpine" ]]; then
+    return 0
+  fi
+
+  case "$linux_version" in
+    3.14*) return 1 ;;
+  esac
+
+  return 0
+}
+
 # Fetch latest GitHub release version with rate limit detection
 # Usage: get_github_release_version "owner/repo"
 # Returns: version string (without 'v' prefix) or exits with error message
@@ -480,14 +514,17 @@ install_fzf() {
 
 main() {
   local linux_distro
+  local linux_version
 
   linux_distro=$(detect_linux_distro)
+  linux_version=$(detect_linux_version)
 
   echo "========================================"
   echo "  Installing binary tools for Linux"
   echo "========================================"
   echo ""
   log_info "Detected Linux distro: $linux_distro"
+  log_info "Detected Linux version: $linux_version"
 
   # Ensure ~/.local/bin exists and is in PATH
   mkdir -p "$HOME/.local/bin"
@@ -496,10 +533,10 @@ main() {
   # Order matters: uv and bun are needed for later tools
   install_neovim
   install_uv
-  if [[ "$linux_distro" == "alpine" ]]; then
-    log_skip "Skipping bun on Alpine"
-  else
+  if alpine_supports_bun "$linux_distro" "$linux_version"; then
     install_bun
+  else
+    log_skip "Skipping bun on Alpine $linux_version"
   fi
 
   # Tools with prebuilt binaries
@@ -516,12 +553,12 @@ main() {
   install_ty
   install_yt_dlp
   install_emojify
-  if [[ "$linux_distro" == "alpine" ]]; then
-    log_skip "Skipping bun-based tools on Alpine"
-  else
+  if alpine_supports_bun "$linux_distro" "$linux_version"; then
     install_opencode
     install_bash_language_server
     install_yaml_language_server
+  else
+    log_skip "Skipping bun-based tools on Alpine $linux_version"
   fi
 
   # Optional: LazyVim (only if nvim config doesn't exist)
