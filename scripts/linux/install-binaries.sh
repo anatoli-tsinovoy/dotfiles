@@ -41,6 +41,25 @@ is_inside_container() {
   [[ -f /.dockerenv ]] || [[ -n "${container:-}" ]] || grep -q docker /proc/1/cgroup 2>/dev/null
 }
 
+detect_linux_distro() {
+  local os_id
+
+  if [[ ! -f /etc/os-release ]]; then
+    echo "unknown"
+    return
+  fi
+
+  os_id=$(sed -n 's/^ID=//p' /etc/os-release | head -1)
+  os_id=${os_id#\"}
+  os_id=${os_id%\"}
+
+  if [[ -n "$os_id" ]]; then
+    echo "$os_id"
+  else
+    echo "unknown"
+  fi
+}
+
 # Fetch latest GitHub release version with rate limit detection
 # Usage: get_github_release_version "owner/repo"
 # Returns: version string (without 'v' prefix) or exits with error message
@@ -460,10 +479,15 @@ install_fzf() {
 # === Main ===
 
 main() {
+  local linux_distro
+
+  linux_distro=$(detect_linux_distro)
+
   echo "========================================"
   echo "  Installing binary tools for Linux"
   echo "========================================"
   echo ""
+  log_info "Detected Linux distro: $linux_distro"
 
   # Ensure ~/.local/bin exists and is in PATH
   mkdir -p "$HOME/.local/bin"
@@ -472,7 +496,11 @@ main() {
   # Order matters: uv and bun are needed for later tools
   install_neovim
   install_uv
-  install_bun
+  if [[ "$linux_distro" == "alpine" ]]; then
+    log_skip "Skipping bun on Alpine"
+  else
+    install_bun
+  fi
 
   # Tools with prebuilt binaries
   install_glow
@@ -488,9 +516,13 @@ main() {
   install_ty
   install_yt_dlp
   install_emojify
-  install_opencode
-  install_bash_language_server
-  install_yaml_language_server
+  if [[ "$linux_distro" == "alpine" ]]; then
+    log_skip "Skipping bun-based tools on Alpine"
+  else
+    install_opencode
+    install_bash_language_server
+    install_yaml_language_server
+  fi
 
   # Optional: LazyVim (only if nvim config doesn't exist)
   # Uncomment if you want LazyVim on fresh installs:

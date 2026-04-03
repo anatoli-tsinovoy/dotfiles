@@ -70,8 +70,56 @@ detect_os() {
   esac
 }
 
+detect_linux_distro() {
+  if [ ! -f /etc/os-release ]; then
+    echo "unknown"
+    return
+  fi
+
+  os_id=$(sed -n 's/^ID=//p' /etc/os-release | head -n 1)
+  os_id=${os_id#\"}
+  os_id=${os_id%\"}
+
+  if [ -n "$os_id" ]; then
+    echo "$os_id"
+  else
+    echo "unknown"
+  fi
+}
+
+install_alpine_packages() {
+  log_info "Installing Alpine packages..."
+  run_privileged apk add --no-cache \
+    bash \
+    build-base \
+    ca-certificates \
+    cmake \
+    coreutils \
+    curl \
+    findutils \
+    git \
+    grep \
+    gzip \
+    libc6-compat \
+    linux-headers \
+    make \
+    sed \
+    stow \
+    sudo \
+    tar \
+    unzip \
+    xz \
+    zsh
+}
+
+install_alpine_prerequisites() {
+  log_info "Installing Alpine prerequisites (curl, git)..."
+  run_privileged apk add --no-cache ca-certificates curl git
+}
+
 install_stow() {
   os="$1"
+  linux_distro="${2:-unknown}"
   if command -v stow >/dev/null 2>&1; then
     log_ok "stow already installed"
     return 0
@@ -83,7 +131,11 @@ install_stow() {
   elif [ "$os" = "termux" ]; then
     pkg install -y stow
   elif [ "$os" = "linux" ]; then
-    run_privileged apt-get update && run_privileged apt-get install -y stow
+    if [ "$linux_distro" = "alpine" ]; then
+      run_privileged apk add --no-cache stow
+    else
+      run_privileged apt-get update && run_privileged apt-get install -y stow
+    fi
   fi
 }
 
@@ -148,10 +200,15 @@ setup_zsh_plugins() {
 }
 
 install_linux_prerequisites() {
+  linux_distro="$1"
   if ! command -v curl >/dev/null 2>&1 || ! command -v git >/dev/null 2>&1; then
-    log_info "Installing prerequisites (curl, git)..."
-    run_privileged apt-get update
-    run_privileged apt-get install -y curl git ca-certificates
+    if [ "$linux_distro" = "alpine" ]; then
+      install_alpine_prerequisites
+    else
+      log_info "Installing prerequisites (curl, git)..."
+      run_privileged apt-get update
+      run_privileged apt-get install -y curl git ca-certificates
+    fi
   fi
 }
 
@@ -242,10 +299,17 @@ run_stow() {
 main() {
   parse_args "$@"
   os="$(detect_os)"
+  linux_distro="unknown"
+  if [ "$os" = "linux" ]; then
+    linux_distro="$(detect_linux_distro)"
+  fi
   log_info "Detected OS: $os"
+  if [ "$os" = "linux" ]; then
+    log_info "Detected Linux distro: $linux_distro"
+  fi
 
   if [ "$os" = "linux" ]; then
-    install_linux_prerequisites
+    install_linux_prerequisites "$linux_distro"
   elif [ "$os" = "termux" ]; then
     install_termux_prerequisites
   fi
@@ -276,11 +340,15 @@ main() {
   elif [ "$os" = "linux" ]; then
     # === Linux Setup ===
 
-    # Install aptfile tool
-    install_aptfile
+    if [ "$linux_distro" = "alpine" ]; then
+      install_alpine_packages
+    else
+      # Install aptfile tool
+      install_aptfile
 
-    log_info "Installing apt packages via Aptfile..."
-    run_privileged aptfile "$SCRIPT_DIR/Aptfile"
+      log_info "Installing apt packages via Aptfile..."
+      run_privileged aptfile "$SCRIPT_DIR/Aptfile"
+    fi
 
     # Initialize git-lfs
     if command -v git-lfs >/dev/null 2>&1; then
@@ -301,7 +369,7 @@ main() {
 
   # === Common Setup (both OS) ===
 
-  install_stow "$os"
+  install_stow "$os" "$linux_distro"
 
   cd "$SCRIPT_DIR"
 
