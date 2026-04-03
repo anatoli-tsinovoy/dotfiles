@@ -1,8 +1,7 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
-SCRIPT_PATH="${BASH_SOURCE[0]}"
-SCRIPT_DIR="$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd)"
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 log_info() { echo "ℹ️  $*"; }
 log_ok() { echo "✅ $*"; }
@@ -22,7 +21,7 @@ EOF
 }
 
 parse_args() {
-  while [[ $# -gt 0 ]]; do
+  while [ "$#" -gt 0 ]; do
     case "$1" in
     --force)
       STOW_FORCE=1
@@ -45,7 +44,7 @@ parse_args() {
 }
 
 run_privileged() {
-  if [[ $EUID -eq 0 ]]; then
+  if [ "$(id -u)" -eq 0 ]; then
     "$@"
   else
     sudo "$@"
@@ -54,10 +53,16 @@ run_privileged() {
 
 detect_os() {
   # Check Termux BEFORE Linux (Termux also returns "Linux" from uname)
-  if [[ -n "${TERMUX_VERSION:-}" ]] || [[ "${PREFIX:-}" == *"com.termux"* ]]; then
+  if [ -n "${TERMUX_VERSION:-}" ]; then
     echo "termux"
     return
   fi
+  case "${PREFIX:-}" in
+  *com.termux*)
+    echo "termux"
+    return
+    ;;
+  esac
   case "$(uname -s)" in
   Darwin) echo "mac" ;;
   Linux) echo "linux" ;;
@@ -66,24 +71,24 @@ detect_os() {
 }
 
 install_stow() {
-  local os="$1"
-  if command -v stow &>/dev/null; then
+  os="$1"
+  if command -v stow >/dev/null 2>&1; then
     log_ok "stow already installed"
     return 0
   fi
 
   log_info "Installing stow..."
-  if [[ "$os" == "mac" ]]; then
+  if [ "$os" = "mac" ]; then
     brew install stow
-  elif [[ "$os" == "termux" ]]; then
+  elif [ "$os" = "termux" ]; then
     pkg install -y stow
-  elif [[ "$os" == "linux" ]]; then
+  elif [ "$os" = "linux" ]; then
     run_privileged apt-get update && run_privileged apt-get install -y stow
   fi
 }
 
 install_aptfile() {
-  if command -v aptfile &>/dev/null; then
+  if command -v aptfile >/dev/null 2>&1; then
     log_ok "aptfile already installed"
     return 0
   fi
@@ -95,10 +100,10 @@ install_aptfile() {
 }
 
 setup_ohmyzsh() {
-  local OMZ="$HOME/.oh-my-zsh"
-  local OMZ_CUSTOM="${OMZ}/custom"
+  OMZ="$HOME/.oh-my-zsh"
+  OMZ_CUSTOM="${OMZ}/custom"
 
-  if [[ ! -d $OMZ ]]; then
+  if [ ! -d "$OMZ" ]; then
     log_info "Installing oh-my-zsh (unattended)…"
     RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
       sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -109,10 +114,10 @@ setup_ohmyzsh() {
 }
 
 setup_p10k() {
-  local OMZ_CUSTOM="$HOME/.oh-my-zsh/custom"
-  local P10K_DIR="$OMZ_CUSTOM/themes/powerlevel10k"
+  OMZ_CUSTOM="$HOME/.oh-my-zsh/custom"
+  P10K_DIR="$OMZ_CUSTOM/themes/powerlevel10k"
 
-  if [[ ! -d "$P10K_DIR" ]]; then
+  if [ ! -d "$P10K_DIR" ]; then
     log_info "Installing powerlevel10k..."
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR"
   else
@@ -121,10 +126,10 @@ setup_p10k() {
 }
 
 setup_zsh_plugins() {
-  local OMZ_CUSTOM="$HOME/.oh-my-zsh/custom"
+  OMZ_CUSTOM="$HOME/.oh-my-zsh/custom"
 
-  local plugin_dir="$OMZ_CUSTOM/plugins/zsh-syntax-highlighting"
-  if [[ -d "$plugin_dir/.git" ]]; then
+  plugin_dir="$OMZ_CUSTOM/plugins/zsh-syntax-highlighting"
+  if [ -d "$plugin_dir/.git" ]; then
     log_ok "zsh-syntax-highlighting already installed"
   else
     rm -rf "$plugin_dir"
@@ -133,7 +138,7 @@ setup_zsh_plugins() {
   fi
 
   plugin_dir="$OMZ_CUSTOM/plugins/zsh-autosuggestions"
-  if [[ -d "$plugin_dir/.git" ]]; then
+  if [ -d "$plugin_dir/.git" ]; then
     log_ok "zsh-autosuggestions already installed"
   else
     rm -rf "$plugin_dir"
@@ -143,7 +148,7 @@ setup_zsh_plugins() {
 }
 
 install_linux_prerequisites() {
-  if ! command -v curl &>/dev/null || ! command -v git &>/dev/null; then
+  if ! command -v curl >/dev/null 2>&1 || ! command -v git >/dev/null 2>&1; then
     log_info "Installing prerequisites (curl, git)..."
     run_privileged apt-get update
     run_privileged apt-get install -y curl git ca-certificates
@@ -151,7 +156,7 @@ install_linux_prerequisites() {
 }
 
 install_termux_prerequisites() {
-  if ! command -v curl &>/dev/null || ! command -v git &>/dev/null || ! command -v unzip &>/dev/null; then
+  if ! command -v curl >/dev/null 2>&1 || ! command -v git >/dev/null 2>&1 || ! command -v unzip >/dev/null 2>&1; then
     log_info "Installing prerequisites (curl, git, unzip)..."
     pkg update -y
     pkg install -y curl git unzip
@@ -159,12 +164,11 @@ install_termux_prerequisites() {
 }
 
 install_termux_font() {
-  local font_file="$HOME/.termux/font.ttf"
-  local hack_version="v3.003"
-  local hack_url="https://github.com/source-foundry/Hack/releases/download/${hack_version}/Hack-${hack_version}-ttf.zip"
-  local tmp_dir
+  font_file="$HOME/.termux/font.ttf"
+  hack_version="v3.003"
+  hack_url="https://github.com/source-foundry/Hack/releases/download/${hack_version}/Hack-${hack_version}-ttf.zip"
 
-  if [[ -f "$font_file" ]]; then
+  if [ -f "$font_file" ]; then
     log_ok "Termux font already installed"
     return 0
   fi
@@ -182,7 +186,7 @@ install_termux_font() {
   cp "$tmp_dir/ttf/Hack-Regular.ttf" "$font_file"
 
   # Reload settings if available
-  if command -v termux-reload-settings &>/dev/null; then
+  if command -v termux-reload-settings >/dev/null 2>&1; then
     termux-reload-settings
   fi
 
@@ -190,59 +194,68 @@ install_termux_font() {
 }
 
 stow_force_cleanup() {
-  local args=("$@")
-  local target="$HOME"
-  local output
+  target="$HOME"
+  expect_target=0
 
-  for ((i = 0; i < ${#args[@]}; i++)); do
-    if [[ "${args[$i]}" == "-t" || "${args[$i]}" == "--target" ]]; then
-      target="${args[$((i + 1))]}"
+  for arg in "$@"; do
+    if [ "$expect_target" -eq 1 ]; then
+      target="$arg"
+      expect_target=0
+      continue
     fi
+
+    case "$arg" in
+    -t | --target)
+      expect_target=1
+      ;;
+    esac
   done
 
-  output="$(stow -n "${args[@]}" 2>&1 || true)"
-  while IFS= read -r line; do
-    if [[ "$line" =~ existing\ target\ is\ not\ owned\ by\ stow:\ (.+)$ ]]; then
-      local conflict="${BASH_REMATCH[1]}"
-      local path="$conflict"
-      if [[ "$conflict" != /* ]]; then
-        path="$target/$conflict"
-      fi
+  output=$(stow -n "$@" 2>&1 || true)
+  printf '%s\n' "$output" | while IFS= read -r line; do
+    case "$line" in
+    *"existing target is not owned by stow: "*)
+      conflict=${line##*existing target is not owned by stow: }
+      path="$conflict"
+      case "$conflict" in
+      /*) ;;
+      *) path="$target/$conflict" ;;
+      esac
       log_warn "Force: removing conflicting target $path"
       rm -rf "$path"
-    fi
-  done <<<"$output"
+      ;;
+    esac
+  done
 }
 
 run_stow() {
-  local stow_args=()
-  if [[ $STOW_ADOPT -eq 1 ]]; then
-    stow_args+=(--adopt)
-  fi
-  if [[ $STOW_FORCE -eq 1 ]]; then
+  if [ "$STOW_FORCE" -eq 1 ]; then
     stow_force_cleanup "$@"
   fi
-  stow "${stow_args[@]}" "$@"
+  if [ "$STOW_ADOPT" -eq 1 ]; then
+    stow --adopt "$@"
+  else
+    stow "$@"
+  fi
 }
 
 main() {
   parse_args "$@"
-  local os
   os="$(detect_os)"
   log_info "Detected OS: $os"
 
-  if [[ "$os" == "linux" ]]; then
+  if [ "$os" = "linux" ]; then
     install_linux_prerequisites
-  elif [[ "$os" == "termux" ]]; then
+  elif [ "$os" = "termux" ]; then
     install_termux_prerequisites
   fi
 
-  if [[ "$os" == "mac" ]]; then
+  if [ "$os" = "mac" ]; then
     # === macOS Setup ===
 
     # Ensure Homebrew
-    if ! command -v brew &>/dev/null; then
-      if ! xcode-select -p &>/dev/null; then
+    if ! command -v brew >/dev/null 2>&1; then
+      if ! xcode-select -p >/dev/null 2>&1; then
         log_warn "Xcode Command Line Tools not found. Installing..."
         xcode-select --install || true
       fi
@@ -258,9 +271,9 @@ main() {
     bun install -g opencode-ai@dev
 
     log_info "Applying macOS defaults..."
-    bash "$SCRIPT_DIR/scripts/macos/macos-defaults.sh"
+    "$SCRIPT_DIR/scripts/macos/macos-defaults.sh"
 
-  elif [[ "$os" == "linux" ]]; then
+  elif [ "$os" = "linux" ]; then
     # === Linux Setup ===
 
     # Install aptfile tool
@@ -270,17 +283,17 @@ main() {
     run_privileged aptfile "$SCRIPT_DIR/Aptfile"
 
     # Initialize git-lfs
-    if command -v git-lfs &>/dev/null; then
+    if command -v git-lfs >/dev/null 2>&1; then
       git lfs install
     fi
 
     log_info "Installing binary tools..."
-    bash "$SCRIPT_DIR/scripts/linux/install-binaries.sh"
+    "$SCRIPT_DIR/scripts/linux/install-binaries.sh"
 
-  elif [[ "$os" == "termux" ]]; then
+  elif [ "$os" = "termux" ]; then
     # === Termux Setup ===
     log_info "Installing Termux packages..."
-    bash "$SCRIPT_DIR/scripts/termux/install-packages.sh"
+    "$SCRIPT_DIR/scripts/termux/install-packages.sh"
 
     log_info "Installing Termux font..."
     install_termux_font
@@ -313,7 +326,7 @@ main() {
   log_info "Stowing zsh configuration..."
   run_stow -t ~ zsh
 
-  if [[ "$os" == "mac" ]]; then
+  if [ "$os" = "mac" ]; then
     # Remove macOS-specific conflicts
     rm -rf ~/.config/aerospace ~/.config/iterm2
     rm -rf ~/Library/Application\ Support/Cursor/User
@@ -326,7 +339,7 @@ main() {
     cp "$SCRIPT_DIR/git/.gitconfig.macos" "$HOME/.gitconfig.local"
 
     # Compile Swift helpers
-    if command -v swiftc &>/dev/null; then
+    if command -v swiftc >/dev/null 2>&1; then
       swiftc "$SCRIPT_DIR/aerospace/.config/aerospace/winbounds.swift" \
         -o "$SCRIPT_DIR/aerospace/.config/aerospace/winbounds"
     fi
@@ -335,7 +348,7 @@ main() {
     log_info "Stowing macOS shims..."
     run_stow -t ~ -d shims macos
 
-  elif [[ "$os" == "linux" ]]; then
+  elif [ "$os" = "linux" ]; then
     # Linux-specific setup
     log_info "Applying Linux-specific settings..."
 
@@ -346,7 +359,7 @@ main() {
     log_info "Stowing Linux shims..."
     run_stow -t ~ -d shims linux
 
-  elif [[ "$os" == "termux" ]]; then
+  elif [ "$os" = "termux" ]; then
     # Termux-specific setup
     log_info "Applying Termux-specific settings..."
 
@@ -360,14 +373,14 @@ main() {
     run_stow --no-folding -t ~ termux
 
     # Initialize colors.properties with dark theme (uses copy, not symlink)
-    if [[ ! -f "$HOME/.termux/colors.properties" ]]; then
+    if [ ! -f "$HOME/.termux/colors.properties" ]; then
       cp "$HOME/.termux/colors.properties.dark" "$HOME/.termux/colors.properties"
       echo "dark" >"$HOME/.termux/.current-theme"
       log_ok "Initialized Termux theme to dark"
     fi
 
     # Set zsh as default shell
-    if [[ "$(basename "$SHELL")" != "zsh" ]]; then
+    if [ "$(basename "$SHELL")" != "zsh" ]; then
       log_info "Setting zsh as default shell..."
       chsh -s zsh
       log_ok "Default shell set to zsh (restart Termux to apply)"
@@ -375,9 +388,9 @@ main() {
   fi
 
   # Tailscale + ET setup (skip on Termux - requires systemd)
-  if [[ "$os" != "termux" ]]; then
+  if [ "$os" != "termux" ]; then
     log_info "Optional: Tailscale + Eternal Terminal setup (requires confirmation)..."
-    bash "$SCRIPT_DIR/scripts/tailscale-et.sh" || true
+    "$SCRIPT_DIR/scripts/tailscale-et.sh" || true
   fi
 
   log_ok "Bootstrap complete! Open a new shell to apply changes."
