@@ -5,6 +5,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 log_info() { echo "ℹ️  $*"; }
 log_ok() { echo "✅ $*"; }
+log_skip() { echo "⏭️  $*"; }
 log_warn() { echo "⚠️  $*"; }
 
 STOW_FORCE=0
@@ -104,7 +105,71 @@ detect_linux_version() {
   fi
 }
 
+detect_linux_arch() {
+  linux_distro="${1:-unknown}"
+
+  if [ "$linux_distro" = "alpine" ] && command -v apk >/dev/null 2>&1; then
+    apk_arch=$(apk --print-arch 2>/dev/null || true)
+    case "$apk_arch" in
+    x86)
+      echo "x86"
+      return
+      ;;
+    x86_64)
+      echo "x86_64"
+      return
+      ;;
+    aarch64)
+      echo "aarch64"
+      return
+      ;;
+    esac
+  fi
+
+  case "$(uname -m)" in
+  x86_64)
+    echo "x86_64"
+    ;;
+  aarch64 | arm64)
+    echo "aarch64"
+    ;;
+  i386 | i486 | i586 | i686 | x86)
+    echo "x86"
+    ;;
+  *)
+    uname -m
+    ;;
+  esac
+}
+
+is_ish_environment() {
+  if uname -r 2>/dev/null | grep -qi 'ish'; then
+    return 0
+  fi
+
+  if [ -f /proc/version ] && grep -qi 'ish' /proc/version 2>/dev/null; then
+    return 0
+  fi
+
+  return 1
+}
+
+detect_deployment_target() {
+  os="$1"
+  linux_distro="${2:-unknown}"
+  linux_arch="${3:-unknown}"
+
+  if [ "$os" = "linux" ] && [ "$linux_distro" = "alpine" ] && [ "$linux_arch" = "x86" ] && is_ish_environment; then
+    echo "ish"
+    return
+  fi
+
+  echo "$os"
+}
+
 print_alpine_upgrade_guide() {
+  deployment_target="${1:-linux}"
+
   echo ""
   echo "╔══════════════════════════════════════════════════════════════════╗"
   echo "║                     Alpine upgrade required                    ║"
@@ -114,24 +179,40 @@ print_alpine_upgrade_guide() {
   echo "╚══════════════════════════════════════════════════════════════════╝"
   echo ""
   log_warn "Recommended upgrade flow:"
-  echo "  1. Back up important data and confirm you can restore access."
-  echo "  2. Update every v3.14 entry in /etc/apk/repositories to v3.20."
-  echo "  3. Run: apk update"
-  echo "  4. Run: apk upgrade --available"
-  echo "  5. Reboot the machine."
-  echo "  6. Re-run: sh ./install.sh"
+  if [ "$deployment_target" = "ish" ]; then
+    echo "  1. Update the iSH app before changing Alpine repositories."
+    echo "     Older iSH builds can hit 'Bad system call' on newer Alpine packages."
+    echo "  2. Back up /etc/apk/repositories and any important data."
+    echo "  3. Update every v3.14 entry in /etc/apk/repositories to v3.20."
+    echo "  4. Run: apk update"
+    echo "  5. Run: apk upgrade --available"
+    echo "  6. Restart iSH if apk or login tools behave strangely."
+    echo "  7. Re-run: sh ./install.sh"
+  else
+    echo "  1. Back up important data and confirm you can restore access."
+    echo "  2. Update every v3.14 entry in /etc/apk/repositories to v3.20."
+    echo "  3. Run: apk update"
+    echo "  4. Run: apk upgrade --available"
+    echo "  5. Reboot the machine."
+    echo "  6. Re-run: sh ./install.sh"
+  fi
   echo ""
-  log_warn "Continuing install, but Bun and Bun-based tools will be skipped on Alpine 3.14.x."
+  if [ "$deployment_target" = "ish" ]; then
+    log_warn "Continuing install in iSH compatibility mode; unsupported x86 tools will be skipped."
+  else
+    log_warn "Continuing install, but Bun and Bun-based tools will be skipped on Alpine 3.14.x."
+  fi
 }
 
 require_supported_alpine() {
   linux_distro="$1"
   linux_version="$2"
+  deployment_target="${3:-linux}"
 
   if [ "$linux_distro" = "alpine" ]; then
     case "$linux_version" in
     3.14*)
-      print_alpine_upgrade_guide
+      print_alpine_upgrade_guide "$deployment_target"
       ;;
     esac
   fi
@@ -351,17 +432,28 @@ main() {
   os="$(detect_os)"
   linux_distro="unknown"
   linux_version="unknown"
+  linux_arch="unknown"
+  deployment_target="$os"
   if [ "$os" = "linux" ]; then
     linux_distro="$(detect_linux_distro)"
     linux_version="$(detect_linux_version)"
+    linux_arch="$(detect_linux_arch "$linux_distro")"
+    deployment_target="$(detect_deployment_target "$os" "$linux_distro" "$linux_arch")"
   fi
   log_info "Detected OS: $os"
   if [ "$os" = "linux" ]; then
     log_info "Detected Linux distro: $linux_distro"
     log_info "Detected Linux version: $linux_version"
+    log_info "Detected Linux architecture: $linux_arch"
   fi
+  log_info "Detected deployment target: $deployment_target"
 
-  require_supported_alpine "$linux_distro" "$linux_version"
+  require_supported_alpine "$linux_distro" "$linux_version" "$deployment_target"
+
+  export DOTFILES_LINUX_DISTRO="$linux_distro"
+  export DOTFILES_LINUX_VERSION="$linux_version"
+  export DOTFILES_LINUX_ARCH="$linux_arch"
+  export DOTFILES_DEPLOYMENT_TARGET="$deployment_target"
 
   if [ "$os" = "linux" ]; then
     install_linux_prerequisites "$linux_distro"
@@ -511,9 +603,11 @@ main() {
   fi
 
   # Tailscale + ET setup (skip on Termux - requires systemd)
-  if [ "$os" != "termux" ]; then
+  if [ "$os" != "termux" ] && [ "$deployment_target" != "ish" ]; then
     log_info "Optional: Tailscale + Eternal Terminal setup (requires confirmation)..."
     "$SCRIPT_DIR/scripts/tailscale-et.sh" || true
+  elif [ "$deployment_target" = "ish" ]; then
+    log_skip "Skipping Tailscale + ET on iSH (requires systemd, TUN/TAP, and Linux service management)"
   fi
 
   log_ok "Bootstrap complete! Open a new shell to apply changes."

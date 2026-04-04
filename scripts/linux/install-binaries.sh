@@ -23,10 +23,38 @@ run_privileged() {
 
 get_arch() {
   local arch
+  local linux_distro
+  local apk_arch
+
+  if [[ -n "${DOTFILES_LINUX_ARCH:-}" ]]; then
+    echo "$DOTFILES_LINUX_ARCH"
+    return 0
+  fi
+
+  linux_distro="${DOTFILES_LINUX_DISTRO:-$(detect_linux_distro)}"
+  if [[ "$linux_distro" == "alpine" ]] && command_exists apk; then
+    apk_arch=$(apk --print-arch 2>/dev/null || true)
+    case "$apk_arch" in
+    x86)
+      echo "x86"
+      return 0
+      ;;
+    x86_64)
+      echo "x86_64"
+      return 0
+      ;;
+    aarch64)
+      echo "aarch64"
+      return 0
+      ;;
+    esac
+  fi
+
   arch="$(uname -m)"
   case "$arch" in
   x86_64) echo "x86_64" ;;
   aarch64 | arm64) echo "aarch64" ;;
+  i386 | i486 | i586 | i686 | x86) echo "x86" ;;
   *) echo "$arch" ;;
   esac
 }
@@ -92,6 +120,46 @@ alpine_supports_bun() {
   esac
 
   return 0
+}
+
+apk_package_exists() {
+  local package="$1"
+
+  apk search -x "$package" 2>/dev/null | grep -q "^${package}-"
+}
+
+install_ish_packages() {
+  local packages=()
+  local package
+
+  log_info "Refreshing Alpine package index for iSH compatibility checks..."
+  run_privileged apk update >/dev/null
+
+  for package in neovim dua fzf ruff viu yt-dlp; do
+    if apk_package_exists "$package"; then
+      packages+=("$package")
+    else
+      log_skip "Skipping ${package} on iSH (not available from current Alpine x86 repositories)"
+    fi
+  done
+
+  if ((${#packages[@]} > 0)); then
+    log_info "Installing iSH-compatible Alpine x86 packages: ${packages[*]}"
+    run_privileged apk add --no-cache "${packages[@]}"
+  fi
+
+  install_emojify
+
+  log_skip "Skipping uv on iSH (no supported Alpine x86 package or upstream i386 installer)"
+  log_skip "Skipping bun on iSH (no supported i386 release)"
+  log_skip "Skipping glow on iSH (no Alpine x86 package in supported repos)"
+  log_skip "Skipping tlrc on iSH (no Alpine x86 package in supported repos)"
+  log_skip "Skipping lazydocker on iSH (Docker/Podman are unsupported in iSH)"
+  log_skip "Skipping thefuck on iSH (no supported Alpine x86 package)"
+  log_skip "Skipping ty on iSH (no supported Alpine x86 package)"
+  log_skip "Skipping opencode on iSH (requires bun)"
+  log_skip "Skipping bash-language-server on iSH (bun-based install unsupported)"
+  log_skip "Skipping yaml-language-server on iSH (bun-based install unsupported)"
 }
 
 # Fetch latest GitHub release version with rate limit detection
@@ -515,9 +583,13 @@ install_fzf() {
 main() {
   local linux_distro
   local linux_version
+  local linux_arch
+  local deployment_target
 
-  linux_distro=$(detect_linux_distro)
-  linux_version=$(detect_linux_version)
+  linux_distro="${DOTFILES_LINUX_DISTRO:-$(detect_linux_distro)}"
+  linux_version="${DOTFILES_LINUX_VERSION:-$(detect_linux_version)}"
+  linux_arch=$(get_arch)
+  deployment_target="${DOTFILES_DEPLOYMENT_TARGET:-linux}"
 
   echo "========================================"
   echo "  Installing binary tools for Linux"
@@ -525,10 +597,25 @@ main() {
   echo ""
   log_info "Detected Linux distro: $linux_distro"
   log_info "Detected Linux version: $linux_version"
+  log_info "Detected Linux architecture: $linux_arch"
+  log_info "Detected deployment target: $deployment_target"
 
   # Ensure ~/.local/bin exists and is in PATH
   mkdir -p "$HOME/.local/bin"
   export PATH="$HOME/.local/bin:$PATH"
+
+  if [[ "$deployment_target" == "ish" ]]; then
+    install_ish_packages
+    echo ""
+    echo "========================================"
+    echo "  Binary tools installation complete!"
+    echo "========================================"
+    echo ""
+    echo "🔧 Make sure ~/.local/bin is in your PATH"
+    echo "   Add to your shell config:"
+    echo '   export PATH="$HOME/.local/bin:$PATH"'
+    return 0
+  fi
 
   # Order matters: uv and bun are needed for later tools
   install_neovim
