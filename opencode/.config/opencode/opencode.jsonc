@@ -1,10 +1,10 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "theme": "system",
   "small_model": "amazon-bedrock/global.anthropic.claude-sonnet-4-5-20250929-v1:0",
   "plugin": [
-    "oh-my-opencode",
-    "opencode-openai-codex-auth"
+    "oh-my-openagent",
+    "opencode-openai-codex-auth",
+    "opencode-anthropic-oauth"
   ],
   "lsp": {
     "pyright": {
