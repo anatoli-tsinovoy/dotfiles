@@ -33,7 +33,7 @@ dotfiles/
 │   ├── macos/macos-defaults.sh     # macOS system preferences
 │   └── tailscale-et.sh             # Tailscale + ET setup (mac/linux only)
 ├── shims/                 # OS-specific binary wrappers
-│   ├── linux/.local/bin/  # bat→batcat, fd→fdfind, node→bun
+│   ├── linux/.local/bin/  # bat fallback, fd→fdfind, node→bun
 │   └── macos/.local/bin/  # docker→podman
 ├── termux/                # Termux-specific config
 │   ├── .termux/           # colors.properties (light/dark themes)
@@ -105,7 +105,7 @@ termux/.termux/colors.properties → ~/.termux/colors.properties
 | OS | Package Manager | Binary Names | Notes |
 |----|-----------------|--------------|-------|
 | macOS | Homebrew | upstream | Uses podman (docker shim provided) |
-| Linux | apt + aptfile | batcat, fdfind | Shims wrap to upstream names |
+| Linux | apt + aptfile | bat, fdfind | Bat comes from GitHub release .deb; shims wrap remaining name mismatches |
 | Termux | pkg | upstream | No sudo, no systemd, skips tailscale-et.sh |
 
 **Termux detection must happen BEFORE Linux** in `detect_os()` because `uname -s` returns "Linux" on both.

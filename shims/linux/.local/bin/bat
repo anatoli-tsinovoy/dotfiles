@@ -1,3 +1,11 @@
 #!/bin/sh
-# Shim: route 'bat' calls to batcat (Debian/Ubuntu package name)
+# Shim: prefer upstream bat binary, fall back to Debian/Ubuntu batcat
+if [ -x /usr/bin/bat ]; then
+  exec /usr/bin/bat "$@"
+fi
+
+if [ -x /usr/local/bin/bat ]; then
+  exec /usr/local/bin/bat "$@"
+fi
+
 exec batcat "$@"

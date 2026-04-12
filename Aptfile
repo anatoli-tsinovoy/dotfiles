@@ -24,7 +24,7 @@ package "tzdata"
 # === Modern CLI tools ===
 package "ripgrep"
 package "fd-find"      # NOTE: Binary is 'fdfind', alias to 'fd' in zshrc
-package "bat"          # NOTE: Binary is 'batcat', alias to 'bat' in zshrc
+# NOTE: bat installed via GitHub release .deb in scripts/linux/install-binaries.sh
 package "eza"
 package "btop"
 package "fzf"

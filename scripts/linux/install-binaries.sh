@@ -69,6 +69,52 @@ get_github_release_version() {
   echo "$version"
 }
 
+install_bat() {
+  local version
+  version=$(get_github_release_version "sharkdp/bat") || return 1
+
+  if dpkg-query -W -f='${Version}' bat >/dev/null 2>&1; then
+    local current_version
+    current_version=$(dpkg-query -W -f='${Version}' bat 2>/dev/null)
+    if dpkg --compare-versions "$current_version" ge "$version"; then
+      log_skip "bat already installed (v${current_version})"
+      return 0
+    fi
+  fi
+
+  log_info "Installing bat from GitHub release .deb..."
+
+  local deb_arch
+  deb_arch=$(get_arch_deb)
+
+  case "$deb_arch" in
+  amd64 | arm64) ;;
+  *)
+    log_warn "Unsupported architecture for bat .deb: $deb_arch"
+    return 1
+    ;;
+  esac
+
+  local asset_name="bat_${version}_${deb_arch}.deb"
+  local url="https://github.com/sharkdp/bat/releases/download/v${version}/${asset_name}"
+  local tmpdir
+  local bat_version_output
+  tmpdir=$(mktemp -d)
+
+  curl -LSsf "$url" -o "$tmpdir/$asset_name"
+  run_privileged apt-get install -y "$tmpdir/$asset_name"
+
+  rm -rf "$tmpdir"
+
+  if [[ -x /usr/bin/bat ]]; then
+    bat_version_output=$(/usr/bin/bat --version | head -1)
+  else
+    bat_version_output=$(dpkg-query -W -f='${Version}' bat 2>/dev/null || echo "$version")
+  fi
+
+  log_ok "bat installed (${bat_version_output})"
+}
+
 # === Installation functions ===
 
 install_neovim() {
@@ -535,7 +581,8 @@ main() {
   install_uv
   install_bun
 
-  # Tools with prebuilt binaries
+  # Tools with prebuilt binaries and release packages
+  install_bat
   install_glow
   install_dua
   install_tlrc # installs cargo on ARM64 only (no prebuilt available)
