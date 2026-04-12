@@ -9,6 +9,7 @@ curl
 git
 zsh
 openssh
+nodejs-lts
 
 # === Modern CLI tools ===
 ripgrep

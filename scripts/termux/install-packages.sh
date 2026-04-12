@@ -15,6 +15,33 @@ log_warn() { echo "⚠️  $*"; }
 
 command_exists() { command -v "$1" &>/dev/null; }
 
+install_pi() {
+  if command_exists pi; then
+    log_skip "pi already installed"
+    return 0
+  fi
+
+  if ! command_exists npm; then
+    log_warn "npm not found; install nodejs-lts first"
+    exit 1
+  fi
+
+  log_info "Installing pi via npm..."
+  npm install -g @mariozechner/pi-coding-agent
+  log_ok "pi installed"
+}
+
+install_forge() {
+  if command_exists forge; then
+    log_skip "forge already installed"
+    return 0
+  fi
+
+  log_info "Installing forge via official install script..."
+  curl -LsfS https://forgecode.dev/install | sh
+  log_ok "forge installed"
+}
+
 # === Main ===
 
 main() {
@@ -55,6 +82,9 @@ main() {
   pkg install -y "${packages[@]}"
 
   log_ok "All packages installed"
+
+  install_pi
+  install_forge
 
   echo ""
   echo "========================================"

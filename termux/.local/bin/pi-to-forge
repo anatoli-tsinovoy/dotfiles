@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+log_info() { echo "ℹ️  $*"; }
+log_ok() { echo "✅ $*"; }
+log_warn() { echo "⚠️  $*"; }
+
+command_exists() { command -v "$1" &>/dev/null; }
+
+main() {
+  if ! command_exists pi; then
+    log_warn "pi not found in PATH"
+    exit 1
+  fi
+
+  if ! command_exists node; then
+    log_warn "node not found in PATH"
+    exit 1
+  fi
+
+  if ! command_exists forge; then
+    log_warn "forge not found in PATH"
+    exit 1
+  fi
+
+  echo "========================================"
+  echo "  Pi -> Forge Codex Auth Sync"
+  echo "========================================"
+  echo
+  log_info "Launching pi so you can log in"
+  log_info "When finished, exit pi and return here"
+  pi || true
+
+  echo
+  read -r -p "Press Enter to copy the current pi Codex JWT into Forge..."
+
+  node <<'JS'
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
+const home = os.homedir();
+const piPath = path.join(home, '.pi/agent/auth.json');
+const forgePath = path.join(home, '.forge/.credentials.json');
+
+if (!fs.existsSync(piPath)) {
+  console.error(`Missing ${piPath}`);
+  process.exit(1);
+}
+
+const pi = JSON.parse(fs.readFileSync(piPath, 'utf8'));
+const src = pi['openai-codex'];
+
+if (!src || !src.access) {
+  console.error('No openai-codex access token found in ~/.pi/agent/auth.json');
+  process.exit(1);
+}
+
+let forge = [];
+if (fs.existsSync(forgePath)) {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(forgePath, 'utf8'));
+    if (Array.isArray(parsed)) forge = parsed;
+  } catch {
+    forge = [];
+  }
+}
+
+forge = forge.filter((entry) => entry && entry.id !== 'codex');
+forge.push({
+  id: 'codex',
+  auth_details: {
+    api_key: src.access,
+  },
+  url_params: {},
+});
+
+fs.mkdirSync(path.dirname(forgePath), { recursive: true });
+fs.writeFileSync(forgePath, JSON.stringify(forge, null, 2));
+console.log(`Wrote ${forgePath}`);
+JS
+
+  echo
+  log_info "Setting Forge default model to codex / gpt-5.4-mini"
+  forge config set model codex gpt-5.4-mini
+
+  echo
+  log_ok "Forge is configured to use pi's current Codex JWT"
+  log_info "Test with: forge -p 'hi'"
+}
+
+main "$@"

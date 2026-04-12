@@ -7,6 +7,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd)"
 log_info() { echo "ℹ️  $*"; }
 log_ok() { echo "✅ $*"; }
 log_warn() { echo "⚠️  $*"; }
+log_skip() { echo "⏭️  $*"; }
 
 STOW_FORCE=0
 STOW_ADOPT=0
@@ -225,6 +226,27 @@ run_stow() {
   stow "${stow_args[@]}" "$@"
 }
 
+maybe_run_pi_to_forge() {
+  local script_path="$HOME/.local/bin/pi-to-forge"
+  local reply=""
+
+  if [[ ! -x "$script_path" ]]; then
+    log_skip "pi-to-forge not available"
+    return 0
+  fi
+
+  echo
+  read -r -p "Run pi-to-forge now to log into pi and sync Forge auth? [y/N] " reply
+  case "$reply" in
+    y|Y|yes|YES)
+      "$script_path"
+      ;;
+    *)
+      log_skip "Skipping pi-to-forge"
+      ;;
+  esac
+}
+
 main() {
   parse_args "$@"
   local os
@@ -304,10 +326,11 @@ main() {
   rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.zshrc.termux ~/.p10k.zsh
   rm -f ~/.gitconfig ~/.vimrc
   rm -rf ~/.config/nvim ~/.config/opencode
+  rm -f ~/.forge/.forge.toml
 
   # Stow common packages (no --adopt: we want OUR files, not whatever exists)
   log_info "Stowing common dotfiles..."
-  run_stow -t ~ nvim git opencode glow tmux
+  run_stow -t ~ nvim git opencode glow tmux forge
 
   # Stow unified zsh package (contains .zshrc, .zshrc.macos, .zshrc.linux, .p10k.zsh)
   log_info "Stowing zsh configuration..."
@@ -372,6 +395,8 @@ main() {
       chsh -s zsh
       log_ok "Default shell set to zsh (restart Termux to apply)"
     fi
+
+    maybe_run_pi_to_forge
   fi
 
   # Tailscale + ET setup (skip on Termux - requires systemd)
