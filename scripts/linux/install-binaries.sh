@@ -60,7 +60,7 @@ get_github_release_version() {
     return 1
   }
 
-  version=$(echo "$response" | grep -Po '"tag_name": "v?\K[0-9.]+' | head -1)
+  version=$(echo "$response" | grep -Po '"tag_name": "v?\K[^"]+' | head -1)
   if [[ -z "$version" ]]; then
     log_warn "Could not parse version from GitHub response for $repo"
     return 1
@@ -108,6 +108,66 @@ install_neovim() {
 
   rm -rf "$tmpdir"
   log_ok "neovim installed to $install_dir"
+}
+
+install_tmux() {
+  local bindir="$HOME/.local/bin"
+  local target_tmux="$bindir/tmux"
+
+  if [[ -x "$target_tmux" ]]; then
+    local current_version
+    current_version=$("$target_tmux" -V | grep -oP 'tmux \K.+' || true)
+    if [[ -n "$current_version" ]]; then
+      log_skip "tmux already installed in ~/.local/bin (v${current_version})"
+    else
+      log_skip "tmux already installed in ~/.local/bin"
+    fi
+    return 0
+  fi
+
+  if command_exists tmux; then
+    log_info "Found tmux outside ~/.local/bin at $(command -v tmux); installing user-local copy..."
+  fi
+
+  log_info "Installing tmux from GitHub releases..."
+  local version arch arch_name
+  version=$(get_github_release_version "tmux/tmux-builds") || return 1
+  arch=$(get_arch)
+
+  case "$arch" in
+  x86_64) arch_name="x86_64" ;;
+  aarch64) arch_name="arm64" ;;
+  *)
+    log_warn "Unsupported architecture for tmux-builds: $arch"
+    log_warn "tmux custom install currently supports Linux x86_64 and aarch64 only"
+    return 1
+    ;;
+  esac
+
+  local tmpdir
+  tmpdir=$(mktemp -d)
+  curl -LSsf "https://github.com/tmux/tmux-builds/releases/download/v${version}/tmux-${version}-linux-${arch_name}.tar.gz" -o "$tmpdir/tmux.tar.gz"
+  tar -xzf "$tmpdir/tmux.tar.gz" -C "$tmpdir"
+
+  local binary_path=""
+  for candidate in "$tmpdir/tmux" "$tmpdir"/tmux*/tmux; do
+    if [[ -f "$candidate" ]]; then
+      binary_path="$candidate"
+      break
+    fi
+  done
+
+  if [[ -z "$binary_path" ]]; then
+    log_warn "Could not find tmux binary in downloaded archive"
+    rm -rf "$tmpdir"
+    return 1
+  fi
+
+  mkdir -p "$bindir"
+  mv "$binary_path" "$bindir/tmux"
+  chmod +x "$bindir/tmux"
+  rm -rf "$tmpdir"
+  log_ok "tmux installed to $bindir/tmux"
 }
 
 install_uv() {
@@ -471,6 +531,7 @@ main() {
 
   # Order matters: uv and bun are needed for later tools
   install_neovim
+  install_tmux
   install_uv
   install_bun
 

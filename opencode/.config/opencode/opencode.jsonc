@@ -5,6 +5,7 @@
     "oh-my-openagent",
     "opencode-openai-codex-auth"
   ],
+  "disabled_providers": ["opencode"],
   "lsp": {
     "pyright": {
       "disabled": true
