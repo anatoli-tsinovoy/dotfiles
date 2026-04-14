@@ -1,6 +1,22 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/refs/heads/dev/assets/oh-my-opencode.schema.json",
   "hashline_edit": true,
+  "agents": {
+    "explore": {
+      "fallback_models": ["google/gemini-flash-latest"]
+    },
+    "librarian": {
+      "fallback_models": ["google/gemini-flash-latest"]
+    }
+  },
+  "categories": {
+    "unspecified-low": {
+      "fallback_models": ["google/gemini-flash-latest"]
+    },
+    "unspecified-high": {
+      "fallback_models": ["google/gemini-flash-latest"]
+    }
+  },
   "experimental": {
     "preemptive_compaction": true
   }
