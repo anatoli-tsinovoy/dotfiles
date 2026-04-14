@@ -71,7 +71,7 @@
       "variant": "max"
     },
     "writing": {
-      "model": "google/gemini-3-flash"
+      "model": "google/gemini-3-flash-preview"
     }
   },
   "experimental": {
