@@ -399,6 +399,14 @@ main() {
     maybe_run_pi_to_forge
   fi
 
+  # Setup rtk opencode plugin (if rtk installed)
+  if command -v rtk &>/dev/null; then
+    log_info "Setting up rtk opencode plugin..."
+    rtk telemetry disable
+    RTK_TELEMETRY_DISABLED=1 rtk init -g --opencode
+    log_ok "rtk configured (telemetry disabled)"
+  fi
+
   # Tailscale + ET setup (skip on Termux - requires systemd)
   if [[ "$os" != "termux" ]]; then
     log_info "Optional: Tailscale + Eternal Terminal setup (requires confirmation)..."

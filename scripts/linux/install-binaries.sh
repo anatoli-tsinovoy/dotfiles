@@ -525,6 +525,16 @@ install_lazydocker() {
   log_ok "lazydocker installed to $bindir/lazydocker"
 }
 
+install_rtk() {
+  if command_exists rtk; then
+    log_skip "rtk already installed ($(rtk --version))"
+    return 0
+  fi
+  log_info "Installing rtk (Rust Token Killer)..."
+  curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
+  log_ok "rtk installed"
+}
+
 install_lazyvim() {
   local nvim_config="$HOME/.config/nvim"
   if [[ -d "$nvim_config" ]] && [[ -f "$nvim_config/lazy-lock.json" || -f "$nvim_config/lazyvim.json" ]]; then
@@ -589,6 +599,7 @@ main() {
   install_lazydocker
   install_fzf
   install_viu
+  install_rtk
 
   # Tools that depend on uv/bun
   install_thefuck
