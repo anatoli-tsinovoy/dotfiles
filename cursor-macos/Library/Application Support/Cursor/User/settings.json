@@ -13,9 +13,9 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
-      "source.organizeImports": "explicit",
+      "source.organizeImports": "explicit"
     },
-    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "editor.fontSize": 26,
   "jupyter.themeMatplotlibPlots": true,
@@ -52,7 +52,7 @@
   "vscode_vibrancy.preferedDarkTheme": "Default Dark",
   "vscode_vibrancy.preferedLightTheme": "Default Light",
   "vscode_vibrancy.imports": [
-    "/Users/anatoli/Documents/dotfiles/cursor-macos/Library/Application Support/Cursor/User/LightModified.css",
+    "/Users/anatoli/Documents/dotfiles/cursor-macos/Library/Application Support/Cursor/User/LightModified.css"
   ],
   "workbench.preferredDarkColorTheme": "Default Dark+",
   "workbench.preferredLightColorTheme": "Default Light+",
@@ -80,7 +80,7 @@
       "terminal.selectionBackground": "#330D81",
       "terminalCursor.foreground": "#8217FF",
       "terminalCursor.background": "#110034",
-      "terminal.findMatchBackground": "#FFD44F",
+      "terminal.findMatchBackground": "#FFD44F"
     },
     "[Default Light+]": {
       "terminal.ansiBlack": "#110034",
@@ -104,18 +104,18 @@
       "terminal.selectionBackground": "#B39AFF",
       "terminalCursor.foreground": "#8217FF",
       "terminalCursor.background": "#F3F0DF",
-      "terminal.findMatchBackground": "#FFD44F",
+      "terminal.findMatchBackground": "#FFD44F"
     },
-    "terminal.background": "#00000000",
+    "terminal.background": "#00000000"
   },
   "terminal.integrated.drawBoldTextInBrightColors": true,
   "redhat.telemetry.enabled": false,
   "[github-actions-workflow]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "remote.SSH.remotePlatform": {
     "Simply-Workstation": "linux",
-    "Simply-Workstation-TailScale": "linux",
+    "Simply-Workstation-TailScale": "linux"
   },
   "workbench.settings.openDefaultKeybindings": true,
   "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
@@ -133,8 +133,9 @@
     "#33BCA7", // Green
     "#B8953E", // Yellow
     "#6D50B5", // Purple
-    "#E69AB3", // Pink
+    "#E69AB3" // Pink
   ],
   "terminal.integrated.gpuAcceleration": "off",
   "workbench.colorTheme": "Default Dark+",
+  "window.commandCenter": true
 }
