@@ -152,7 +152,6 @@ automatically-unhide-macos-hidden-apps = true
     alt-g = 'exec-and-forget open -a "Google Chrome"'
     alt-t = 'exec-and-forget open -a "iTerm"'
     alt-shift-t = 'exec-and-forget open -a "iTerm" ~'
-    alt-c = 'exec-and-forget open -a "Cursor"'
     alt-m = 'exec-and-forget open -a "Spotify"'
     alt-v = 'exec-and-forget open -a "WhatsApp"'
     alt-s = 'exec-and-forget open -a "Slack"'
@@ -270,19 +269,11 @@ run = ['layout floating']
 
 [[on-window-detected]]
 if.app-id = 'com.googlecode.iterm2'
-run = ['move-node-to-workspace b']
-
-# [[on-window-detected]]
-# if.app-id = 'com.google.Chrome'
-# run = ['move-node-to-workspace 1']
+run = ['move-node-to-workspace 2']
 
 [[on-window-detected]]
 if.app-id = 'com.spotify.client'
 run = ['move-node-to-workspace e']
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Cursor'
-run = ['move-node-to-workspace 2']
 
 [[on-window-detected]]
 if.app-id = 'net.whatsapp.WhatsApp'
