@@ -71,7 +71,7 @@ alias vim="nvim"
 alias ls="eza -la --icons --group-directories-first"
 
 # === OpenCode ===
-if ! command -v opencode &>/dev/null; then
+if command -v opencode &>/dev/null; then
   export OMO_SEND_ANONYMOUS_TELEMETRY=0
   export OMO_DISABLE_POSTHOG=1
   alias oc="opencode"
