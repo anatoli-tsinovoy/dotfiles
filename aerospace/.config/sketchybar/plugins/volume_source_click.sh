@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-HIDE_AFTER=2
+HIDE_AFTER=5
 TIMER_FILE="/tmp/sketchybar_volume_source.timer"
 
 toggle_devices() {

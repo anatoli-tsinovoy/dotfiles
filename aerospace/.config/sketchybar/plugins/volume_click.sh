@@ -12,6 +12,11 @@ detail_off() {
   sketchybar --animate tanh 30 --set volume slider.width=0
 }
 
+reset_auto_hide_timer() {
+  TIMER_TOKEN="$$-$(date +%s)"
+  printf '%s\n' "$TIMER_TOKEN" >"$TIMER_FILE"
+}
+
 toggle_detail() {
   INITIAL_WIDTH=$(sketchybar --query volume | jq -r ".slider.width")
   if [ "$INITIAL_WIDTH" -eq "0" ]; then
@@ -23,8 +28,7 @@ toggle_detail() {
 }
 
 auto_hide_detail() {
-  TIMER_TOKEN="$$-$(date +%s)"
-  printf '%s\n' "$TIMER_TOKEN" >"$TIMER_FILE"
+  reset_auto_hide_timer
 
   sleep "$HIDE_AFTER"
 

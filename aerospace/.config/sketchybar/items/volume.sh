@@ -36,6 +36,8 @@ volume_icon=(
 sketchybar --add slider volume right \
   --set volume "${volume_slider[@]}" \
   --subscribe volume volume_change \
+  mouse.entered \
+  mouse.exited \
   mouse.clicked \
   --add item volume_icon right \
   --set volume_icon "${volume_icon[@]}" \

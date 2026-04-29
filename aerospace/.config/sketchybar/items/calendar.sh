@@ -9,6 +9,7 @@ calendar=(
   padding_left=15
   update_freq=30
   script="$PLUGIN_DIR/calendar.sh"
+  click_script="$PLUGIN_DIR/notification_center.sh"
 )
 
 sketchybar --add item calendar right \

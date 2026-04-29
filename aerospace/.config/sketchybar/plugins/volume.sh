@@ -1,6 +1,33 @@
 #!/usr/bin/env bash
 
 WIDTH=100
+HIDE_AFTER=2
+TIMER_FILE="/tmp/sketchybar_volume_slider.timer"
+
+detail_on() {
+  sketchybar --animate tanh 30 --set "$NAME" slider.width=$WIDTH
+}
+
+detail_off() {
+  sketchybar --animate tanh 30 --set "$NAME" slider.width=0
+}
+
+reset_auto_hide_timer() {
+  TIMER_TOKEN="$$-$(date +%s)"
+  printf '%s\n' "$TIMER_TOKEN" >"$TIMER_FILE"
+}
+
+auto_hide_detail() {
+  reset_auto_hide_timer
+
+  sleep "$HIDE_AFTER"
+
+  CURRENT_TOKEN="$(cat "$TIMER_FILE" 2>/dev/null || true)"
+  if [ "$CURRENT_TOKEN" = "$TIMER_TOKEN" ]; then
+    detail_off
+  fi
+}
+
 volume_change() {
   source "$CONFIG_DIR/icons.sh"
 
@@ -43,20 +70,23 @@ volume_change() {
 
   INITIAL_WIDTH="$(sketchybar --query "$NAME" | jq -r ".slider.width")"
   if [ "$INITIAL_WIDTH" -eq "0" ]; then
-    sketchybar --animate tanh 30 --set "$NAME" slider.width=$WIDTH
+    detail_on
   fi
 
-  sleep 2
-
-  # Check whether the volume was changed another time while sleeping
-  FINAL_PERCENTAGE="$(sketchybar --query "$NAME" | jq -r ".slider.percentage")"
-  if [ "$FINAL_PERCENTAGE" -eq "$INFO" ]; then
-    sketchybar --animate tanh 30 --set "$NAME" slider.width=0
-  fi
+  auto_hide_detail
 }
 
 mouse_clicked() {
   osascript -e "set volume output volume $PERCENTAGE"
+  auto_hide_detail
+}
+
+mouse_entered() {
+  reset_auto_hide_timer
+}
+
+mouse_exited() {
+  auto_hide_detail
 }
 
 case "$SENDER" in
@@ -65,5 +95,11 @@ case "$SENDER" in
   ;;
 "mouse.clicked")
   mouse_clicked
+  ;;
+"mouse.entered")
+  mouse_entered
+  ;;
+"mouse.exited")
+  mouse_exited
   ;;
 esac
