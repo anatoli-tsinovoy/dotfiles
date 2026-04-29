@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 WIDTH=100
+HIDE_AFTER=2
+TIMER_FILE="/tmp/sketchybar_volume_slider.timer"
 
 detail_on() {
   sketchybar --animate tanh 30 --set volume slider.width=$WIDTH
@@ -14,34 +16,22 @@ toggle_detail() {
   INITIAL_WIDTH=$(sketchybar --query volume | jq -r ".slider.width")
   if [ "$INITIAL_WIDTH" -eq "0" ]; then
     detail_on
+    auto_hide_detail
   else
     detail_off
   fi
 }
 
-toggle_devices() {
-  which SwitchAudioSource >/dev/null || exit 0
-  source "$CONFIG_DIR/colors.sh"
+auto_hide_detail() {
+  TIMER_TOKEN="$$-$(date +%s)"
+  printf '%s\n' "$TIMER_TOKEN" >"$TIMER_FILE"
 
-  args=(--remove '/volume.device\.*/' --set "$NAME" popup.drawing=toggle)
-  COUNTER=0
-  CURRENT="$(SwitchAudioSource -t output -c)"
-  while IFS= read -r device; do
-    args+=(--add item volume.device.$COUNTER popup."$NAME"
-      --set volume.device.$COUNTER label="${device}"
-      click_script="SwitchAudioSource -s \"${device}\" && sketchybar --set $NAME popup.drawing=off")
-    if [ "${device}" = "$CURRENT" ]; then
-      args+=(label.color="$GREEN")
-    fi
+  sleep "$HIDE_AFTER"
 
-    COUNTER=$((COUNTER + 1))
-  done <<<"$(SwitchAudioSource -a -t output)"
-
-  sketchybar -m "${args[@]}" >/dev/null
+  CURRENT_TOKEN="$(cat "$TIMER_FILE" 2>/dev/null || true)"
+  if [ "$CURRENT_TOKEN" = "$TIMER_TOKEN" ]; then
+    detail_off
+  fi
 }
 
-if [ "$BUTTON" = "right" ] || [ "$MODIFIER" = "shift" ]; then
-  toggle_devices
-else
-  toggle_detail
-fi
+toggle_detail
