@@ -70,13 +70,6 @@ export EDITOR='nvim'
 alias vim="nvim"
 alias ls="eza -la --icons --group-directories-first"
 
-# === OpenCode ===
-if command -v opencode &>/dev/null; then
-  export OMO_SEND_ANONYMOUS_TELEMETRY=0
-  export OMO_DISABLE_POSTHOG=1
-  alias oc="opencode"
-fi
-
 # bat theming (ansi theme uses terminal colors, also used by git-delta)
 export BAT_THEME="ansi"
 alias bat="bat --color=always"
@@ -100,6 +93,13 @@ alias zln='zmv -L'
 if [[ -d "$HOME/.bun" ]]; then
   export BUN_INSTALL="$HOME/.bun"
   export PATH="$BUN_INSTALL/bin:$PATH"
+fi
+
+# === OpenCode ===
+if command -v opencode &>/dev/null; then
+  export OMO_SEND_ANONYMOUS_TELEMETRY=0
+  export OMO_DISABLE_POSTHOG=1
+  alias oc="opencode"
 fi
 
 # uv environment (if installed via install script)
