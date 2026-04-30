@@ -17,6 +17,7 @@ export LC_ALL='en_US.UTF-8'
 # Only set TERM as a last-resort fallback; never override inside tmux
 if [[ "$(uname -s)" == "Linux" && -z "${TMUX-}" ]]; then
   export TERM=xterm-256color
+  export COLORTERM=truecolor
 fi
 
 # === PATH setup (early, so tools are available for rest of config) ===
