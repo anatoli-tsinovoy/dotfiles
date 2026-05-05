@@ -386,6 +386,11 @@ main() {
     mkdir -p ~/.termux ~/.local/bin
     run_stow --no-folding -t ~ termux
 
+    # Stow forge config (termux only)
+    log_info "Stowing forge configuration..."
+    rm -f ~/.forge/.forge.toml
+    run_stow -t ~ forge
+
     # Initialize colors.properties with dark theme (uses copy, not symlink)
     if [[ ! -f "$HOME/.termux/colors.properties" ]]; then
       cp "$HOME/.termux/colors.properties.dark" "$HOME/.termux/colors.properties"
