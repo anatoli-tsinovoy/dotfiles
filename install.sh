@@ -238,12 +238,12 @@ maybe_run_pi_to_forge() {
   echo
   read -r -p "Run pi-to-forge now to log into pi and sync Forge auth? [y/N] " reply
   case "$reply" in
-    y|Y|yes|YES)
-      "$script_path"
-      ;;
-    *)
-      log_skip "Skipping pi-to-forge"
-      ;;
+  y | Y | yes | YES)
+    "$script_path"
+    ;;
+  *)
+    log_skip "Skipping pi-to-forge"
+    ;;
   esac
 }
 
@@ -277,7 +277,10 @@ main() {
     brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
 
     log_info "Installing opencode via bun..."
-    bun install -g opencode-ai@dev
+    bun install -g opencode-ai@dev --safe-chain-skip-minimum-package-age
+
+    log_info "Installing oh-my-pi via bun..."
+    bun install -g @oh-my-pi/pi-coding-agent --safe-chain-skip-minimum-package-age
 
     log_info "Applying macOS defaults..."
     bash "$SCRIPT_DIR/scripts/macos/macos-defaults.sh"
@@ -327,10 +330,11 @@ main() {
   rm -f ~/.gitconfig ~/.vimrc
   rm -rf ~/.config/nvim ~/.config/opencode
   rm -f ~/.forge/.forge.toml
+  rm -f ~/.omp/agent/config.yml
 
   # Stow common packages (no --adopt: we want OUR files, not whatever exists)
   log_info "Stowing common dotfiles..."
-  run_stow -t ~ nvim git opencode glow tmux forge
+  run_stow -t ~ nvim git opencode omp glow tmux forge
 
   # Stow unified zsh package (contains .zshrc, .zshrc.macos, .zshrc.linux, .p10k.zsh)
   log_info "Stowing zsh configuration..."

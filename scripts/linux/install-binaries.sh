@@ -422,6 +422,21 @@ install_opencode() {
   log_ok "opencode installed"
 }
 
+install_omp() {
+  if command_exists omp; then
+    log_skip "oh-my-pi already installed"
+    return 0
+  fi
+  if ! command_exists bun; then
+    log_warn "bun not found, skipping oh-my-pi installation"
+    return 1
+  fi
+
+  log_info "Installing oh-my-pi via bun..."
+  bun install -g @oh-my-pi/pi-coding-agent@latest
+  log_ok "oh-my-pi installed"
+}
+
 install_bash_language_server() {
   if command_exists bash-language-server; then
     log_skip "bash-language-server already installed"
@@ -608,6 +623,7 @@ main() {
   install_yt_dlp
   install_emojify
   install_opencode
+  install_omp
   install_bash_language_server
   install_yaml_language_server
 

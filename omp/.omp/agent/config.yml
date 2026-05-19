@@ -1,0 +1,23 @@
+lastChangelogVersion: 15.1.3
+modelRoles: 
+  default: openai-codex/gpt-5.5:medium
+  smol: openai-codex/gpt-5.4-mini:high
+  slow: openai-codex/gpt-5.5:xhigh
+hideThinkingBlock: true
+theme: 
+  light: light
+  dark: dark
+symbolPreset: nerd
+colorBlindMode: false
+compaction: 
+  strategy: handoff
+  thresholdPercent: 70
+  handoffSaveToDisk: true
+  thresholdTokens: 150000
+lsp: 
+  formatOnWrite: true
+  diagnosticsOnEdit: true
+bashInterceptor: 
+  enabled: true
+browser: 
+  headless: true
