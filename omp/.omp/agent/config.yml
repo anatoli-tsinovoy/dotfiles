@@ -1,8 +1,13 @@
-lastChangelogVersion: 15.1.3
+lastChangelogVersion: 15.7.2
 modelRoles: 
   default: openai-codex/gpt-5.5:medium
   smol: openai-codex/gpt-5.4-mini:high
   slow: openai-codex/gpt-5.5:xhigh
+  designer: openai-codex/gpt-5.5
+  vision: openai-codex/gpt-5.5
+  plan: openai-codex/gpt-5.5:high
+  task: openai-codex/gpt-5.5
+  commit: openai-codex/gpt-5.4-mini
 hideThinkingBlock: true
 theme: 
   light: light
@@ -21,3 +26,6 @@ bashInterceptor:
   enabled: true
 browser: 
   headless: true
+setupVersion: 1
+contextPromotion: 
+  enabled: false
