@@ -1,4 +1,4 @@
-lastChangelogVersion: 15.7.2
+lastChangelogVersion: 15.10.0
 modelRoles: 
   default: openai-codex/gpt-5.5:medium
   smol: openai-codex/gpt-5.4-mini:high
