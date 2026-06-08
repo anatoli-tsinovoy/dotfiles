@@ -73,6 +73,11 @@ alias ls="eza -la --icons --group-directories-first"
 
 # bat theming (ansi theme uses terminal colors, also used by git-delta)
 export BAT_THEME="ansi"
+# Force delta to use the stowed git config when it is called outside Git
+# (for example: `gh pr diff --patch --color=never | delta`).
+export DELTA_CONFIG="$HOME/.gitconfig"
+alias delta='delta --config "$DELTA_CONFIG"'
+export GH_PAGER='delta --config "$DELTA_CONFIG"'
 alias bat="bat --color=always"
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
