@@ -164,28 +164,6 @@ bindkey -M viins '^[b' backward-word
 # Posted by Gilles 'SO- stop being evil', modified by community. See post 'Timeline' for change history
 # Retrieved 2026-02-25, License - CC BY-SA 3.0
 
-autoload -Uz add-zsh-hook
-# OMP handles Ctrl-Z inside its raw TUI and suspends itself with SIGTSTP.
-# ZLE never sees that keypress while OMP is foreground, so mirror the empty-
-# prompt fancy-ctrl-z behavior when zsh regains control after OMP stops.
-
-
-bg-stopped-omp() {
-  emulate -L zsh
-  local line job
-
-  for line in "${(@f)$(jobs -s)}"; do
-    [[ "$line" == *" omp"* || "$line" == *" oh-my-pi"* || "$line" == *"@oh-my-pi/pi-coding-agent"* ]] || continue
-
-    job="${line%%]*}"
-    job="${job#\[}"
-    [[ "$job" == <-> ]] || continue
-
-    bg "%$job" >/dev/null 2>&1
-  done
-}
-add-zsh-hook precmd bg-stopped-omp
-
 fancy-ctrl-z () {
   if [[ $#BUFFER -eq 0 ]]; then
     bg
