@@ -1,9 +1,6 @@
-import { type ExtensionAPI, type ExtensionContext, type Theme, getAgentDir } from "@oh-my-pi/pi-coding-agent";
-import { getPluginSettings } from "@oh-my-pi/pi-coding-agent/extensibility/plugins";
-import { Input, matchesKey, truncateToWidth, visibleWidth, type Component, type Focusable } from "@oh-my-pi/pi-tui";
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 
 const PACKAGE_ID = "@local/omp-prompt-stash";
 const DEFAULT_STORE_FILE = "prompt-stash.json";
@@ -15,8 +12,6 @@ const DEFAULT_POPUP_WIDTH = 92;
 const DEFAULT_LIST_ROWS = 10;
 const PADDING_X = 2;
 const PADDING_Y = 1;
-const ANSI_YELLOW_FG = "\u001b[33m";
-const ANSI_FG_RESET = "\u001b[39m";
 const FRAME = { tl: "┏", tr: "┓", bl: "┗", br: "┛", h: "━", v: "┃" } as const;
 const ELLIPSIS = "…";
 
@@ -41,20 +36,94 @@ interface PromptStashSettings {
 	listRows: number;
 }
 
-function ansiYellow(text: string): string {
-	return `${ANSI_YELLOW_FG}${text}${ANSI_FG_RESET}`;
+interface Theme {
+	fg(name: string, text: string): string;
+	bg(name: string, text: string): string;
+	bold(text: string): string;
 }
 
-function safeFileName(value: string): string {
-	return value.replace(/[^\w.-]+/g, "_");
+interface TuiApi {
+	requestRender(force?: boolean): void;
+	resetDisplay?(): void;
+	stop?(): void;
+	start?(): void;
 }
 
-function sessionIdForContext(ctx: ExtensionContext): string {
-	const id = ctx.sessionManager.getSessionId();
-	if (id && id.trim()) return id;
-	const file = ctx.sessionManager.getSessionFile();
-	if (file) return basename(file, ".jsonl");
-	return `ephemeral-${process.pid}`;
+interface KeybindingsApi {
+	matches?(data: string, keybinding: string): boolean;
+}
+
+interface Component {
+	focused?: boolean;
+	handleInput?(data: string): void;
+	invalidate?(): void;
+	render(width: number): string[];
+}
+
+interface ExtensionContext {
+	cwd: string;
+	hasUI: boolean;
+	sessionManager: {
+		getSessionId(): string | undefined;
+		getSessionFile(): string | undefined;
+	};
+	ui: {
+		getEditorText(): string;
+		setEditorText(text: string): void;
+		notify(message: string, type?: "info" | "warning" | "error"): void;
+		custom<T>(
+			factory: (tui: TuiApi, theme: Theme, keybindings: KeybindingsApi, done: (result: T) => void) => Component,
+			options?: { overlay?: boolean },
+		): Promise<T>;
+	};
+}
+
+interface ExtensionAPI {
+	registerShortcut(
+		shortcut: string,
+		spec: { description: string; handler: (ctx: ExtensionContext) => Promise<void> | void },
+	): void;
+	registerCommand(
+		name: string,
+		spec: { description: string; handler: (args: string[], ctx: ExtensionContext) => Promise<void> | void },
+	): void;
+	on(event: "session_start", handler: (event: unknown, ctx: ExtensionContext) => Promise<void> | void): void;
+}
+
+function configRootDir(): string {
+	return join(homedir(), process.env.PI_CONFIG_DIR || ".omp");
+}
+
+function agentDir(): string {
+	return process.env.PI_CODING_AGENT_DIR ? resolve(process.env.PI_CODING_AGENT_DIR) : join(configRootDir(), "agent");
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function readJsonRecord(path: string): Record<string, unknown> {
+	try {
+		const parsed = JSON.parse(readFileSync(path, "utf8")) as unknown;
+		return isRecord(parsed) ? parsed : {};
+	} catch {
+		return {};
+	}
+}
+
+function pluginSettingsFrom(path: string): Record<string, unknown> {
+	const root = readJsonRecord(path);
+	const settings = root.settings;
+	if (!isRecord(settings)) return {};
+	const plugin = settings[PACKAGE_ID];
+	return isRecord(plugin) ? plugin : {};
+}
+
+function getPluginSettings(cwd: string): Record<string, unknown> {
+	return {
+		...pluginSettingsFrom(join(configRootDir(), "plugins", "omp-plugins.lock.json")),
+		...pluginSettingsFrom(join(cwd, ".omp", "plugin-overrides.json")),
+	};
 }
 
 function settingString(raw: Record<string, unknown>, key: string, fallback: string): string {
@@ -87,8 +156,8 @@ function sanitizeStoreFile(value: string): string {
 	return !file || file === "." || file === ".." ? DEFAULT_STORE_FILE : file;
 }
 
-async function settingsFor(cwd: string): Promise<PromptStashSettings> {
-	const raw = (await getPluginSettings(PACKAGE_ID, cwd)) as Record<string, unknown>;
+function settingsFor(cwd: string): PromptStashSettings {
+	const raw = getPluginSettings(cwd);
 	const shortcut = settingString(raw, "shortcut", DEFAULT_SHORTCUT).toLowerCase();
 	return {
 		shortcut,
@@ -101,16 +170,20 @@ async function settingsFor(cwd: string): Promise<PromptStashSettings> {
 	};
 }
 
-function matchesAnyShortcut(data: string, shortcuts: readonly string[]): boolean {
-	return shortcuts.some((shortcut) => matchesKey(data, shortcut));
+function safeFileName(value: string): string {
+	return value.replace(/[^\w.-]+/g, "_");
 }
 
-function shortcutHint(shortcuts: readonly string[]): string | undefined {
-	return shortcuts.length > 0 ? shortcuts.join("/") : undefined;
+function sessionIdForContext(ctx: ExtensionContext): string {
+	const id = ctx.sessionManager.getSessionId();
+	if (id && id.trim()) return id;
+	const file = ctx.sessionManager.getSessionFile();
+	if (file) return basename(file, ".jsonl");
+	return `ephemeral-${process.pid}`;
 }
 
 function storeDir(ctx: ExtensionContext): string {
-	return join(getAgentDir(), "prompt-stash", "sessions", safeFileName(sessionIdForContext(ctx)));
+	return join(agentDir(), "prompt-stash", "sessions", safeFileName(sessionIdForContext(ctx)));
 }
 
 function storePath(ctx: ExtensionContext, settings: PromptStashSettings): string {
@@ -121,7 +194,7 @@ function legacyStorePaths(ctx: ExtensionContext, settings: PromptStashSettings):
 	const session = safeFileName(sessionIdForContext(ctx));
 	return [
 		join(homedir(), ".pi", "agent", "vstack", "sessions", session, "prompt-stash", settings.storeFile),
-		join(getAgentDir(), "vstack", "sessions", session, "prompt-stash", settings.storeFile),
+		join(agentDir(), "vstack", "sessions", session, "prompt-stash", settings.storeFile),
 	];
 }
 
@@ -188,6 +261,65 @@ function stashPrompt(ctx: ExtensionContext, text: string, settings: PromptStashS
 	return items.length;
 }
 
+function stripAnsi(text: string): string {
+	return text
+		.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, "")
+		.replace(/\x1b\][^\x07]*(?:\x07|\x1b\\)/g, "")
+		.replace(/\x1b_pi:[^\x07]*\x07/g, "");
+}
+
+function takeEscapeSequence(text: string, index: number): string | undefined {
+	if (text.charCodeAt(index) !== 0x1b) return undefined;
+	const next = text[index + 1];
+	if (next === "[") {
+		let end = index + 2;
+		while (end < text.length && !/[@-~]/.test(text[end])) end += 1;
+		return text.slice(index, Math.min(text.length, end + 1));
+	}
+	if (next === "]") {
+		const bel = text.indexOf("\x07", index + 2);
+		const st = text.indexOf("\x1b\\", index + 2);
+		const end = bel === -1 ? st : st === -1 ? bel : Math.min(bel, st);
+		return end === -1 ? text.slice(index) : text.slice(index, end + (end === st ? 2 : 1));
+	}
+	return text.slice(index, Math.min(text.length, index + 2));
+}
+
+function visibleWidth(text: string): number {
+	return Array.from(stripAnsi(text)).length;
+}
+
+function truncateToWidth(text: string, width: number, ellipsis = ELLIPSIS): string {
+	if (width <= 0) return "";
+	if (visibleWidth(text) <= width) return text;
+	const suffixWidth = visibleWidth(ellipsis);
+	const budget = Math.max(0, width - suffixWidth);
+	let out = "";
+	let used = 0;
+	for (let i = 0; i < text.length; ) {
+		if (text.charCodeAt(i) === 0x1b) {
+			const sequence = takeEscapeSequence(text, i);
+			if (sequence) {
+				out += sequence;
+				i += sequence.length;
+				continue;
+			}
+		}
+		const char = Array.from(text.slice(i))[0];
+		if (!char) break;
+		if (used + 1 > budget) break;
+		out += char;
+		used += 1;
+		i += char.length;
+	}
+	return `${out}${ellipsis}`;
+}
+
+function padAnsi(text: string, width: number): string {
+	const truncated = truncateToWidth(text, width, "");
+	return `${truncated}${" ".repeat(Math.max(0, width - visibleWidth(truncated)))}`;
+}
+
 function lineCount(text: string): number {
 	return Math.max(1, text.split(/\r\n|\r|\n/).length);
 }
@@ -198,11 +330,6 @@ function previewText(text: string): string {
 		.map((line) => line.trim())
 		.find((line) => line.length > 0);
 	return first ?? "(empty prompt)";
-}
-
-function padAnsi(text: string, width: number): string {
-	const truncated = truncateToWidth(text, width, "");
-	return `${truncated}${" ".repeat(Math.max(0, width - visibleWidth(truncated)))}`;
 }
 
 function searchable(text: string): string {
@@ -246,22 +373,95 @@ function framePopup(lines: string[], width: number, theme: Theme, title = "", ri
 	return framed.map((line) => truncateToWidth(line, width, ""));
 }
 
-function renderSearchLine(searchInput: Input, width: number, theme: Theme): string {
-	const prefix = " ";
-	const input = searchInput.render(Math.max(1, width - visibleWidth(prefix)))[0] ?? "";
-	return theme.bg("toolPendingBg", padAnsi(truncateToWidth(`${prefix}${input}`, width, ""), width));
-}
-
 function filterItems(items: StashItem[], query: string): StashItem[] {
 	const trimmed = query.trim().toLowerCase();
 	if (!trimmed) return items;
 	return items.filter((item) => searchable(item.text).includes(trimmed));
 }
 
+function matchesKey(data: string, key: string): boolean {
+	const normalized = key.toLowerCase();
+	if (normalized.startsWith("ctrl+") && normalized.length === 6) {
+		const code = normalized.charCodeAt(5) - 96;
+		return code > 0 && code < 27 && data === String.fromCharCode(code);
+	}
+	switch (normalized) {
+		case "return":
+		case "enter":
+			return data === "\r" || data === "\n";
+		case "escape":
+			return data === "\x1b";
+		case "up":
+			return data === "\x1b[A";
+		case "down":
+			return data === "\x1b[B";
+		case "pageup":
+			return data === "\x1b[5~";
+		case "pagedown":
+			return data === "\x1b[6~";
+		case "delete":
+		case "del":
+			return data === "\x1b[3~";
+		case "backspace":
+			return data === "\x7f" || data === "\x08";
+		default:
+			return data === normalized;
+	}
+}
+
+function matchesAnyShortcut(data: string, shortcuts: readonly string[]): boolean {
+	return shortcuts.some((shortcut) => matchesKey(data, shortcut));
+}
+
+function shortcutLabel(shortcut: string): string {
+	switch (shortcut.toLowerCase()) {
+		case "delete":
+		case "del":
+			return "Del";
+		default:
+			return shortcut;
+	}
+}
+
+function shortcutHint(shortcuts: readonly string[]): string | undefined {
+	return shortcuts.length > 0 ? shortcuts.map(shortcutLabel).join("/") : undefined;
+}
+
+function isPrintableInput(data: string): boolean {
+	return Array.from(data).length === 1 && data >= " " && data !== "\x7f";
+}
+
+function handleSuspend(tui: TuiApi): void {
+	if (process.platform === "win32") return;
+	const onResume = (): void => {
+		tui.start?.();
+		tui.requestRender(true);
+	};
+	process.once("SIGCONT", onResume);
+	tui.stop?.();
+	try {
+		process.kill(0, "SIGTSTP");
+	} catch {
+		process.removeListener("SIGCONT", onResume);
+		tui.start?.();
+		tui.requestRender(true);
+	}
+}
+
+function matchesAction(keybindings: KeybindingsApi, data: string, action: string, fallback: string): boolean {
+	return keybindings.matches?.(data, action) ?? matchesKey(data, fallback);
+}
+
+function renderSearchLine(query: string, width: number, theme: Theme): string {
+	const prefix = "> ";
+	const content = truncateToWidth(`${prefix}${query}`, width, "");
+	return theme.bg("toolPendingBg", padAnsi(content, width));
+}
+
 async function openStashPopup(ctx: ExtensionContext): Promise<void> {
 	if (!ctx.hasUI) return;
 
-	const settings = await settingsFor(ctx.cwd);
+	const settings = settingsFor(ctx.cwd);
 	const path = storePath(ctx, settings);
 	mergeLegacyStores(ctx, path, settings);
 	let items = loadItems(path);
@@ -270,16 +470,15 @@ async function openStashPopup(ctx: ExtensionContext): Promise<void> {
 		return;
 	}
 
-	let restored: string | null = null;
-	restored = await ctx.ui.custom<string | null>(
-		(tui, theme, _keybindings, done) => {
-			const searchInput = new Input();
-			searchInput.focused = true;
+	const restored = await ctx.ui.custom<string | null>(
+		(tui, theme, keybindings, done) => {
+			let query = "";
 			let selected = 0;
 			let scroll = 0;
+			let focused = true;
 			let confirmDeleteAll = false;
 
-			const filtered = () => filterItems(items, searchInput.getValue());
+			const filtered = () => filterItems(items, query);
 			const clampSelection = () => {
 				const count = filtered().length;
 				if (count === 0) {
@@ -323,7 +522,7 @@ async function openStashPopup(ctx: ExtensionContext): Promise<void> {
 				clampSelection();
 
 				const lines: string[] = [];
-				lines.push(panelLine(renderSearchLine(searchInput, innerWidth, theme), innerWidth));
+				lines.push(panelLine(renderSearchLine(query, innerWidth, theme), innerWidth));
 				lines.push(panelLine("", innerWidth));
 
 				if (results.length === 0) {
@@ -340,7 +539,8 @@ async function openStashPopup(ctx: ExtensionContext): Promise<void> {
 						const preview = truncateToWidth(previewText(item.text), previewWidth, "");
 						const styledPreview = index === selected ? theme.bold(preview) : preview;
 						const styledCount = index === selected ? theme.fg("text", countText) : theme.fg("dim", countText);
-						const row = `${itemPad}${styledPreview}${" ".repeat(Math.max(1, rowWidth - visibleWidth(itemPad) - visibleWidth(preview) - countWidth))}${styledCount}`;
+						const gap = " ".repeat(Math.max(1, rowWidth - visibleWidth(itemPad) - visibleWidth(preview) - countWidth));
+						const row = `${itemPad}${styledPreview}${gap}${styledCount}`;
 						lines.push(index === selected ? selectedLine(theme, row, innerWidth) : panelLine(row, innerWidth));
 					}
 				}
@@ -349,11 +549,11 @@ async function openStashPopup(ctx: ExtensionContext): Promise<void> {
 				for (let i = 0; i < emptyRows; i += 1) lines.push(panelLine("", innerWidth));
 
 				lines.push(panelLine("", innerWidth));
-				const footerParts = [`${ansiYellow("-/=")} ${theme.fg("dim", "page")}`];
+				const footerParts = [`${theme.fg("warning", "-/=")} ${theme.fg("dim", "page")}`];
 				const deleteHint = shortcutHint(settings.deleteShortcuts);
-				if (deleteHint) footerParts.push(`${ansiYellow(deleteHint)} ${theme.fg("dim", "delete")}`);
+				if (deleteHint) footerParts.push(`${theme.fg("warning", deleteHint)} ${theme.fg("dim", "delete")}`);
 				const deleteAllHint = shortcutHint(settings.deleteAllShortcuts);
-				if (deleteAllHint) footerParts.push(`${ansiYellow(deleteAllHint)} ${theme.fg("dim", "delete all")}`);
+				if (deleteAllHint) footerParts.push(`${theme.fg("warning", deleteAllHint)} ${theme.fg("dim", "delete all")}`);
 				const status = confirmDeleteAll ? theme.fg("warning", "delete all stashed prompts?") : footerParts.join(theme.fg("dim", " · "));
 				lines.push(panelLine(status, innerWidth));
 
@@ -362,14 +562,24 @@ async function openStashPopup(ctx: ExtensionContext): Promise<void> {
 				return frame.map((line) => truncateToWidth(`${left}${line}`, width, ""));
 			};
 
-			const component: Component & Focusable & { handleInput(data: string): void; invalidate(): void; render(width: number): string[] } = {
+			return {
 				get focused(): boolean {
-					return searchInput.focused;
+					return focused;
 				},
 				set focused(value: boolean) {
-					searchInput.focused = value;
+					focused = value;
 				},
 				handleInput(data: string) {
+					if (matchesAction(keybindings, data, "app.display.reset", "ctrl+l")) {
+						tui.resetDisplay?.();
+						tui.requestRender(true);
+						return;
+					}
+					if (matchesAction(keybindings, data, "app.suspend", "ctrl+z")) {
+						handleSuspend(tui);
+						return;
+					}
+
 					if (confirmDeleteAll) {
 						if (matchesKey(data, "return") || matchesKey(data, "enter")) {
 							clearAll();
@@ -424,27 +634,29 @@ async function openStashPopup(ctx: ExtensionContext): Promise<void> {
 						return;
 					}
 					if (matchesKey(data, "ctrl+u")) {
-						searchInput.setValue("");
+						query = "";
 						selected = 0;
 						clampSelection();
 						tui.requestRender();
 						return;
 					}
-
-					const before = searchInput.getValue();
-					searchInput.handleInput(data);
-					if (searchInput.getValue() !== before) {
+					if (matchesKey(data, "backspace")) {
+						query = query.slice(0, -1);
 						selected = 0;
 						clampSelection();
+						tui.requestRender();
+						return;
 					}
-					tui.requestRender();
+					if (isPrintableInput(data)) {
+						query += data;
+						selected = 0;
+						clampSelection();
+						tui.requestRender();
+					}
 				},
-				invalidate() {
-					searchInput.invalidate();
-				},
+				invalidate() {},
 				render,
 			};
-			return component;
 		},
 		{ overlay: true },
 	);
@@ -458,8 +670,8 @@ let stashShortcutOpen = false;
 
 async function toggleStash(ctx: ExtensionContext): Promise<void> {
 	if (stashShortcutOpen) return;
-	const settings = await settingsFor(ctx.cwd);
-	const text = ctx.ui.getEditorText?.() ?? "";
+	const settings = settingsFor(ctx.cwd);
+	const text = ctx.ui.getEditorText() ?? "";
 	if (text.trim().length > 0) {
 		const count = stashPrompt(ctx, text, settings);
 		ctx.ui.setEditorText("");
@@ -475,8 +687,8 @@ async function toggleStash(ctx: ExtensionContext): Promise<void> {
 	}
 }
 
-export default async function promptStash(pi: ExtensionAPI): Promise<void> {
-	const initialSettings = await settingsFor(process.cwd());
+export default function promptStash(pi: ExtensionAPI): void {
+	const initialSettings = settingsFor(process.cwd());
 	if (initialSettings.shortcut !== "none") {
 		pi.registerShortcut(initialSettings.shortcut, {
 			description: "Stash current prompt or restore from prompt stash",
@@ -489,8 +701,8 @@ export default async function promptStash(pi: ExtensionAPI): Promise<void> {
 		handler: async (_args, ctx) => openStashPopup(ctx),
 	});
 
-	pi.on("session_start", async (_event, ctx) => {
-		const settings = await settingsFor(ctx.cwd);
+	pi.on("session_start", (_event, ctx) => {
+		const settings = settingsFor(ctx.cwd);
 		mergeLegacyStores(ctx, storePath(ctx, settings), settings);
 	});
 }

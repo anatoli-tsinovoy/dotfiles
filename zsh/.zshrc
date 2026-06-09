@@ -168,7 +168,10 @@ bindkey -M viins '^[b' backward-word
 # Source - https://superuser.com/a/378045
 # Posted by Gilles 'SO- stop being evil', modified by community. See post 'Timeline' for change history
 # Retrieved 2026-02-25, License - CC BY-SA 3.0
-
+#
+# Bind only in ZLE's vi insert/command maps. Foreground raw-mode TUIs (OMP,
+# opencode, nvim) own their first Ctrl+Z; once zsh has the prompt again, this
+# widget can background the stopped job with a second Ctrl+Z.
 fancy-ctrl-z () {
   if [[ $#BUFFER -eq 0 ]]; then
     bg
@@ -178,7 +181,8 @@ fancy-ctrl-z () {
   fi
 }
 zle -N fancy-ctrl-z
-bindkey '^Z' fancy-ctrl-z
+bindkey -M viins '^Z' fancy-ctrl-z
+bindkey -M vicmd '^Z' fancy-ctrl-z
 
 # === OS-specific configuration ===
 # Detect OS and source appropriate config

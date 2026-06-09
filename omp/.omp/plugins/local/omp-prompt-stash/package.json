@@ -45,9 +45,5 @@
         "description": "Visible stash rows before the picker scrolls."
       }
     }
-  },
-  "peerDependencies": {
-    "@oh-my-pi/pi-coding-agent": "*",
-    "@oh-my-pi/pi-tui": "*"
   }
 }
