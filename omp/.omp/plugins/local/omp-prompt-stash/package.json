@@ -1,0 +1,53 @@
+{
+  "name": "@local/omp-prompt-stash",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local OMP prompt stash extension with configurable shortcuts.",
+  "omp": {
+    "extensions": ["./src/prompt-stash.ts"],
+    "settings": {
+      "shortcut": {
+        "type": "string",
+        "default": "ctrl+shift+g",
+        "description": "Global shortcut for stash/restore. Use none to disable. Restart OMP after changing."
+      },
+      "deleteShortcuts": {
+        "type": "string",
+        "default": "ctrl+r,delete",
+        "description": "Comma-separated picker shortcuts that delete/remove the selected stash item. Use none to disable. Defaults avoid ctrl+d because ctrl+d is OMP's global TUI exit."
+      },
+      "deleteAllShortcuts": {
+        "type": "string",
+        "default": "ctrl+x",
+        "description": "Comma-separated picker shortcuts that ask to delete all stash items. Use none to disable."
+      },
+      "storeFile": {
+        "type": "string",
+        "default": "prompt-stash.json",
+        "description": "File name inside the OMP per-session prompt stash directory. Path components are ignored."
+      },
+      "deduplicate": {
+        "type": "boolean",
+        "default": true,
+        "description": "When stashing, remove older entries with identical text."
+      },
+      "popupWidth": {
+        "type": "number",
+        "default": 92,
+        "min": 40,
+        "description": "Preferred visual width for the centered picker panel."
+      },
+      "listRows": {
+        "type": "number",
+        "default": 10,
+        "min": 1,
+        "description": "Visible stash rows before the picker scrolls."
+      }
+    }
+  },
+  "peerDependencies": {
+    "@oh-my-pi/pi-coding-agent": "*",
+    "@oh-my-pi/pi-tui": "*"
+  }
+}

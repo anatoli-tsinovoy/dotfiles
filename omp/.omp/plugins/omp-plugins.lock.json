@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "@local/omp-prompt-stash": {
+      "version": "0.1.0",
+      "enabledFeatures": null,
+      "enabled": true
+    }
+  },
+  "settings": {
+    "@local/omp-prompt-stash": {
+      "shortcut": "ctrl+shift+g",
+      "deleteShortcuts": "ctrl+r,delete",
+      "deleteAllShortcuts": "ctrl+x"
+    }
+  }
+}
