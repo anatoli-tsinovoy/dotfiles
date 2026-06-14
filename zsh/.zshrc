@@ -194,7 +194,3 @@ case "$(uname -s)" in
     [[ -f ~/.zshrc.linux ]] && source ~/.zshrc.linux
     ;;
 esac
-
-# bun completions
-[ -s "/Users/anatoli/.bun/_bun" ] && source "/Users/anatoli/.bun/_bun"
-source /Users/anatoli/.safe-chain/scripts/init-posix.sh # Safe-chain Zsh initialization script
