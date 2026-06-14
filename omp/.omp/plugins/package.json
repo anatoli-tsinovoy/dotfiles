@@ -2,6 +2,6 @@
   "name": "omp-plugins",
   "private": true,
   "dependencies": {
-    "@local/omp-prompt-stash": "file:./local/omp-prompt-stash"
+    "ponytail": "https://github.com/DietrichGebert/ponytail"
   }
 }

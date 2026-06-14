@@ -1,5 +1,10 @@
 {
   "plugins": {
+    "ponytail": {
+      "version": "0.1.0",
+      "enabledFeatures": null,
+      "enabled": true
+    },
     "@local/omp-prompt-stash": {
       "version": "0.1.0",
       "enabledFeatures": null,
@@ -8,7 +13,7 @@
   },
   "settings": {
     "@local/omp-prompt-stash": {
-      "shortcut": "ctrl+shift+g",
+      "shortcut": "ctrl+h",
       "deleteShortcuts": "ctrl+r,delete",
       "deleteAllShortcuts": "ctrl+x"
     }

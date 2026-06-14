@@ -9,7 +9,7 @@
     "settings": {
       "shortcut": {
         "type": "string",
-        "default": "ctrl+shift+g",
+        "default": "ctrl+h",
         "description": "Global shortcut for stash/restore. Use none to disable. Restart OMP after changing."
       },
       "deleteShortcuts": {

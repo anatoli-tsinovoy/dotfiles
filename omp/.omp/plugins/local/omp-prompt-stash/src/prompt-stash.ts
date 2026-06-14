@@ -5,7 +5,7 @@ import { basename, dirname, join, resolve } from "node:path";
 const PACKAGE_ID = "@local/omp-prompt-stash";
 const DEFAULT_STORE_FILE = "prompt-stash.json";
 const STORE_VERSION = 1;
-const DEFAULT_SHORTCUT = "ctrl+shift+g";
+const DEFAULT_SHORTCUT = "ctrl+h";
 const DEFAULT_DELETE_SHORTCUTS = "ctrl+r,delete";
 const DEFAULT_DELETE_ALL_SHORTCUTS = "ctrl+x";
 const DEFAULT_POPUP_WIDTH = 92;
