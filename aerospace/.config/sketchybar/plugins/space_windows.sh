@@ -8,7 +8,7 @@ reload_workspace_icon() {
   local all_apps=$1
   local outvar=$2
   local args_=()
-  apps=()
+  local apps=()
   while read -r sid ws_is_focused app_name; do
     if [ "$sid" = "$3" ]; then
       apps+=("$app_name")
@@ -34,7 +34,7 @@ reload_workspace_icon() {
     SID_ICON_HIGHLIGHT="false"
     SID_LABEL_HIGHLIGHT="false"
     SID_BORDER_COLOR=$BACKGROUND_1
-    if [ $6 ]; then
+    if [ "$6" = 1 ]; then
       SID_DISPLAY=0
     else
       # AS_TO_SB is zero-based, but as_monitor is one-based
@@ -58,18 +58,40 @@ ALL_APPS=$(aerospace list-windows --all --format '%{workspace} %{workspace-is-fo
 # this should be enough actually $(aerospace list-windows --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id} %{app-name}')
 ALL_AS_WS=$(aerospace list-workspaces --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id}')
 
+refresh_all_workspace_icons() {
+  local outvar=$1
+  local nonempty_ws=" "
+  local sid ws_is_focused app_name
+  while read -r sid ws_is_focused app_name; do
+    if [ -n "$sid" ]; then
+      nonempty_ws+="$sid "
+    fi
+  done <<<"$ALL_APPS"
+
+  while IFS=" " read -r sid is_focused is_visible as_monitor; do
+    local is_highlighted=0
+    local should_hide=0
+    if [ "$is_focused" = "true" ]; then
+      is_highlighted=1
+    fi
+    if [[ "$nonempty_ws" != *" $sid "* ]] && [ "$is_visible" != "true" ]; then
+      should_hide=1
+    fi
+    reload_workspace_icon "$ALL_APPS" "$outvar" "$sid" "$as_monitor" "$is_highlighted" "$should_hide"
+  done <<<"${ALL_AS_WS}"
+}
+
 if [ "$SENDER" = "aerospace_focus_change" ]; then
-  echo ""
-  # CURRENT_FOCUS=
-  # while read -r sid ws_is_focused app_names; do
-  #   if [ "$ws_if_focused" = "true" ]; then
-  #     CURRENT_FOCUS=$sid
-  #   fi
-  # done <<<"${ALL_APPS}"
-  # if [ -z $CURRENT_FOCUS ]; then
-  #   echo ""
-  #   # echo "GOTEM 2" >>~/aaaa
-  # fi
+  sleep 0.1
+  ALL_APPS=$(aerospace list-windows --all --format '%{workspace} %{workspace-is-focused} %{app-name}')
+  ALL_AS_WS=$(aerospace list-workspaces --all --format '%{workspace} %{workspace-is-focused} %{workspace-is-visible} %{monitor-id}')
+
+  args=()
+  refresh_all_workspace_icons args
+
+  if [ ${#args[@]} -gt 0 ]; then
+    sketchybar "${args[@]}"
+  fi
 fi
 
 if [ "$SENDER" = "front_app_switched" ]; then
@@ -102,6 +124,7 @@ if [ "$SENDER" = "aerospace_monitor_move" ]; then
     sketchybar "${args[@]}"
   fi
 fi
+
 
 if [ "$SENDER" = "aerospace_workspace_change" ]; then
   AS_NONEMPTY_WS=""

@@ -83,6 +83,33 @@ install_stow() {
   fi
 }
 
+trust_homebrew_taps() {
+  local brewfile="$1"
+  local line
+  local tap
+
+  if ! brew help trust &>/dev/null; then
+    log_skip "Homebrew tap trust not supported"
+    return 0
+  fi
+
+  log_info "Trusting Homebrew taps..."
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^[[:space:]]*tap[[:space:]]+\"([^\"]+)\" ]]; then
+      tap="${BASH_REMATCH[1]}"
+    elif [[ "$line" =~ ^[[:space:]]*tap[[:space:]]+\'([^\']+)\' ]]; then
+      tap="${BASH_REMATCH[1]}"
+    else
+      continue
+    fi
+
+    brew tap "$tap"
+    brew trust "$tap"
+  done <"$brewfile"
+  log_ok "Homebrew taps trusted"
+}
+
+
 install_aptfile() {
   if command -v aptfile &>/dev/null; then
     log_ok "aptfile already installed"
@@ -290,6 +317,8 @@ main() {
       eval "$(/opt/homebrew/bin/brew shellenv)"
       eval "$(/opt/homebrew/bin/brew shellenv zsh)"
     fi
+
+    trust_homebrew_taps "$SCRIPT_DIR/Brewfile"
 
     log_info "Installing Homebrew packages..."
     brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true

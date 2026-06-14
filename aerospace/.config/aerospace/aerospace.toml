@@ -41,7 +41,7 @@ default-root-container-orientation = 'auto'
 on-focus-changed = [
   'move-mouse window-lazy-center',
   'exec-and-forget sketchybar --trigger aerospace_focus_change',
-  'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh sync',
+  'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh',
 ]
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
