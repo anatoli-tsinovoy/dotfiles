@@ -143,6 +143,24 @@ setup_zsh_plugins() {
   fi
 }
 
+setup_omp_plugins() {
+  if ! command -v omp &>/dev/null; then
+    log_skip "oh-my-pi not available; skipping OMP plugins"
+    return 0
+  fi
+
+  log_info "Installing OMP plugins..."
+  omp plugin install https://github.com/DietrichGebert/ponytail
+
+  local local_plugin_dir="$HOME/.omp/plugins/local/omp-prompt-stash"
+  if [[ -d "$local_plugin_dir" ]]; then
+    omp plugin link -l "$local_plugin_dir"
+    omp plugin install "$local_plugin_dir"
+  else
+    log_warn "OMP prompt stash plugin missing at $local_plugin_dir"
+  fi
+}
+
 install_linux_prerequisites() {
   if ! command -v curl &>/dev/null || ! command -v git &>/dev/null; then
     log_info "Installing prerequisites (curl, git)..."
@@ -333,8 +351,11 @@ main() {
   rm -f ~/.omp/agent/config.yml
 
   # Stow common packages (no --adopt: we want OUR files, not whatever exists)
+
   log_info "Stowing common dotfiles..."
   run_stow -t ~ nvim git opencode omp glow tmux forge
+
+  setup_omp_plugins
 
   # Stow unified zsh package (contains .zshrc, .zshrc.macos, .zshrc.linux, .p10k.zsh)
   log_info "Stowing zsh configuration..."
