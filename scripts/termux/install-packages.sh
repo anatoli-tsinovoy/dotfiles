@@ -31,16 +31,6 @@ install_pi() {
   log_ok "pi installed"
 }
 
-install_forge() {
-  if command_exists forge; then
-    log_skip "forge already installed"
-    return 0
-  fi
-
-  log_info "Installing forge via official install script..."
-  curl -LsfS https://forgecode.dev/install | sh
-  log_ok "forge installed"
-}
 
 # === Main ===
 
@@ -84,7 +74,6 @@ main() {
   log_ok "All packages installed"
 
   install_pi
-  install_forge
 
   echo ""
   echo "========================================"

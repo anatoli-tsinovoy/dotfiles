@@ -271,26 +271,6 @@ run_stow() {
   stow "${stow_args[@]}" "$@"
 }
 
-maybe_run_pi_to_forge() {
-  local script_path="$HOME/.local/bin/pi-to-forge"
-  local reply=""
-
-  if [[ ! -x "$script_path" ]]; then
-    log_skip "pi-to-forge not available"
-    return 0
-  fi
-
-  echo
-  read -r -p "Run pi-to-forge now to log into pi and sync Forge auth? [y/N] " reply
-  case "$reply" in
-  y | Y | yes | YES)
-    "$script_path"
-    ;;
-  *)
-    log_skip "Skipping pi-to-forge"
-    ;;
-  esac
-}
 
 main() {
   parse_args "$@"
@@ -376,13 +356,12 @@ main() {
   rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.zshrc.termux ~/.p10k.zsh
   rm -f ~/.gitconfig ~/.vimrc
   rm -rf ~/.config/nvim ~/.config/opencode
-  rm -f ~/.forge/.forge.toml
   rm -f ~/.omp/agent/config.yml
 
   # Stow common packages (no --adopt: we want OUR files, not whatever exists)
 
   log_info "Stowing common dotfiles..."
-  run_stow -t ~ nvim git opencode omp glow tmux forge
+  run_stow -t ~ nvim git opencode omp glow tmux
 
   setup_omp_plugins
 
@@ -436,10 +415,6 @@ main() {
     mkdir -p ~/.termux ~/.local/bin
     run_stow --no-folding -t ~ termux
 
-    # Stow forge config (termux only)
-    log_info "Stowing forge configuration..."
-    rm -f ~/.forge/.forge.toml
-    run_stow -t ~ forge
 
     # Initialize colors.properties with dark theme (uses copy, not symlink)
     if [[ ! -f "$HOME/.termux/colors.properties" ]]; then
@@ -455,7 +430,6 @@ main() {
       log_ok "Default shell set to zsh (restart Termux to apply)"
     fi
 
-    maybe_run_pi_to_forge
   fi
 
   # Setup rtk opencode plugin (if rtk installed)
