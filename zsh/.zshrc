@@ -75,9 +75,23 @@ alias ls="eza -la --icons --group-directories-first"
 export BAT_THEME="ansi"
 # Force delta to use the stowed git config when it is called outside Git
 # (for example: `gh pr diff --patch --color=never | delta`).
-export DELTA_CONFIG="$HOME/.gitconfig"
-alias delta='delta --config "$DELTA_CONFIG"'
-export GH_PAGER='delta --config "$DELTA_CONFIG"'
+export GH_PAGER='delta --config "$HOME/.gitconfig"'
+gh() {
+  if [[ "$1" == "pr" && "$2" == "diff" ]]; then
+    local arg has_color=0
+    for arg in "${@:3}"; do
+      [[ "$arg" == "--color" || "$arg" == --color=* ]] && has_color=1
+    done
+
+    if (( has_color )); then
+      command gh "$@"
+    else
+      command gh pr diff --color=never "${@:3}"
+    fi
+  else
+    command gh "$@"
+  fi
+}
 alias bat="bat --color=always"
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"

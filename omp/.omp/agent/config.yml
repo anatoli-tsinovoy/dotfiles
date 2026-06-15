@@ -1,4 +1,3 @@
-lastChangelogVersion: 15.10.8
 modelRoles: 
   default: openai-codex/gpt-5.5:medium
   smol: openai-codex/gpt-5.4-mini:high
@@ -15,10 +14,11 @@ theme:
 symbolPreset: nerd
 colorBlindMode: false
 compaction: 
-  strategy: handoff
+  strategy: snapcompact
   thresholdPercent: 70
   handoffSaveToDisk: true
-  thresholdTokens: 150000
+  thresholdTokens: 175000
+  remoteEnabled: false
 lsp: 
   formatOnWrite: true
   diagnosticsOnEdit: true
