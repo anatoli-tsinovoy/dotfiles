@@ -8,6 +8,21 @@ termux/.termux/termux.properties
 termux/.termux/shell
 termux/.termux/.current-theme
 
+# omp user files (not tracked, user state)
+omp/.omp/agent/last-changelog-version
+omp/.omp/stats.db*
+omp/.omp/agent/models.db*
+omp/.omp/agent/agent.db*
+omp/.omp/agent/history.db*
+omp/.omp/agent/blobs
+omp/.omp/cache
+omp/.omp/logs
+omp/.omp/puppeteer
+omp/.omp/agent/prompt-stash
+omp/.omp/agent/sessions
+omp/.omp/agent/terminal-sessions
+omp/.omp/plugins/node_modules
+
 # Sensitive
 private-macos
 
