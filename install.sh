@@ -398,7 +398,7 @@ main() {
     # Create empty gitconfig.local (no OS-specific overrides needed)
     touch "$HOME/.gitconfig.local"
 
-    # Stow Linux shims (bun -> node)
+    # Stow Linux shims (bat/fd Debian name fixes)
     log_info "Stowing Linux shims..."
     run_stow -t ~ -d shims linux
 

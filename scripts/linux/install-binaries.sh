@@ -228,6 +228,13 @@ install_uv() {
   log_ok "uv installed"
 }
 
+install_node() {
+  log_info "Installing current Node.js LTS from NodeSource..."
+  curl -fsSL https://deb.nodesource.com/setup_lts.x | run_privileged bash -
+  run_privileged apt-get install -y nodejs
+  log_ok "Node.js installed ($(/usr/bin/node --version), npm $(/usr/bin/npm --version))"
+}
+
 install_bun() {
   if command_exists bun; then
     log_skip "bun already installed ($(bun --version))"
@@ -600,10 +607,11 @@ main() {
   mkdir -p "$HOME/.local/bin"
   export PATH="$HOME/.local/bin:$PATH"
 
-  # Order matters: uv and bun are needed for later tools
+  # Order matters: uv, Node.js, and bun are needed for later tools
   install_neovim
   install_tmux
   install_uv
+  install_node
   install_bun
 
   # Tools with prebuilt binaries and release packages
