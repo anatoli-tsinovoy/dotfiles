@@ -109,7 +109,6 @@ trust_homebrew_taps() {
   log_ok "Homebrew taps trusted"
 }
 
-
 install_aptfile() {
   if command -v aptfile &>/dev/null; then
     log_ok "aptfile already installed"
@@ -178,6 +177,7 @@ setup_omp_plugins() {
 
   log_info "Installing OMP plugins..."
   omp plugin install https://github.com/DietrichGebert/ponytail
+  omp plugin install @plannotator/pi-extension
 
   local local_plugin_dir="$HOME/.omp/plugins/local/omp-prompt-stash"
   if [[ -d "$local_plugin_dir" ]]; then
@@ -270,7 +270,6 @@ run_stow() {
   fi
   stow "${stow_args[@]}" "$@"
 }
-
 
 main() {
   parse_args "$@"
@@ -417,7 +416,6 @@ main() {
     log_info "Stowing Termux configuration..."
     mkdir -p ~/.termux ~/.local/bin
     run_stow --no-folding -t ~ termux
-
 
     # Initialize colors.properties with dark theme (uses copy, not symlink)
     if [[ ! -f "$HOME/.termux/colors.properties" ]]; then

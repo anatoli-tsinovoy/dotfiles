@@ -2,6 +2,7 @@
   "name": "omp-plugins",
   "private": true,
   "dependencies": {
+    "@plannotator/pi-extension": "^0.20.2",
     "ponytail": "https://github.com/DietrichGebert/ponytail"
   }
 }

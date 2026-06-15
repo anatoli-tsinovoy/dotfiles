@@ -9,6 +9,11 @@
       "version": "0.1.0",
       "enabledFeatures": null,
       "enabled": true
+    },
+    "@plannotator/pi-extension": {
+      "version": "0.20.2",
+      "enabledFeatures": null,
+      "enabled": true
     }
   },
   "settings": {
