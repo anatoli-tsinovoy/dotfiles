@@ -248,6 +248,55 @@ install_bun() {
   log_ok "bun installed"
 }
 
+install_gh() {
+  if command_exists gh; then
+    log_skip "gh already installed ($(gh --version | sed -n '1p'))"
+    return 0
+  fi
+
+  log_info "Installing gh from GitHub's official apt repo..."
+  local keyring="/etc/apt/keyrings/githubcli-archive-keyring.gpg"
+  local source_list="/etc/apt/sources.list.d/github-cli.list"
+  local tmp_key
+  tmp_key="$(mktemp)"
+
+  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o "$tmp_key"
+  run_privileged install -d -m 755 /etc/apt/keyrings /etc/apt/sources.list.d
+  run_privileged install -m 644 "$tmp_key" "$keyring"
+  rm -f "$tmp_key"
+  printf 'deb [arch=%s signed-by=%s] https://cli.github.com/packages stable main\n' "$(dpkg --print-architecture)" "$keyring" |
+    run_privileged tee "$source_list" >/dev/null
+  run_privileged apt-get update
+  run_privileged apt-get install -y gh
+  log_ok "gh installed"
+}
+
+install_aws_cli() {
+  if command_exists aws && [[ "$(aws --version 2>&1)" == aws-cli/2.* ]]; then
+    log_skip "aws cli already installed ($(aws --version 2>&1))"
+    return 0
+  fi
+
+  local arch
+  arch="$(get_arch)"
+  case "$arch" in
+  x86_64 | aarch64) ;;
+  *)
+    log_warn "Unsupported AWS CLI architecture: $arch"
+    return 1
+    ;;
+  esac
+
+  log_info "Installing AWS CLI v2 from AWS official installer..."
+  local tmp_dir
+  tmp_dir="$(mktemp -d)"
+  curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-${arch}.zip" -o "$tmp_dir/awscliv2.zip"
+  unzip -q "$tmp_dir/awscliv2.zip" -d "$tmp_dir"
+  run_privileged "$tmp_dir/aws/install" --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+  rm -rf "$tmp_dir"
+  log_ok "AWS CLI installed ($(aws --version 2>&1))"
+}
+
 install_cargo() {
   if command_exists cargo; then
     log_skip "cargo already installed ($(cargo --version))"
@@ -427,6 +476,21 @@ install_opencode() {
   log_info "Installing opencode via bun..."
   bun install -g opencode-ai@dev
   log_ok "opencode installed"
+}
+
+install_sentry_cli() {
+  if command_exists sentry-cli; then
+    log_skip "sentry-cli already installed"
+    return 0
+  fi
+  if ! command_exists bun; then
+    log_warn "bun not found, skipping sentry-cli installation"
+    return 1
+  fi
+
+  log_info "Installing sentry-cli via bun..."
+  bun install -g @sentry/cli
+  log_ok "sentry-cli installed"
 }
 
 install_omp() {
@@ -613,6 +677,8 @@ main() {
   install_uv
   install_node
   install_bun
+  install_gh
+  install_aws_cli
 
   # Tools with prebuilt binaries and release packages
   install_bat
@@ -631,6 +697,7 @@ main() {
   install_yt_dlp
   install_emojify
   install_opencode
+  install_sentry_cli
   install_omp
   install_bash_language_server
   install_yaml_language_server

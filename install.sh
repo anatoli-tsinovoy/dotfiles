@@ -309,6 +309,9 @@ main() {
     log_info "Installing oh-my-pi via bun..."
     bun install -g @oh-my-pi/pi-coding-agent --safe-chain-skip-minimum-package-age
 
+    log_info "Installing sentry-cli via bun..."
+    bun install -g @sentry/cli --safe-chain-skip-minimum-package-age
+
     log_info "Applying macOS defaults..."
     bash "$SCRIPT_DIR/scripts/macos/macos-defaults.sh"
 
