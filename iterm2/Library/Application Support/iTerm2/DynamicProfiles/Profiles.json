@@ -1,5 +1,5 @@
 {
-  "Profiles": [
+  "Profiles" : [
     {
       "Close Sessions On End": true,
       "HotKey Modifier Flags": 1310720,
@@ -631,13 +631,12 @@
       }
     },
     {
+      "Command" : "\/opt\/homebrew\/bin\/btop",
+      "Allow Title Setting" : false,
       "Name" : "btop",
-      "Guid" : "btop-floating-terminal",
       "Custom Command" : "Yes",
-      "Command" : "/opt/homebrew/bin/btop",
-      "Title" : "btop",
-      "Allow Title Setting" : false
+      "Guid" : "btop-floating-terminal",
+      "Title" : "btop"
     }
   ]
 }
-

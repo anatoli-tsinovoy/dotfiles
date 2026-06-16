@@ -1,0 +1,12 @@
+{
+  "Profiles" : [
+    {
+      "Command" : "/bin/bash -lc 'exec \"$HOME/.config/aerospace/ssh-tunnel.sh\"'",
+      "Allow Title Setting" : false,
+      "Name" : "ssh-tunnel",
+      "Guid" : "ssh-tunnel-terminal",
+      "Title" : "ssh-tunnel",
+      "Custom Command" : "Yes"
+    }
+  ]
+}
