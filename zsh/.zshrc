@@ -122,6 +122,10 @@ if command -v opencode &>/dev/null; then
   alias oc="opencode"
 fi
 
+# === oh-my-pi ===
+export PLANNOTATOR_REMOTE=1
+export PLANNOTATOR_PORT=9999
+
 # uv environment (if installed via install script)
 if [[ -f "$HOME/.local/bin/env" ]]; then
   . "$HOME/.local/bin/env"
