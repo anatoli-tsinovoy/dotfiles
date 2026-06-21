@@ -176,16 +176,33 @@ setup_omp_plugins() {
   fi
 
   log_info "Installing OMP plugins..."
-  omp plugin install https://github.com/DietrichGebert/ponytail
-  omp plugin install @plannotator/pi-extension
 
-  local local_plugin_dir="$HOME/.omp/plugins/local/omp-prompt-stash"
-  if [[ -d "$local_plugin_dir" ]]; then
-    omp plugin link -l "$local_plugin_dir"
-    omp plugin install "$local_plugin_dir"
-  else
-    log_warn "OMP prompt stash plugin missing at $local_plugin_dir"
-  fi
+  local plugin
+  local remote_plugins=(
+    "https://github.com/DietrichGebert/ponytail"
+    "@plannotator/pi-extension"
+  )
+  for plugin in "${remote_plugins[@]}"; do
+    omp plugin install "$plugin"
+  done
+
+  install_local_omp_plugin() {
+    local name="$1"
+    local dir="$2"
+    local link="${3:-0}"
+
+    if [[ -d "$dir" ]]; then
+      if [[ "$link" == "1" ]]; then
+        omp plugin link -l "$dir"
+      fi
+      omp plugin install "$dir"
+    else
+      log_warn "OMP $name plugin missing at $dir"
+    fi
+  }
+
+  install_local_omp_plugin "rtk" "$HOME/.omp/agent/extensions/rtk"
+  install_local_omp_plugin "prompt stash" "$HOME/.omp/plugins/local/omp-prompt-stash" 1
 }
 
 install_linux_prerequisites() {

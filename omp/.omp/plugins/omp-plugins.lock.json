@@ -14,6 +14,10 @@
       "version": "0.20.2",
       "enabledFeatures": null,
       "enabled": true
+    },
+    "rtk": {
+      "enabledFeatures": null,
+      "enabled": true
     }
   },
   "settings": {

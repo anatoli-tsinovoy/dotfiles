@@ -1,0 +1,7 @@
+{
+  "name": "rtk",
+  "omp": {
+    "extensions": ["rtk.ts"]
+  }
+}
+
