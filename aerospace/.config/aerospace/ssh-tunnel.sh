@@ -20,6 +20,6 @@ host=${input:-$host}
 read -r -p "Internal address [$internal_addr]: " input
 internal_addr=${input:-$internal_addr}
 
-exec ssh "${username}@${host}" -L "${port}:${internal_addr}:${port}"
+exec ssh -o ExitOnForwardFailure=yes -o PermitLocalCommand=yes -o "LocalCommand=open http://localhost:${port}" "${username}@${host}" -L "${port}:${internal_addr}:${port}"
 
 
