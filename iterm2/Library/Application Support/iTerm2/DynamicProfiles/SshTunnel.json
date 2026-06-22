@@ -1,11 +1,14 @@
 {
   "Profiles" : [
     {
-      "Command" : "/bin/bash -lc 'exec \"$HOME/.config/aerospace/ssh-tunnel.sh\"'",
+      "Use Separate Colors for Light and Dark Mode" : true,
+      "Rewritable" : true,
+      "Command" : "\/bin\/bash -lc 'exec \"$HOME\/.config\/aerospace\/ssh-tunnel.sh\"'",
+      "Initial Text" : "",
       "Allow Title Setting" : false,
-      "Name" : "ssh-tunnel",
       "Guid" : "ssh-tunnel-terminal",
       "Title" : "ssh-tunnel",
+      "Name" : "ssh-tunnel",
       "Custom Command" : "Yes"
     }
   ]

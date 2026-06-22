@@ -29,3 +29,5 @@ browser:
 setupVersion: 1
 contextPromotion: 
   enabled: false
+task: 
+  showResolvedModelBadge: true

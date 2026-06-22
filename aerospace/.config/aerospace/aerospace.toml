@@ -151,7 +151,7 @@ automatically-unhide-macos-hidden-apps = true
     # Applications
     alt-g = 'exec-and-forget open -a "Google Chrome"'
     alt-t = 'exec-and-forget open -a "iTerm"'
-    alt-shift-t = 'exec-and-forget open -a "iTerm" ~'
+    alt-shift-t = "exec-and-forget osascript -e 'tell application \"iTerm\" to create window with profile \"tmux-init\"'"
     alt-shift-o = "exec-and-forget osascript -e 'tell application \"iTerm\" to create window with profile \"ssh-tunnel\"'"
     alt-m = 'exec-and-forget open -a "Spotify"'
     alt-v = 'exec-and-forget open -a "WhatsApp"'

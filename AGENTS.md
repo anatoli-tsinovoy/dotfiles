@@ -42,6 +42,7 @@ dotfiles/
 ├── nvim/                  # LazyVim-based Neovim config
 ├── git/                   # .gitconfig + .gitconfig.macos
 ├── aerospace/             # Tiling WM + sketchybar (macOS only)
+├── iterm2/                # Dynamic iTerm2 profiles
 └── opencode/              # OpenCode AI configuration
 ```
 
@@ -109,6 +110,23 @@ termux/.termux/colors.properties → ~/.termux/colors.properties
 | Termux | pkg | upstream | No sudo, no systemd, skips tailscale-et.sh |
 
 **Termux detection must happen BEFORE Linux** in `detect_os()` because `uname -s` returns "Linux" on both.
+
+## iTerm2 Dynamic Profiles
+
+Profiles live in `iterm2/Library/Application Support/iTerm2/DynamicProfiles/` and stow to `~/Library/Application Support/iTerm2/DynamicProfiles/`.
+
+- Use dynamic profiles for repo-managed iTerm2 profiles; they hot-reload when the folder contents change.
+- Keep `"Initial Text": ""` unless the profile is explicitly meant to type text into an interactive shell.
+- Prefer `"Command"` + `"Custom Command": "Yes"` for startup behavior. This avoids leaking default-profile initial text into other profiles.
+- After editing profiles, force a live refresh without restarting iTerm2:
+
+```bash
+profile_dir="$HOME/Library/Application Support/iTerm2/DynamicProfiles"
+for f in "$profile_dir"/*.json; do tmp="$f.tmp"; cp "$f" "$tmp" && mv "$tmp" "$f"; done
+touch "$profile_dir"
+```
+
+- Validate with `python3 -m json.tool "$profile_dir/Profiles.json"`; `plutil -lint` rejects plain JSON here even though iTerm2 accepts it.
 
 ## Lua Style (Neovim)
 
