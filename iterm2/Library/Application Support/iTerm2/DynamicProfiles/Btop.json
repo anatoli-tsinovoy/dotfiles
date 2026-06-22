@@ -1,0 +1,14 @@
+{
+  "Profiles": [
+    {
+      "Command": "/opt/homebrew/bin/btop",
+      "Allow Title Setting": false,
+      "Name": "btop",
+      "Custom Command": "Yes",
+      "Guid": "btop-floating-terminal",
+      "Title": "btop",
+      "Initial Text": "",
+      "Rewritable": true
+    }
+  ]
+}

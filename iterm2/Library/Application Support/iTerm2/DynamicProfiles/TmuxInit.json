@@ -1,0 +1,15 @@
+{
+  "Profiles": [
+    {
+      "Allow Title Setting": false,
+      "Rewritable": true,
+      "Command": "/bin/zsh -lc 'exec tmux new-session -A -s init'",
+      "Initial Text": "",
+      "Guid": "tmux-init-terminal",
+      "Custom Command": "Yes",
+      "Title": "tmux init",
+      "Name": "tmux-init",
+      "Use Separate Colors for Light and Dark Mode": true
+    }
+  ]
+}
