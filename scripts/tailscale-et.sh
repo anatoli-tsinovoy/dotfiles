@@ -21,6 +21,10 @@ is_inside_container() {
   [[ -f /.dockerenv ]] || [[ -n "${container:-}" ]] || grep -q docker /proc/1/cgroup 2>/dev/null
 }
 
+has_systemd() {
+  [[ -d /run/systemd/system ]]
+}
+
 run_privileged() {
   if [[ $EUID -eq 0 ]]; then
     "$@"
@@ -44,8 +48,8 @@ if [[ "$OS" == "other" ]]; then
   exit 1
 fi
 
-if is_inside_container; then
-  log_skip "Inside container, skipping Tailscale + ET setup (requires systemd)"
+if is_inside_container && ! has_systemd; then
+  log_skip "Inside container without systemd, skipping Tailscale + ET setup"
   exit 0
 fi
 
