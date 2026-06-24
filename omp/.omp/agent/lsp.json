@@ -1,0 +1,22 @@
+{
+  "servers": {
+    "pyright": {
+      "disabled": true
+    },
+    "basedpyright": {
+      "disabled": true
+    },
+    "pylsp": {
+      "disabled": true
+    },
+    "ty": {
+      "command": "ty",
+      "args": ["server"],
+      "fileTypes": [".py", ".pyi"],
+      "rootMarkers": ["pyproject.toml", "requirements.txt", "setup.py", "setup.cfg", ".git"]
+    },
+    "ruff": {
+      "rootMarkers": ["pyproject.toml", "ruff.toml", ".ruff.toml", "requirements.txt", ".git"]
+    }
+  }
+}
