@@ -29,5 +29,10 @@ browser:
 setupVersion: 1
 contextPromotion: 
   enabled: false
+dev: 
+  autoqa: false
+github: 
+  enabled: true
 task: 
   showResolvedModelBadge: true
+  enableLsp: true
