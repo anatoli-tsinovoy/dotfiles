@@ -331,6 +331,9 @@ main() {
     log_info "Applying macOS defaults..."
     bash "$SCRIPT_DIR/scripts/macos/macos-defaults.sh"
 
+    log_info "Installing Open in Neovim Finder integration..."
+    bash "$SCRIPT_DIR/scripts/macos/open-in-neovim/install-open-in-neovim.sh"
+
   elif [[ "$os" == "linux" ]]; then
     # === Linux Setup ===
 
