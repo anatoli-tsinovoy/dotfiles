@@ -1,5 +1,8 @@
 {
   "servers": {
+    "typescript-language-server": {
+      "rootMarkers": ["package.json", "tsconfig.json", "jsconfig.json", ".git"]
+    },
     "pyright": {
       "disabled": true
     },
