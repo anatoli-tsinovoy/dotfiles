@@ -1,12 +1,14 @@
 modelRoles: 
-  default: openai-codex/gpt-5.5:medium
-  smol: openai-codex/gpt-5.4-mini:high
-  slow: openai-codex/gpt-5.5:xhigh
-  designer: openai-codex/gpt-5.5
-  vision: openai-codex/gpt-5.5
-  plan: openai-codex/gpt-5.5:high
-  task: openai-codex/gpt-5.5
-  commit: openai-codex/gpt-5.4-mini
+  default: openai/gpt-5.5:medium
+  smol: openai/gpt-5.5:low
+  slow: openai/gpt-5.5:xhigh
+  designer: openai/gpt-5.5
+  vision: openai/gpt-5.5
+  plan: openai/gpt-5.5:high
+  task: openai/gpt-5.5:medium
+  commit: openai/gpt-5.5:off
+  advisor: openai/gpt-5.5:medium
+  tiny: openai/gpt-5.5:low
 hideThinkingBlock: true
 theme: 
   light: light
@@ -30,9 +32,14 @@ setupVersion: 1
 contextPromotion: 
   enabled: false
 dev: 
-  autoqa: false
+  autoqa: 
+    consent: denied
 github: 
   enabled: true
 task: 
   showResolvedModelBadge: true
   enableLsp: true
+tools: 
+  discoveryMode: all
+providers: 
+  webSearch: codex
