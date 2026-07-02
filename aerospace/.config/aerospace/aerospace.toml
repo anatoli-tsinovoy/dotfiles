@@ -1,6 +1,10 @@
 # Place a copy of this config to ~/.aerospace.toml
 # After that, you can edit ~/.aerospace.toml to your liking
 
+# Config version for compatibility and deprecations
+# See: https://nikitabobko.github.io/AeroSpace/guide#config-version
+config-version = 2
+
 # You can use it to add commands that run after AeroSpace startup.
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = [
@@ -48,6 +52,9 @@ on-focus-changed = [
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
 automatically-unhide-macos-hidden-apps = true
+
+# Explicit in config-version 2. Keep the lowercase workspace names used by bindings below.
+persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
 
 # Possible values: (qwerty|dvorak|colemak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
@@ -108,10 +115,10 @@ automatically-unhide-macos-hidden-apps = true
     # alt-comma = 'layout accordion horizontal vertical'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#focus
-    alt-h = 'focus left --boundaries-action wrap-around-the-workspace'
-    alt-j = 'focus down --boundaries-action wrap-around-the-workspace'
-    alt-k = 'focus up --boundaries-action wrap-around-the-workspace'
-    alt-l = 'focus right --boundaries-action wrap-around-the-workspace'
+    alt-h = 'focus left --wrap-around'
+    alt-j = 'focus down --wrap-around'
+    alt-k = 'focus up --wrap-around'
+    alt-l = 'focus right --wrap-around'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#move
     alt-shift-h = 'move left'
@@ -162,21 +169,21 @@ automatically-unhide-macos-hidden-apps = true
     ctrl-cmd-alt-shift-l = 'exec-and-forget open -a "Google Chrome" "$HOME/.private/redirect2.html"'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-    alt-shift-1 = ['move-node-to-workspace 1', 'workspace 1']# , 'exec-and-forget "aerospace focus --window-id ${AEROSPACE_PREV_WINDOW_ID:-$AEROSPACE_FOCUSED_WINDOW_ID}"']
-    alt-shift-2 = ['move-node-to-workspace 2', 'workspace 2']
-    alt-shift-3 = ['move-node-to-workspace 3', 'workspace 3']
-    alt-shift-4 = ['move-node-to-workspace 4', 'workspace 4']
-    alt-shift-5 = ['move-node-to-workspace 5', 'workspace 5']
-    alt-shift-6 = ['move-node-to-workspace 6', 'workspace 6']
-    alt-shift-7 = ['move-node-to-workspace 7', 'workspace 7']
-    alt-shift-8 = ['move-node-to-workspace 8', 'workspace 8']
-    alt-shift-9 = ['move-node-to-workspace 9', 'workspace 9']
-    ctrl-alt-shift-1 = ['move-node-to-workspace a', 'workspace a']
-    ctrl-alt-shift-2 = ['move-node-to-workspace b', 'workspace b']
-    ctrl-alt-shift-3 = ['move-node-to-workspace c', 'workspace c']
-    ctrl-alt-shift-4 = ['move-node-to-workspace d', 'workspace d']
-    ctrl-alt-shift-5 = ['move-node-to-workspace e', 'workspace e']
-    ctrl-alt-shift-6 = ['move-node-to-workspace f', 'workspace f']
+    alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1'
+    alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2'
+    alt-shift-3 = 'move-node-to-workspace --focus-follows-window 3'
+    alt-shift-4 = 'move-node-to-workspace --focus-follows-window 4'
+    alt-shift-5 = 'move-node-to-workspace --focus-follows-window 5'
+    alt-shift-6 = 'move-node-to-workspace --focus-follows-window 6'
+    alt-shift-7 = 'move-node-to-workspace --focus-follows-window 7'
+    alt-shift-8 = 'move-node-to-workspace --focus-follows-window 8'
+    alt-shift-9 = 'move-node-to-workspace --focus-follows-window 9'
+    ctrl-alt-shift-1 = 'move-node-to-workspace --focus-follows-window a'
+    ctrl-alt-shift-2 = 'move-node-to-workspace --focus-follows-window b'
+    ctrl-alt-shift-3 = 'move-node-to-workspace --focus-follows-window c'
+    ctrl-alt-shift-4 = 'move-node-to-workspace --focus-follows-window d'
+    ctrl-alt-shift-5 = 'move-node-to-workspace --focus-follows-window e'
+    ctrl-alt-shift-6 = 'move-node-to-workspace --focus-follows-window f'
 
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
@@ -184,11 +191,11 @@ automatically-unhide-macos-hidden-apps = true
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
     alt-shift-tab = [
       'move-workspace-to-monitor --wrap-around next',
-      'exec-and-forget /usr/bin/env bash -c "sketchybar --trigger aerospace_monitor_move"',
+      'exec-and-forget sketchybar --trigger aerospace_monitor_move',
     ]
     ctrl-alt-shift-tab = [
       'move-node-to-monitor --wrap-around next --focus-follows-window',
-      'exec-and-forget /usr/bin/env bash -c "sketchybar --trigger aerospace_monitor_move"', 
+      'exec-and-forget sketchybar --trigger aerospace_monitor_move',
     ]
     ctrl-alt-up = [
       'fullscreen',
@@ -246,44 +253,30 @@ automatically-unhide-macos-hidden-apps = true
 
 
 [[on-window-detected]]
-if.app-id = 'com.tinyspeck.slackmacgap'
-run = ['move-node-to-workspace 3']
+if = 'test %{app-bundle-id} = com.tinyspeck.slackmacgap'
+run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
-if.app-id = 'com.openai.chat'
-run = ['move-node-to-workspace 4']
-
-# [[on-window-detected]]
-# if.node.layout = 'horizontal'
-# run = ['join-with left']
-# 
-# [[on-window-detected]]
-# if.node.layout = 'vertical'
-# 
-# run = ['join-with up']
+if = 'test %{app-bundle-id} = com.openai.chat'
+run = 'move-node-to-workspace 4'
 
 # btop profile has title set immediately, so this matches before shell loads
 [[on-window-detected]]
-if.app-id = 'com.googlecode.iterm2'
-if.window-title-regex-substring = 'btop'
-run = ['layout floating']
+if = 'test %{app-bundle-id} = com.googlecode.iterm2 && test %{window-title} ~= btop'
+run = 'layout floating'
 
 [[on-window-detected]]
-if.app-id = 'com.googlecode.iterm2'
-run = ['move-node-to-workspace 2']
+if = 'test %{app-bundle-id} = com.googlecode.iterm2'
+run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
-if.app-id = 'com.spotify.client'
-run = ['move-node-to-workspace e']
+if = 'test %{app-bundle-id} = com.spotify.client'
+run = 'move-node-to-workspace e'
 
 [[on-window-detected]]
-if.app-id = 'net.whatsapp.WhatsApp'
-run = ['move-node-to-workspace f']
+if = 'test %{app-bundle-id} = net.whatsapp.WhatsApp'
+run = 'move-node-to-workspace f'
 
 [[on-window-detected]]
-if.app-name-regex-substring = 'YouTube'
-run = ['move-node-to-workspace 3']
-
-# [[on-window-detected]]
-# if.app-name-regex-substring = 'Xcode'
-# run = ['move-node-to-workspace 9']
+if = 'test %{app-name} ~= YouTube'
+run = 'move-node-to-workspace 3'
