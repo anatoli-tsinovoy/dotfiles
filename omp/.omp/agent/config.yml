@@ -19,7 +19,7 @@ compaction:
   strategy: snapcompact
   thresholdPercent: 70
   handoffSaveToDisk: true
-  thresholdTokens: 175000
+  thresholdTokens: 300000
   remoteEnabled: false
 lsp: 
   formatOnWrite: true
