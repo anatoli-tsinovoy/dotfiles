@@ -179,7 +179,7 @@ setup_omp_plugins() {
 
   local plugin
   local remote_plugins=(
-    "https://github.com/DietrichGebert/ponytail"
+    "git:github.com/DietrichGebert/ponytail"
     "@plannotator/pi-extension"
   )
   for plugin in "${remote_plugins[@]}"; do
