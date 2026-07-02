@@ -1,15 +1,17 @@
-providers: 
-  mlx-lm: 
+providers:
+  openai:
+    apiKey: "!cat $HOME/.omp/agent/keys/openai"
+
+  mlx-lm:
     baseUrl: http://localhost:8080/v1
     api: openai-completions
     apiKey: none
-    models: 
+    models:
       - id: mlx-community/Qwen3.6-35B-A3B-8bit
-  llama-cpp: 
+  llama-cpp:
     baseUrl: http://localhost:8000/v1
     api: openai-completions
     apiKey: none
-    models: 
+    models:
       - id: deepreinforce-ai/Ornith-1.0-9B-GGUF
       - id: deepreinforce-ai/Ornith-1.0-35B-GGUF
-

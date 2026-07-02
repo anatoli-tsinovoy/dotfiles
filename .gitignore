@@ -21,6 +21,7 @@ omp/.omp/puppeteer
 omp/.omp/agent/prompt-stash
 omp/.omp/agent/sessions
 omp/.omp/agent/terminal-sessions
+omp/.omp/agent/keys
 omp/.omp/plugins/node_modules
 
 # Sensitive
