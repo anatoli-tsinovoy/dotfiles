@@ -1,0 +1,10 @@
+# style name or JSON path (default "auto")
+style: "auto"
+# mouse support (TUI-mode only)
+mouse: true
+# use pager to display markdown; zsh wrapper adds -p by default and omits it for -t/--tui
+pager: false
+# fallback wrap width for bare command glow; the zsh wrapper passes -w 0 for bat-like no-wrap
+width: 200
+# show all files, including hidden and ignored.
+all: false

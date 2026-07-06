@@ -143,8 +143,13 @@ if command -v glow &>/dev/null; then
   glow() {
     local style_dir="${XDG_CONFIG_HOME:-$HOME/.config}/glow"
     local style="$style_dir/simply-dark.json"
+    local pager=(-p)
+    local arg
     [[ "$(_detect_background)" == "light" ]] && style="$style_dir/simply-light.json"
-    command glow -ps "$style" "$@"
+    for arg in "$@"; do
+      [[ "$arg" == "-t" || "$arg" == "--tui" ]] && pager=()
+    done
+    command glow "${pager[@]}" -w "${GLOW_WIDTH:-0}" -s "$style" "$@"
   }
 fi
 
