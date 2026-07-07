@@ -73,3 +73,6 @@ git-lfs-dl() {
     quickaction "Download from Git LFS" "$input_file"
   done
 }
+
+export CLIPSSH_HOST=anatoli@orange
+export CLIPSSH_REMOTE_DIR=/data/tmp

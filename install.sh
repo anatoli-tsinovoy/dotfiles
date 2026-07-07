@@ -334,6 +334,9 @@ main() {
     log_info "Installing Open in Neovim Finder integration..."
     bash "$SCRIPT_DIR/scripts/macos/open-in-neovim/install-open-in-neovim.sh"
 
+    log_info "Installing clipssh"
+    curl -fsSL https://raw.githubusercontent.com/samuellawrentz/clipssh/main/install.sh | bash
+
   elif [[ "$os" == "linux" ]]; then
     # === Linux Setup ===
 
