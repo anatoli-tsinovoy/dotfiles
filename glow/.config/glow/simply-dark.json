@@ -80,7 +80,8 @@
     "underline": true
   },
   "image_text": {
-    "color": "14"
+    "color": "14",
+    "format": "Image: {{.text}} →"
   },
   "code": {
     "color": "10"
@@ -89,93 +90,93 @@
     "margin": 1,
     "chroma": {
       "text": {
-        "color": "15"
+        "color": "#F3F0DF"
       },
       "error": {
-        "color": "15",
-        "background_color": "1"
+        "color": "#F3F0DF",
+        "background_color": "#FF4F44"
       },
       "comment": {
-        "color": "8",
+        "color": "#330D81",
         "italic": true
       },
       "comment_preproc": {
-        "color": "11"
+        "color": "#FFE680"
       },
       "keyword": {
-        "color": "13",
+        "color": "#FFC9D7",
         "bold": true
       },
       "keyword_reserved": {
-        "color": "13",
+        "color": "#FFC9D7",
         "bold": true
       },
       "keyword_namespace": {
-        "color": "9"
+        "color": "#FF6767"
       },
       "keyword_type": {
-        "color": "12"
+        "color": "#9A67FF"
       },
       "operator": {
-        "color": "13"
+        "color": "#FFC9D7"
       },
       "punctuation": {
-        "color": "15"
+        "color": "#F3F0DF"
       },
       "name": {
-        "color": "15"
+        "color": "#F3F0DF"
       },
       "name_builtin": {
-        "color": "14"
+        "color": "#00E6CC"
       },
       "name_tag": {
-        "color": "12"
+        "color": "#9A67FF"
       },
       "name_attribute": {
-        "color": "4"
+        "color": "#8217FF"
       },
       "name_class": {
-        "color": "12",
+        "color": "#9A67FF",
         "bold": true
       },
       "name_constant": {
-        "color": "13"
+        "color": "#FFC9D7"
       },
       "name_decorator": {
-        "color": "11"
+        "color": "#FFE680"
       },
       "name_exception": {
-        "color": "9"
+        "color": "#FF6767"
       },
       "name_function": {
-        "color": "14"
+        "color": "#00E6CC"
       },
       "name_other": {},
       "literal": {},
       "literal_number": {
-        "color": "11"
+        "color": "#FFE680"
       },
       "literal_date": {},
       "literal_string": {
-        "color": "3"
+        "color": "#FFD44F"
       },
       "literal_string_escape": {
-        "color": "10"
+        "color": "#00E6BB"
       },
       "generic_deleted": {
-        "color": "9"
+        "color": "#FF6767"
       },
       "generic_emph": {
         "italic": true
       },
       "generic_inserted": {
-        "color": "10"
+        "color": "#00E6BB"
       },
       "generic_strong": {
         "bold": true
       },
       "generic_subheading": {
-        "color": "8"
+        "color": "#330D81"
       }
     }
   },

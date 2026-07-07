@@ -2,7 +2,8 @@
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 IS_CURSOR_TERMINAL=$([[ $PAGER == 'sh -c "head -n 10000 | cat"' ]] && echo 1 || echo 0)
-if [ $IS_CURSOR_TERMINAL -eq 0 ]; then
+IS_OMP_COMMAND_SHELL=${OMPCODE:+1}
+if [[ $IS_CURSOR_TERMINAL -eq 0 && -z "$IS_OMP_COMMAND_SHELL" ]]; then
   if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
   fi
@@ -44,15 +45,19 @@ fi
 # === Oh My Zsh ===
 export ZSH="$HOME/.oh-my-zsh"
 
-if [ $IS_CURSOR_TERMINAL -eq 0 ]; then
+if [[ -n "$IS_OMP_COMMAND_SHELL" ]]; then
+  ZSH_THEME=""
+elif [[ $IS_CURSOR_TERMINAL -eq 0 ]]; then
   ZSH_THEME="powerlevel10k/powerlevel10k"
 else
   ZSH_THEME="robbyrussell"
 fi
 
 # Plugins
-plugins=(git zsh-syntax-highlighting zsh-autosuggestions)
-
+plugins=(git)
+if [[ -z "$IS_OMP_COMMAND_SHELL" ]]; then
+  plugins+=(zsh-syntax-highlighting zsh-autosuggestions)
+fi
 # Docker plugin only on Linux, outside containers, with docker installed
 is_inside_container() {
   [[ -f /.dockerenv ]] || [[ -n "${container:-}" ]] || grep -qsE '(docker|kubepod)' /proc/1/cgroup 2>/dev/null
@@ -164,7 +169,7 @@ if command -v zoxide &>/dev/null; then
 fi
 
 # === Powerlevel10k config ===
-if [ $IS_CURSOR_TERMINAL -eq 0 ]; then
+if [[ $IS_CURSOR_TERMINAL -eq 0 && -z "$IS_OMP_COMMAND_SHELL" ]]; then
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 fi
 
@@ -175,37 +180,39 @@ awslogin() {
 }
 
 # === Vi-mode keybindings ===
-bindkey -v
-bindkey -v '^?' backward-delete-char
-bindkey '^K' kill-line
-bindkey '^Y' yank
-bindkey -M viins '^A' beginning-of-line
-bindkey -M vicmd '^A' beginning-of-line
-bindkey -M viins '^E' end-of-line
-bindkey -M vicmd '^E' end-of-line
-bindkey -M vicmd '^R' vi-redo
-bindkey -M viins '^[f' forward-word
-bindkey -M viins '^[b' backward-word
+if [[ -z "$IS_OMP_COMMAND_SHELL" && -o zle ]]; then
+  bindkey -v
+  bindkey -v '^?' backward-delete-char
+  bindkey '^K' kill-line
+  bindkey '^Y' yank
+  bindkey -M viins '^A' beginning-of-line
+  bindkey -M vicmd '^A' beginning-of-line
+  bindkey -M viins '^E' end-of-line
+  bindkey -M vicmd '^E' end-of-line
+  bindkey -M vicmd '^R' vi-redo
+  bindkey -M viins '^[f' forward-word
+  bindkey -M viins '^[b' backward-word
 
-# === Fancy ^Z ===
-# Source - https://superuser.com/a/378045
-# Posted by Gilles 'SO- stop being evil', modified by community. See post 'Timeline' for change history
-# Retrieved 2026-02-25, License - CC BY-SA 3.0
-#
-# Bind only in ZLE's vi insert/command maps. Foreground raw-mode TUIs (OMP,
-# opencode, nvim) own their first Ctrl+Z; once zsh has the prompt again, this
-# widget can background the stopped job with a second Ctrl+Z.
-fancy-ctrl-z () {
-  if [[ $#BUFFER -eq 0 ]]; then
-    bg
-    zle redisplay
-  else
-    zle push-input
-  fi
-}
-zle -N fancy-ctrl-z
-bindkey -M viins '^Z' fancy-ctrl-z
-bindkey -M vicmd '^Z' fancy-ctrl-z
+  # === Fancy ^Z ===
+  # Source - https://superuser.com/a/378045
+  # Posted by Gilles 'SO- stop being evil', modified by community. See post 'Timeline' for change history
+  # Retrieved 2026-02-25, License - CC BY-SA 3.0
+  #
+  # Bind only in ZLE's vi insert/command maps. Foreground raw-mode TUIs (OMP,
+  # opencode, nvim) own their first Ctrl+Z; once zsh has the prompt again, this
+  # widget can background the stopped job with a second Ctrl+Z.
+  fancy-ctrl-z () {
+    if [[ $#BUFFER -eq 0 ]]; then
+      bg
+      zle redisplay
+    else
+      zle push-input
+    fi
+  }
+  zle -N fancy-ctrl-z
+  bindkey -M viins '^Z' fancy-ctrl-z
+  bindkey -M vicmd '^Z' fancy-ctrl-z
+fi
 
 # === OS-specific configuration ===
 # Detect OS and source appropriate config

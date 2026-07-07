@@ -2,10 +2,12 @@
 # Sourced from ~/.zshrc on Linux systems (including Termux)
 
 # fzf shell integration
-if [[ -f "$HOME/.fzf.zsh" ]]; then
-  source "$HOME/.fzf.zsh"
-elif command -v fzf &>/dev/null; then
-  source <(fzf --zsh)
+if [[ -z "${OMPCODE:-}" ]]; then
+  if [[ -f "$HOME/.fzf.zsh" ]]; then
+    source "$HOME/.fzf.zsh"
+  elif command -v fzf &>/dev/null; then
+    source <(fzf --zsh)
+  fi
 fi
 
 # code -> cursor alias (if cursor exists but code doesn't)
