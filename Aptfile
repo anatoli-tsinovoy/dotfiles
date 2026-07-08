@@ -30,6 +30,7 @@ package "btop"
 package "fzf"
 package "zoxide"
 # NOTE: tmux installed via GitHub releases in scripts/linux/install-binaries.sh
+package "timg"
 
 # === Git tools ===
 package "git-lfs"

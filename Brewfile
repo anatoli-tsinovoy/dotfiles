@@ -176,8 +176,8 @@ brew "tlrc"
 brew "tmux"
 # Extremely fast Python package installer and resolver, written in Rust
 brew "uv"
-# Simple terminal image viewer written in Rust
-brew "viu"
+# Terminal image and video viewer
+brew "timg"
 # Sends magic packets to wake up network-devices
 brew "wakeonlan"
 # Internet file retriever
