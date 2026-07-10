@@ -1,14 +1,14 @@
 modelRoles: 
-  default: openai/gpt-5.5:medium
-  smol: openai/gpt-5.5:low
-  slow: openai/gpt-5.5:xhigh
-  designer: openai/gpt-5.5
-  vision: openai/gpt-5.5
-  plan: openai/gpt-5.5:high
-  task: openai/gpt-5.5:medium
-  commit: openai/gpt-5.5:off
-  advisor: openai/gpt-5.5:medium
-  tiny: openai/gpt-5.5:low
+  default: openai/gpt-5.6-terra:high
+  smol: openai/gpt-5.6-luna:medium
+  slow: openai/gpt-5.6-sol:xhigh
+  designer: openai/gpt-5.6-sol
+  vision: openai/gpt-5.6-terra
+  plan: openai/gpt-5.6-sol:high
+  task: openai/gpt-5.6-terra:high
+  commit: openai/gpt-5.6-luna:off
+  advisor: openai/gpt-5.6-sol:high
+  tiny: openai/gpt-5.6-luna:medium
 hideThinkingBlock: true
 theme: 
   light: light
