@@ -1,14 +1,14 @@
 modelRoles: 
-  default: openai/gpt-5.6-terra:high
+  default: openai/gpt-5.6-sol:medium
   smol: openai/gpt-5.6-luna:medium
   slow: openai/gpt-5.6-sol:xhigh
   designer: openai/gpt-5.6-sol
-  vision: openai/gpt-5.6-terra
+  vision: openai/gpt-5.6-sol
   plan: openai/gpt-5.6-sol:high
   task: openai/gpt-5.6-terra:high
   commit: openai/gpt-5.6-luna:off
-  advisor: openai/gpt-5.6-sol:high
   tiny: openai/gpt-5.6-luna:medium
+  advisor: openai/gpt-5.6-sol:high
 hideThinkingBlock: true
 theme: 
   light: light
@@ -43,3 +43,12 @@ tools:
   discoveryMode: all
 providers: 
   webSearch: codex
+advisor: 
+  enabled: true
+  subagents: true
+  syncBacklog: "3"
+doubleEscapeAction: tree
+marketplace: 
+  autoUpdate: auto
+stt: 
+  enabled: false
