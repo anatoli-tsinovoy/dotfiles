@@ -20,7 +20,7 @@
     "bold": true
   },
   "h1": {
-    "color": "12",
+    "color": "4",
     "bold": true
   },
   "h2": {
@@ -28,17 +28,17 @@
     "bold": true
   },
   "h3": {
-    "color": "6",
+    "color": "4",
     "bold": true
   },
   "h4": {
-    "color": "8"
+    "color": "4"
   },
   "h5": {
-    "color": "8"
+    "color": "4"
   },
   "h6": {
-    "color": "8",
+    "color": "4",
     "bold": false
   },
   "text": {},
@@ -47,40 +47,41 @@
   },
   "emph": {
     "italic": true,
-    "color": "3"
+    "color": "5"
   },
   "strong": {
-    "bold": true
+    "bold": true,
+    "color": "3"
   },
   "hr": {
-    "color": "8",
+    "color": "0",
     "format": "\n────────\n"
   },
   "item": {
     "block_prefix": "• ",
-    "color": "13"
+    "color": "0"
   },
   "enumeration": {
     "block_prefix": ". ",
-    "color": "4"
+    "color": "0"
   },
   "task": {
     "ticked": "[✓] ",
     "unticked": "[ ] "
   },
   "link": {
-    "color": "4",
+    "color": "3",
     "underline": true
   },
   "link_text": {
-    "color": "6"
+    "color": "3"
   },
   "image": {
-    "color": "4",
+    "color": "0",
     "underline": true
   },
   "image_text": {
-    "color": "6",
+    "color": "0",
     "format": "Image: {{.text}} →"
   },
   "code": {
@@ -93,29 +94,29 @@
         "color": "#110034"
       },
       "error": {
-        "color": "#5F5873",
+        "color": "#110034",
         "background_color": "#CC3E34"
       },
       "comment": {
-        "color": "#330D81",
+        "color": "#009A81",
         "italic": true
       },
       "comment_preproc": {
-        "color": "#CD9A1B"
+        "color": "#E69AB3"
       },
       "keyword": {
-        "color": "#CC3E34",
+        "color": "#E69AB3",
         "bold": true
       },
       "keyword_reserved": {
-        "color": "#CC3E34",
+        "color": "#E69AB3",
         "bold": true
       },
       "keyword_namespace": {
-        "color": "#CC3E34"
+        "color": "#E69AB3"
       },
       "keyword_type": {
-        "color": "#009A81",
+        "color": "#E69AB3",
         "bold": true
       },
       "operator": {
@@ -131,23 +132,23 @@
         "color": "#00B39A"
       },
       "name_tag": {
-        "color": "#6734CD"
+        "color": "#CC3E34"
       },
       "name_attribute": {
-        "color": "#330D81"
+        "color": "#CD9A1B"
       },
       "name_class": {
-        "color": "#6734CD",
+        "color": "#CD9A1B",
         "bold": true
       },
       "name_constant": {
-        "color": "#E69AB3"
-      },
-      "name_decorator": {
         "color": "#CD9A1B"
       },
+      "name_decorator": {
+        "color": "#110034"
+      },
       "name_exception": {
-        "color": "#CC3E34"
+        "color": "#CD9A1B"
       },
       "name_function": {
         "color": "#330D81",
@@ -156,14 +157,14 @@
       "name_other": {},
       "literal": {},
       "literal_number": {
-        "color": "#CC3E34"
+        "color": "#CD9A1B"
       },
       "literal_date": {},
       "literal_string": {
-        "color": "#00B39A"
+        "color": "#009A81"
       },
       "literal_string_escape": {
-        "color": "#009A81"
+        "color": "#00B39A"
       },
       "generic_deleted": {
         "color": "#CC3E34"
