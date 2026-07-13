@@ -6,6 +6,7 @@
       "Name": "btop",
       "Custom Command": "Yes",
       "Guid": "btop-floating-terminal",
+      "Dynamic Profile Parent GUID": "5877CC56-49A4-45E3-834B-DEBDED6B7C60",
       "Title": "btop",
       "Initial Text": "",
       "Rewritable": true
