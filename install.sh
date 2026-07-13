@@ -380,7 +380,9 @@ main() {
   rm -f ~/.zshenv ~/.zshenv.macos ~/.zshenv.linux
   rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.zshrc.termux ~/.p10k.zsh
   rm -f ~/.gitconfig ~/.vimrc
-  rm -rf ~/.config/nvim ~/.config/opencode
+  rm -rf ~/.config/nvim ~/.config/opencode ~/.config/btop
+  mkdir -p ~/.config/btop
+  printf '%s\n' 'color_theme = "TTY"' 'theme_background = False' >~/.config/btop/btop.conf
   rm -f ~/.omp/agent/config.yml
 
   # Stow common packages (no --adopt: we want OUR files, not whatever exists)

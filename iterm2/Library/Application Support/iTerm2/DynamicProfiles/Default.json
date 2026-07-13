@@ -200,9 +200,9 @@
         "Green Component": 0.6039215686274509
       },
       "Ansi 7 Color (Light)": {
-        "Green Component": 0.9411764705882353,
-        "Red Component": 0.9529411764705882,
-        "Blue Component": 0.8745098039215686
+        "Green Component": 0,
+        "Red Component": 0.06666666666666667,
+        "Blue Component": 0.20392156862745098
       },
       "Ansi 3 Color (Light)": {
         "Red Component": 0.803921568627451,
@@ -316,9 +316,9 @@
         "Blue Component": 1
       },
       "Ansi 15 Color (Light)": {
-        "Green Component": 0.9411764705882353,
-        "Red Component": 0.9529411764705882,
-        "Blue Component": 0.8745098039215686
+        "Green Component": 0,
+        "Red Component": 0.06666666666666667,
+        "Blue Component": 0.20392156862745098
       },
       "HotKey Characters Ignoring Modifiers": "t",
       "Ansi 11 Color": {
