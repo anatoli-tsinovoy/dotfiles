@@ -398,7 +398,7 @@ main() {
 
   if [[ "$os" == "mac" ]]; then
     # Remove macOS-specific conflicts
-    rm -rf ~/.config/aerospace ~/.config/iterm2
+    rm -rf "$HOME/.config/aerospace" "$HOME/.config/iterm2" "$HOME/Library/Application Support/iTerm2/DynamicProfiles"
     rm -rf ~/Library/Application\ Support/Cursor/User
 
     # macOS-specific stow packages
