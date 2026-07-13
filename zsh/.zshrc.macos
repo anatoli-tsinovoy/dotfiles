@@ -2,7 +2,9 @@
 # Sourced from ~/.zshrc on Darwin systems
 
 # === fzf shell integration (Homebrew) ===
-source <(fzf --zsh)
+if [[ -z "$IS_OMP_COMMAND_SHELL" ]]; then
+  source <(fzf --zsh)
+fi
 
 # === bat theming (removed - using ansi theme from base .zshrc) ===
 
@@ -17,6 +19,26 @@ plugins+=(podman docker)
 # === macOS Aliases ===
 alias python="/opt/homebrew/bin/python3"
 alias code="cursor"
+
+# timg wrapper: default to Kitty protocol; explicit -p* overrides it
+timg() {
+  local has_protocol=false
+  local arg
+
+  for arg in "$@"; do
+    [[ "$arg" == "--" ]] && break
+    if [[ "$arg" == "-p"* ]]; then
+      has_protocol=true
+      break
+    fi
+  done
+
+  if $has_protocol; then
+    command timg "$@"
+  else
+    command timg -pk "$@"
+  fi
+}
 
 # === Podman/Docker ===
 export DOCKER_HOST=unix://$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')
