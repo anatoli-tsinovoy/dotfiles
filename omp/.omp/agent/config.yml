@@ -42,11 +42,9 @@ task:
 tools: 
   discoveryMode: all
 providers: 
-  webSearch: codex
+  webSearch: auto
 advisor: 
-  enabled: true
-  subagents: true
-  syncBacklog: "3"
+  enabled: false
 doubleEscapeAction: tree
 marketplace: 
   autoUpdate: auto
