@@ -141,6 +141,11 @@ if command -v uv &>/dev/null; then
   eval "$(uv generate-shell-completion zsh)"
 fi
 
+# omp shell completion
+if command -v omp &>/dev/null; then
+  eval "$(omp completions zsh)"
+fi
+
 # glow with custom light/dark styles
 if command -v glow &>/dev/null; then
   eval "$(glow completion zsh)"
