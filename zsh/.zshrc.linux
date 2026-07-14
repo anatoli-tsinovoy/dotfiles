@@ -15,6 +15,9 @@ if ! command -v code &>/dev/null && command -v cursor &>/dev/null; then
   alias code="cursor"
 fi
 
+# Force Kitty graphics for Oh My Pi; the timg wrapper below does the same.
+export PI_FORCE_IMAGE_PROTOCOL=kitty
+
 # timg wrapper: default to Kitty protocol; explicit -p* overrides it
 timg() {
   local has_protocol=false

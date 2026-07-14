@@ -52,3 +52,16 @@ marketplace:
   autoUpdate: auto
 stt: 
   enabled: false
+statusLine: 
+  sessionAccent: true
+  transparent: true
+  compactThinkingLevel: true
+  showHookStatus: true
+tui: 
+  scrollbackRebuild: true
+  textSizing: false
+display: 
+  cacheMissMarker: true
+  showTokenUsage: false
+terminal: 
+  showImages: true
