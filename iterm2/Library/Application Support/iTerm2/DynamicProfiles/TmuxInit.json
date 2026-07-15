@@ -6,7 +6,6 @@
       "Command": "/bin/zsh -lc 'exec tmux new-session -A -s init'",
       "Initial Text": "",
       "Guid": "tmux-init-terminal",
-      "Dynamic Profile Parent GUID": "5877CC56-49A4-45E3-834B-DEBDED6B7C60",
       "Custom Command": "Yes",
       "Title": "tmux init",
       "Name": "tmux-init",

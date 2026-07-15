@@ -7,7 +7,6 @@
       "Initial Text" : "",
       "Allow Title Setting" : false,
       "Guid" : "ssh-tunnel-terminal",
-      "Dynamic Profile Parent GUID" : "5877CC56-49A4-45E3-834B-DEBDED6B7C60",
       "Title" : "ssh-tunnel",
       "Name" : "ssh-tunnel",
       "Custom Command" : "Yes"
