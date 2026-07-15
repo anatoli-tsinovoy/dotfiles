@@ -201,7 +201,6 @@ setup_omp_plugins() {
     fi
   }
 
-  install_local_omp_plugin "rtk" "$HOME/.omp/agent/extensions/rtk"
   install_local_omp_plugin "prompt stash" "$HOME/.omp/plugins/local/omp-prompt-stash" 1
 }
 

@@ -15,11 +15,6 @@
       "enabledFeatures": null,
       "enabled": true
     },
-    "rtk": {
-      "version": "0.1.0",
-      "enabledFeatures": null,
-      "enabled": true
-    },
     "@dietrichgebert/ponytail": {
       "version": "4.8.4",
       "enabledFeatures": null,
