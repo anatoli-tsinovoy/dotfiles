@@ -180,7 +180,9 @@ fi
 
 # === AWS SSO Login with Profile ===
 awslogin() {
-  aws sso login --profile "$1"
+  local -a login_args=(--profile "$1")
+  [[ "$(uname -s)" == "Linux" ]] && ! is_termux && login_args+=(--no-browser)
+  aws sso login "${login_args[@]}"
   export AWS_PROFILE="$1"
 }
 
