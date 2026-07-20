@@ -1,8 +1,8 @@
 {
   "Profiles": [
     {
+      "Rewritable": false,
       "Allow Title Setting": false,
-      "Rewritable": true,
       "Command": "/bin/zsh -lc 'exec tmux new-session -A -s init'",
       "Initial Text": "",
       "Guid": "tmux-init-terminal",
