@@ -1,6 +1,6 @@
 modelRoles: 
   default: openai/gpt-5.6-sol:medium
-  smol: openai/gpt-5.6-luna:medium
+  smol: openai/gpt-5.6-luna:xhigh
   slow: openai/gpt-5.6-sol:xhigh
   designer: openai/gpt-5.6-sol
   vision: openai/gpt-5.6-sol
@@ -16,11 +16,11 @@ theme:
 symbolPreset: nerd
 colorBlindMode: false
 compaction: 
-  strategy: snapcompact
+  strategy: context-full
   thresholdPercent: 70
   handoffSaveToDisk: true
-  thresholdTokens: 300000
-  remoteEnabled: false
+  thresholdTokens: 200000
+  remoteEnabled: true
 lsp: 
   formatOnWrite: true
   diagnosticsOnEdit: true
@@ -64,4 +64,8 @@ display:
 terminal: 
   showImages: true
 generate_image: 
+  enabled: true
+edit: 
+  mode: hashline
+astGrep: 
   enabled: true
