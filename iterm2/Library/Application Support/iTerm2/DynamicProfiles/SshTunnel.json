@@ -9,7 +9,8 @@
       "Guid" : "ssh-tunnel-terminal",
       "Title" : "ssh-tunnel",
       "Name" : "ssh-tunnel",
-      "Custom Command" : "Yes"
+      "Custom Command" : "Yes",
+      "Window Type": 1,
     }
   ]
 }

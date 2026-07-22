@@ -32,8 +32,7 @@ setupVersion: 1
 contextPromotion: 
   enabled: false
 dev: 
-  autoqa: 
-    consent: denied
+  autoqaConsent: denied
 github: 
   enabled: true
 task: 
@@ -43,6 +42,7 @@ tools:
   discoveryMode: all
 providers: 
   webSearch: auto
+  image: auto
 advisor: 
   enabled: false
 doubleEscapeAction: tree
@@ -63,3 +63,5 @@ display:
   showTokenUsage: false
 terminal: 
   showImages: true
+generate_image: 
+  enabled: true
