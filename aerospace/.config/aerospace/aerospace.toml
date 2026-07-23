@@ -157,7 +157,7 @@ persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 
 
     # Applications
     alt-g = 'exec-and-forget open -a "Google Chrome"'
-    alt-t = 'exec-and-forget /usr/bin/open -a Ghostty.app'
+    alt-t = "exec-and-forget osascript -e 'tell application \"Ghostty\" to activate'"
     alt-shift-t = "exec-and-forget /usr/bin/open -na Ghostty.app --args --window-save-state=never --title=tmux-init -e /bin/zsh -lc 'exec tmux new-session -A -s init'"
     alt-shift-o = "exec-and-forget /usr/bin/open -na Ghostty.app --args --window-save-state=never --title=ssh-tunnel -e /bin/bash -lc 'exec \"$HOME/.config/aerospace/ssh-tunnel.sh\"'"
     alt-shift-c = "exec-and-forget /usr/bin/env zsh -ic clipssh"

@@ -8,6 +8,8 @@ background-opacity = 0.8116629464285714
 background-opacity-cells = true
 background-blur = 21
 mouse-scroll-multiplier = discrete:1
+bell-features = system,no-attention,no-title
+desktop-notifications = true
 keybind = alt+left=csi:1;5D
 keybind = alt+right=csi:1;5C
 keybind = cmd+left=text:\x01
