@@ -228,8 +228,8 @@ cask "gimp"
 cask "google-chrome"
 # Free and open-source media player
 cask "iina"
-# Terminal emulator as alternative to Apple's Terminal app
-cask "iterm2"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
 # Open-source keystroke visualiser
 cask "keycastr"
 # Open-source cross-platform alternative to AirDrop

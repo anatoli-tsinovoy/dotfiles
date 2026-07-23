@@ -1,5 +1,5 @@
 {
-  "terminal.external.osxExec": "iTerm.app",
+  "terminal.external.osxExec": "Ghostty.app",
   "editor.formatOnType": true,
   "github.gitProtocol": "ssh",
   "editor.fontLigatures": true,

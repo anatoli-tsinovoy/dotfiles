@@ -1,0 +1,15 @@
+theme = dark:Dotfiles Dark,light:Dotfiles Light
+font-family = MesloLGSNFM-Regular
+font-size = 20
+term = xterm-256color
+window-width = 88
+window-height = 25
+background-opacity = 0.8116629464285714
+background-opacity-cells = true
+background-blur = 21
+mouse-scroll-multiplier = discrete:1
+keybind = alt+left=csi:1;5D
+keybind = alt+right=csi:1;5C
+keybind = cmd+left=text:\x01
+keybind = cmd+right=text:\x05
+macos-titlebar-style = hidden

@@ -468,9 +468,6 @@ function __icon_map() {
   "Iris")
     icon_result=":iris:"
     ;;
-  "iTerm")
-    icon_result=":iterm:"
-    ;;
   "Jane Reader")
     icon_result=":jane_reader:"
     ;;
@@ -996,7 +993,7 @@ function __icon_map() {
   "Telegram")
     icon_result=":telegram:"
     ;;
-  "Terminal" | "iTerm2" | "终端" | "ターミナル")
+  "Terminal" | "终端" | "ターミナル")
     icon_result=":terminal:"
     ;;
   "Termius")

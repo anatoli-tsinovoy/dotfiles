@@ -157,9 +157,9 @@ persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 
 
     # Applications
     alt-g = 'exec-and-forget open -a "Google Chrome"'
-    alt-t = 'exec-and-forget open -a "iTerm"'
-    alt-shift-t = "exec-and-forget osascript -e 'tell application \"iTerm\" to create window with profile \"tmux-init\"'"
-    alt-shift-o = "exec-and-forget osascript -e 'tell application \"iTerm\" to create window with profile \"ssh-tunnel\"'"
+    alt-t = 'exec-and-forget /usr/bin/open -a Ghostty.app'
+    alt-shift-t = "exec-and-forget /usr/bin/open -na Ghostty.app --args --window-save-state=never --title=tmux-init -e /bin/zsh -lc 'exec tmux new-session -A -s init'"
+    alt-shift-o = "exec-and-forget /usr/bin/open -na Ghostty.app --args --window-save-state=never --title=ssh-tunnel -e /bin/bash -lc 'exec \"$HOME/.config/aerospace/ssh-tunnel.sh\"'"
     alt-shift-c = "exec-and-forget /usr/bin/env zsh -ic clipssh"
     alt-m = 'exec-and-forget open -a "Spotify"'
     alt-v = 'exec-and-forget open -a "WhatsApp"'
@@ -261,13 +261,13 @@ run = 'move-node-to-workspace 3'
 if = 'test %{app-bundle-id} = com.openai.chat'
 run = 'move-node-to-workspace 4'
 
-# btop profile has title set immediately, so this matches before shell loads
+# btop's forced Ghostty title is set immediately, so this matches before shell loads
 [[on-window-detected]]
-if = 'test %{app-bundle-id} = com.googlecode.iterm2 && test %{window-title} ~= btop'
+if = 'test %{app-bundle-id} = com.mitchellh.ghostty && test %{window-title} ~= btop'
 run = 'layout floating'
 
 [[on-window-detected]]
-if = 'test %{app-bundle-id} = com.googlecode.iterm2'
+if = 'test %{app-bundle-id} = com.mitchellh.ghostty'
 run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]

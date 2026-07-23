@@ -21,7 +21,7 @@ apple_prefs=(
 apple_activity=(
   icon=$ACTIVITY
   label="Activity"
-  click_script="osascript -e 'tell application \"iTerm\" to create window with profile \"btop\"'; $POPUP_OFF"
+  click_script="/usr/bin/open -na Ghostty.app --args --window-save-state=never --title=btop -e /opt/homebrew/bin/btop; $POPUP_OFF"
 )
 
 apple_lock=(

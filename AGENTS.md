@@ -42,7 +42,7 @@ dotfiles/
 ├── nvim/                  # LazyVim-based Neovim config
 ├── git/                   # .gitconfig + .gitconfig.macos
 ├── aerospace/             # Tiling WM + sketchybar (macOS only)
-├── iterm2/                # Dynamic iTerm2 profiles
+├── ghostty/               # Ghostty config and light/dark themes
 └── opencode/              # OpenCode AI configuration
 ```
 
@@ -111,23 +111,20 @@ termux/.termux/colors.properties → ~/.termux/colors.properties
 
 **Termux detection must happen BEFORE Linux** in `detect_os()` because `uname -s` returns "Linux" on both.
 
-## iTerm2 Dynamic Profiles
+## Ghostty
 
-Profiles live in `iterm2/Library/Application Support/iTerm2/DynamicProfiles/` and stow to `~/Library/Application Support/iTerm2/DynamicProfiles/`.
+Ghostty config lives in `ghostty/.config/ghostty/` and stows to `~/.config/ghostty/`.
 
-- Use dynamic profiles for repo-managed iTerm2 profiles; they hot-reload when the folder contents change.
-- Keep one profile per file (`Default.json`, `Profile-Btop.json`, etc.). Do not collapse full profiles into GUID-only entries in a shared `Profiles.json`.
-- Keep `"Initial Text": ""` unless the profile is explicitly meant to type text into an interactive shell.
-- Prefer `"Command"` + `"Custom Command": "Yes"` for startup behavior. This avoids leaking default-profile initial text into other profiles.
-- After editing profiles, force a live refresh without restarting iTerm2:
+- Keep `macos-titlebar-style = hidden`; AeroSpace still matches the invisible window title used by btop.
+- Keep exact light/dark palettes in `themes/Dotfiles Dark` and `themes/Dotfiles Light`; their names must match `theme` in `config`.
+- Keep one-off commands out of the global `command` setting. AeroSpace and SketchyBar launch btop, tmux, and SSH with `open -na Ghostty.app --args ... -e ...`.
+- `scripts/macos/btop/install-btop.sh` builds `/Applications/btop.app` for Spotlight, Raycast, and Alfred.
+- Validate the staged config without stowing:
 
 ```bash
-profile_dir="$HOME/Library/Application Support/iTerm2/DynamicProfiles"
-for f in "$profile_dir"/*.json; do tmp="$f.tmp"; cp "$f" "$tmp" && mv "$tmp" "$f"; done
-touch "$profile_dir"
+XDG_CONFIG_HOME="$PWD/ghostty/.config" \
+  /Applications/Ghostty.app/Contents/MacOS/ghostty +validate-config
 ```
-
-- Validate with `python3 -m json.tool "$profile_dir/Default.json"`; `plutil -lint` rejects plain JSON here even though iTerm2 accepts it.
 
 ## Lua Style (Neovim)
 
