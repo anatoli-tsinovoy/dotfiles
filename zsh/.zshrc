@@ -40,7 +40,16 @@ ZSH_SITE_FUNCTIONS="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions"
 [[ -d "$ZSH_SITE_FUNCTIONS" ]] && fpath=("$ZSH_SITE_FUNCTIONS" "${fpath[@]}")
 [[ "$OSTYPE" == darwin* && -d /opt/homebrew/share/zsh/site-functions ]] && fpath=(/opt/homebrew/share/zsh/site-functions "${fpath[@]}")
 
-autoload -Uz compinit && compinit
+autoload -Uz compinit
+typeset _zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+typeset -a _zcompdump_old
+_zcompdump_old=("$_zcompdump"(N.mh+24))
+if [[ ! -s "$_zcompdump" ]] || (( ${#_zcompdump_old} )); then
+  compinit -d "$_zcompdump"
+else
+  compinit -C -d "$_zcompdump"
+fi
+unset _zcompdump _zcompdump_old
 
 ZSH_PLUGIN_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
 if [[ -z "$IS_OMP_COMMAND_SHELL" ]]; then
