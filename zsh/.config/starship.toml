@@ -9,7 +9,7 @@ green = '2'
 red = '1'
 cyan = '6'
 magenta = '5'
-ink = '232'
+ink = '15'
 success = '76'
 error = '196'
 
@@ -135,12 +135,6 @@ error_symbol = '[❯](bold fg:error)'
 [azure]
 symbol = ' '
 
-[battery]
-full_symbol = '󰁹 '
-charging_symbol = '󰂄 '
-discharging_symbol = '󰂃 '
-unknown_symbol = '󰂑 '
-empty_symbol = '󰂎 '
 
 [buf]
 symbol = ' '
