@@ -1,5 +1,2 @@
 export PATH="/usr/local/et-bin:/usr/local/bin:/opt/homebrew/bin:$PATH"
 
-# bun completions
-[[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
-[[ -s "$HOME/.safe-chain/scripts/init-posix.sh" ]] && source "$HOME/.safe-chain/scripts/init-posix.sh"

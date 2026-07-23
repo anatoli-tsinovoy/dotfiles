@@ -100,3 +100,5 @@ git-lfs-dl() {
 
 export CLIPSSH_HOST=anatoli@orange
 export CLIPSSH_REMOTE_DIR=/data/tmp
+
+[[ -s "$HOME/.safe-chain/scripts/init-posix.sh" ]] && source "$HOME/.safe-chain/scripts/init-posix.sh"
