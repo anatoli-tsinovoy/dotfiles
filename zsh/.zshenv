@@ -9,4 +9,3 @@ case "$OSTYPE" in
     [[ -f ~/.zshenv.linux ]] && source ~/.zshenv.linux
     ;;
 esac
-. "$HOME/.cargo/env"
