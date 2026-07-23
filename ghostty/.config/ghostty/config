@@ -15,3 +15,4 @@ keybind = alt+right=csi:1;5C
 keybind = cmd+left=text:\x01
 keybind = cmd+right=text:\x05
 macos-titlebar-style = hidden
+clipboard-paste-protection = false
