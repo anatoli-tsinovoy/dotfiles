@@ -18,6 +18,7 @@ bat
 eza
 fzf
 zoxide
+starship
 tmux
 neovim
 glow

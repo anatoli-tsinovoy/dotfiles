@@ -121,51 +121,43 @@ install_aptfile() {
   log_ok "aptfile installed"
 }
 
-setup_ohmyzsh() {
-  local OMZ="$HOME/.oh-my-zsh"
-  local OMZ_CUSTOM="${OMZ}/custom"
 
-  if [[ ! -d $OMZ ]]; then
-    log_info "Installing oh-my-zsh (unattended)…"
-    RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
-      sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    mkdir -p "$OMZ_CUSTOM"
-  else
-    log_ok "oh-my-zsh already present"
-  fi
-}
-
-setup_p10k() {
-  local OMZ_CUSTOM="$HOME/.oh-my-zsh/custom"
-  local P10K_DIR="$OMZ_CUSTOM/themes/powerlevel10k"
-
-  if [[ ! -d "$P10K_DIR" ]]; then
-    log_info "Installing powerlevel10k..."
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR"
-  else
-    log_ok "powerlevel10k already present"
-  fi
-}
 
 setup_zsh_plugins() {
-  local OMZ_CUSTOM="$HOME/.oh-my-zsh/custom"
+  local plugins_dir="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
+  local plugin
+  local plugin_dir
+  local repo
 
-  local plugin_dir="$OMZ_CUSTOM/plugins/zsh-syntax-highlighting"
-  if [[ -d "$plugin_dir/.git" ]]; then
-    log_ok "zsh-syntax-highlighting already installed"
-  else
+  mkdir -p "$plugins_dir"
+  for plugin in zsh-autosuggestions zsh-syntax-highlighting; do
+    plugin_dir="$plugins_dir/$plugin"
+    if [[ -d "$plugin_dir/.git" ]] && git -C "$plugin_dir" rev-parse --is-inside-work-tree &>/dev/null; then
+      log_ok "$plugin already installed"
+      continue
+    fi
+
     rm -rf "$plugin_dir"
-    log_info "Installing zsh-syntax-highlighting..."
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir"
+    repo="https://github.com/zsh-users/$plugin.git"
+    log_info "Installing $plugin..."
+    git clone --depth=1 "$repo" "$plugin_dir"
+  done
+}
+
+setup_zsh_completions() {
+  local completions_dir="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions"
+  mkdir -p "$completions_dir"
+  if command -v uv &>/dev/null; then
+    uv generate-shell-completion zsh >"$completions_dir/_uv"
   fi
-
-  plugin_dir="$OMZ_CUSTOM/plugins/zsh-autosuggestions"
-  if [[ -d "$plugin_dir/.git" ]]; then
-    log_ok "zsh-autosuggestions already installed"
-  else
-    rm -rf "$plugin_dir"
-    log_info "Installing zsh-autosuggestions..."
-    git clone https://github.com/zsh-users/zsh-autosuggestions "$plugin_dir"
+  if command -v omp &>/dev/null; then
+    omp completions zsh >"$completions_dir/_omp"
+  fi
+  if command -v glow &>/dev/null; then
+    glow completion zsh >"$completions_dir/_glow"
+  fi
+  if command -v starship &>/dev/null; then
+    starship completions zsh >"$completions_dir/_starship"
   fi
 }
 
@@ -222,33 +214,36 @@ install_termux_prerequisites() {
 
 install_termux_font() {
   local font_file="$HOME/.termux/font.ttf"
-  local hack_version="v3.003"
-  local hack_url="https://github.com/source-foundry/Hack/releases/download/${hack_version}/Hack-${hack_version}-ttf.zip"
-  local tmp_dir
+  local font_marker="$HOME/.termux/.hack-nerd-font-installed"
+  local hack_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip"
+  local tmp_dir cleanup_command
 
-  if [[ -f "$font_file" ]]; then
+  if [[ -f "$font_file" && -f "$font_marker" ]]; then
     log_ok "Termux font already installed"
     return 0
   fi
 
-  log_info "Installing Hack font for Termux..."
+  log_info "Installing Hack Nerd Font for Termux..."
   mkdir -p "$HOME/.termux"
 
   tmp_dir="$(mktemp -d)"
-  trap 'rm -rf "$tmp_dir"' EXIT
+  printf -v cleanup_command 'rm -rf -- %q' "$tmp_dir"
+  # shellcheck disable=SC2064 # cleanup_command is safely pre-escaped with %q.
+  trap "$cleanup_command" EXIT
 
   curl -fsSL "$hack_url" -o "$tmp_dir/hack.zip"
-  unzip -q "$tmp_dir/hack.zip" -d "$tmp_dir"
+  unzip -qp "$tmp_dir/hack.zip" "HackNerdFont-Regular.ttf" >"$tmp_dir/font.ttf"
 
-  # Use Regular weight as the terminal font
-  cp "$tmp_dir/ttf/Hack-Regular.ttf" "$font_file"
+  # Use the regular, non-mono Nerd Font for the terminal font.
+  cp "$tmp_dir/font.ttf" "$font_file"
+  touch "$font_marker"
 
   # Reload settings if available
   if command -v termux-reload-settings &>/dev/null; then
     termux-reload-settings
   fi
 
-  log_ok "Hack font installed"
+  log_ok "Hack Nerd Font installed"
 }
 
 stow_force_cleanup() {
@@ -365,19 +360,17 @@ main() {
     install_termux_font
   fi
 
-  # === Common Setup (both OS) ===
+  # === Common Setup ===
 
   install_stow "$os"
 
   cd "$SCRIPT_DIR"
 
-  # Setup oh-my-zsh, powerlevel10k, and plugins
-  setup_ohmyzsh
-  setup_p10k
+  # Install standalone zsh plugins
   setup_zsh_plugins
+  setup_zsh_completions
 
-  # Remove files that would conflict with stow
-  # (oh-my-zsh creates a default .zshrc that we don't want)
+  # Remove files that would conflict with stow, including the legacy p10k symlink
   log_info "Removing conflicting files before stow..."
   rm -f ~/.zshenv ~/.zshenv.macos ~/.zshenv.linux
   rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.zshrc.termux ~/.p10k.zsh
@@ -387,14 +380,14 @@ main() {
   printf '%s\n' 'color_theme = "TTY"' 'theme_background = False' >~/.config/btop/btop.conf
   rm -f ~/.omp/agent/config.yml
 
-  # Stow common packages (no --adopt: we want OUR files, not whatever exists)
+  # Stow common packages (no --adopt: use the repository versions)
 
   log_info "Stowing common dotfiles..."
   run_stow -t ~ nvim git opencode omp glow tmux
 
   setup_omp_plugins
 
-  # Stow unified zsh package (contains .zshrc, .zshrc.macos, .zshrc.linux, .p10k.zsh)
+  # Stow unified zsh package
   log_info "Stowing zsh configuration..."
   run_stow -t ~ zsh
 

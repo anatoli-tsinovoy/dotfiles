@@ -1,14 +1,5 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-IS_CURSOR_TERMINAL=$([[ $PAGER == 'sh -c "head -n 10000 | cat"' ]] && echo 1 || echo 0)
-IS_OMP_COMMAND_SHELL=${OMPCODE:+1}
-if [[ $IS_CURSOR_TERMINAL -eq 0 && -z "$IS_OMP_COMMAND_SHELL" ]]; then
-  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-  fi
-fi
 
+IS_OMP_COMMAND_SHELL=${OMPCODE:+1}
 # === Locale ===
 export LANG='en_US.UTF-8'
 export LANGUAGE='en_US:en'
@@ -16,7 +7,7 @@ export LC_ALL='en_US.UTF-8'
 
 # === TERM (Linux needs this early, macOS sets it via terminal app) ===
 # Only set TERM as a last-resort fallback; never override inside tmux
-if [[ "$(uname -s)" == "Linux" && -z "${TMUX-}" ]]; then
+if [[ "$OSTYPE" == linux* && -z "${TMUX-}" ]]; then
   export TERM=xterm-256color
   export COLORTERM=truecolor
 fi
@@ -42,32 +33,20 @@ if is_termux && [[ -f ~/.zshrc.termux ]]; then
   source ~/.zshrc.termux
 fi
 
-# === Oh My Zsh ===
-export ZSH="$HOME/.oh-my-zsh"
-
-if [[ -n "$IS_OMP_COMMAND_SHELL" ]]; then
-  ZSH_THEME=""
-elif [[ $IS_CURSOR_TERMINAL -eq 0 ]]; then
-  ZSH_THEME="powerlevel10k/powerlevel10k"
-else
-  ZSH_THEME="robbyrussell"
-fi
-
-# Plugins
-plugins=(git)
-if [[ -z "$IS_OMP_COMMAND_SHELL" ]]; then
-  plugins+=(zsh-syntax-highlighting zsh-autosuggestions)
-fi
-# Docker plugin only on Linux, outside containers, with docker installed
-is_inside_container() {
-  [[ -f /.dockerenv ]] || [[ -n "${container:-}" ]] || grep -qsE '(docker|kubepod)' /proc/1/cgroup 2>/dev/null
-}
-if [[ "$(uname -s)" == "Linux" ]] && ! is_inside_container && command -v docker &>/dev/null; then
-  plugins+=(docker)
-fi
+# === Completion ===
+typeset -U fpath
+fpath=("${(@)fpath:#${HOME}/.oh-my-zsh(|/*)}")
+ZSH_SITE_FUNCTIONS="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions"
+[[ -d "$ZSH_SITE_FUNCTIONS" ]] && fpath=("$ZSH_SITE_FUNCTIONS" "${fpath[@]}")
+[[ "$OSTYPE" == darwin* && -d /opt/homebrew/share/zsh/site-functions ]] && fpath=(/opt/homebrew/share/zsh/site-functions "${fpath[@]}")
 
 autoload -Uz compinit && compinit
-source $ZSH/oh-my-zsh.sh
+
+ZSH_PLUGIN_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
+if [[ -z "$IS_OMP_COMMAND_SHELL" ]]; then
+  [[ -f "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && source "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  command -v starship &>/dev/null && eval "$(starship init zsh)"
+fi
 
 # === Editor ===
 export EDITOR='nvim'
@@ -104,6 +83,16 @@ export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p
 # fzf with bat preview
 alias fzf='fzf --preview-window=right:60%:wrap --preview "bat --color=always --style=numbers {} 2>/dev/null || printf %s "{}" | bat --color=always --wrap=auto -l zsh -p"'
 
+is_inside_container() {
+  [[ -f /.dockerenv || -n "${container:-}" ]] && return 0
+  local cgroup
+  [[ -r /proc/1/cgroup ]] || return 1
+  while IFS= read -r cgroup; do
+    [[ "$cgroup" == *docker* || "$cgroup" == *kubepods* ]] && return 0
+  done < /proc/1/cgroup
+  return 1
+}
+
 # lazydocker (only outside containers)
 if ! is_inside_container && command -v lazydocker &>/dev/null; then
   alias lzd='lazydocker'
@@ -136,19 +125,9 @@ if [[ -f "$HOME/.local/bin/env" ]]; then
   . "$HOME/.local/bin/env"
 fi
 
-# uv shell completion
-if command -v uv &>/dev/null; then
-  eval "$(uv generate-shell-completion zsh)"
-fi
-
-# omp shell completion
-if command -v omp &>/dev/null; then
-  eval "$(omp completions zsh)"
-fi
 
 # glow with custom light/dark styles
 if command -v glow &>/dev/null; then
-  eval "$(glow completion zsh)"
   source ~/.zsh/detect-background.zsh
   glow() {
     local style_dir="${XDG_CONFIG_HOME:-$HOME/.config}/glow"
@@ -165,7 +144,11 @@ fi
 
 # thefuck
 if command -v thefuck &>/dev/null; then
-  eval $(thefuck --alias)
+  fuck() {
+    unfunction fuck
+    eval "$(thefuck --alias)"
+    fuck "$@"
+  }
 fi
 
 # zoxide (replaces cd)
@@ -173,15 +156,11 @@ if command -v zoxide &>/dev/null; then
   eval "$(zoxide init zsh --cmd cd)"
 fi
 
-# === Powerlevel10k config ===
-if [[ $IS_CURSOR_TERMINAL -eq 0 && -z "$IS_OMP_COMMAND_SHELL" ]]; then
-  [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-fi
 
 # === AWS SSO Login with Profile ===
 awslogin() {
   local -a login_args=(--profile "$1")
-  [[ "$(uname -s)" == "Linux" ]] && ! is_termux && login_args+=(--no-browser)
+  [[ "$OSTYPE" == linux* ]] && ! is_termux && login_args+=(--no-browser)
   aws sso login "${login_args[@]}"
   export AWS_PROFILE="$1"
 }
@@ -223,11 +202,16 @@ fi
 
 # === OS-specific configuration ===
 # Detect OS and source appropriate config
-case "$(uname -s)" in
-  Darwin)
+case "$OSTYPE" in
+  darwin*)
     [[ -f ~/.zshrc.macos ]] && source ~/.zshrc.macos
     ;;
-  Linux)
+  linux*)
     [[ -f ~/.zshrc.linux ]] && source ~/.zshrc.linux
     ;;
 esac
+
+# Must be sourced after every other ZLE setup.
+if [[ -z "$IS_OMP_COMMAND_SHELL" && -f "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi

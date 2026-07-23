@@ -5,8 +5,8 @@
 if [[ -z "${OMPCODE:-}" ]]; then
   if [[ -f "$HOME/.fzf.zsh" ]]; then
     source "$HOME/.fzf.zsh"
-  elif command -v fzf &>/dev/null; then
-    source <(fzf --zsh)
+  elif (( $+commands[fzf] )); then
+    source <(command fzf --zsh)
   fi
 fi
 

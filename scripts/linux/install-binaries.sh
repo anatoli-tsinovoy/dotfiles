@@ -627,6 +627,17 @@ install_fzf() {
   fi
 }
 
+install_starship() {
+  if command_exists starship; then
+    log_skip "starship already installed ($(starship --version))"
+    return 0
+  fi
+
+  log_info "Installing Starship..."
+  curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
+  log_ok "starship installed"
+}
+
 # === Main ===
 
 main() {
@@ -655,6 +666,7 @@ main() {
   install_tlrc # installs cargo on ARM64 only (no prebuilt available)
   install_lazydocker
   install_fzf
+  install_starship
   install_rtk
 
   # Tools that depend on uv/bun

@@ -1,0 +1,69 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+palette = 'p10k_rainbow'
+format = '$os$all'
+
+[palettes.p10k_rainbow]
+blue = '4'
+green = '2'
+red = '1'
+cyan = '6'
+magenta = '5'
+ink = '232'
+success = '76'
+error = '196'
+
+[hostname]
+disabled = true
+
+[os]
+disabled = false
+style = 'bold fg:ink'
+
+[os.symbols]
+Android = ' '
+Arch = ' '
+Debian = ' '
+Fedora = ' '
+Linux = ' '
+Macos = ' '
+NixOS = ' '
+Ubuntu = ' '
+
+[directory]
+style = 'bold fg:blue'
+
+[git_branch]
+style = 'bold fg:green'
+
+[git_status]
+style = 'bold fg:green'
+
+[jobs]
+style = 'bold fg:cyan'
+
+[python]
+style = 'bold fg:blue'
+
+[conda]
+style = 'bold fg:blue'
+
+[php]
+style = 'bold fg:magenta'
+
+[package]
+style = 'bold fg:magenta'
+
+[terraform]
+style = 'bold fg:magenta'
+
+[aws]
+style = 'bold fg:red'
+
+[nix_shell]
+style = 'bold fg:cyan'
+
+
+[character]
+success_symbol = '[❯](bold fg:success)'
+error_symbol = '[❯](bold fg:error)'

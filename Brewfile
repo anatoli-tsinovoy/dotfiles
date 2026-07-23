@@ -158,6 +158,8 @@ brew "ruby-install"
 brew "shellcheck"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
 brew "stow"
+# Cross-shell prompt
+brew "starship"
 # Formatting technology for Swift source code
 brew "swift-format"
 # Tool to enforce Swift style and conventions

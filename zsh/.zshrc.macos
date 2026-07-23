@@ -3,18 +3,15 @@
 
 # === fzf shell integration (Homebrew) ===
 if [[ -z "$IS_OMP_COMMAND_SHELL" ]]; then
-  source <(fzf --zsh)
+  [[ -r /opt/homebrew/opt/fzf/shell/completion.zsh ]] && source /opt/homebrew/opt/fzf/shell/completion.zsh
+  [[ -r /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]] && source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
 fi
 
 # === bat theming (removed - using ansi theme from base .zshrc) ===
 
 # === Homebrew ===
 HOMEBREW_AUTO_UPDATE_SECS=86400  # one day
-eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# === Plugins (add to existing plugins array) ===
-# podman and docker plugins for completion
-plugins+=(podman docker)
 
 # === macOS Aliases ===
 alias python="/opt/homebrew/bin/python3"
@@ -44,7 +41,9 @@ timg() {
 }
 
 # === Podman/Docker ===
-export DOCKER_HOST=unix://$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')
+if [[ -n "$TMPDIR" ]]; then
+  export DOCKER_HOST="unix://${TMPDIR}podman/podman-machine-default-api.sock"
+fi
 
 # === NVM (lazy-loaded) ===
 export NVM_DIR="$HOME/.nvm"
