@@ -121,8 +121,6 @@ install_aptfile() {
   log_ok "aptfile installed"
 }
 
-
-
 setup_zsh_plugins() {
   local plugins_dir="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
   local plugin
@@ -159,6 +157,10 @@ setup_zsh_completions() {
   if command -v starship &>/dev/null; then
     starship completions zsh >"$completions_dir/_starship"
   fi
+  if command -v bun &>/dev/null; then
+    # bun completions
+    [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+  fi
 }
 
 setup_omp_plugins() {
@@ -171,7 +173,6 @@ setup_omp_plugins() {
 
   local plugin
   local remote_plugins=(
-    "git:github.com/DietrichGebert/ponytail"
     "@plannotator/pi-extension"
   )
   for plugin in "${remote_plugins[@]}"; do
@@ -329,7 +330,6 @@ main() {
     bash "$SCRIPT_DIR/scripts/macos/open-in-neovim/install-open-in-neovim.sh"
     log_info "Installing btop Spotlight integration..."
     bash "$SCRIPT_DIR/scripts/macos/btop/install-btop.sh"
-
 
     log_info "Installing clipssh"
     curl -fsSL https://raw.githubusercontent.com/samuellawrentz/clipssh/main/install.sh | bash

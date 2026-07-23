@@ -39,7 +39,7 @@ task:
   showResolvedModelBadge: true
   enableLsp: true
 tools: 
-  discoveryMode: all
+  {}
 providers: 
   webSearch: auto
   image: auto
