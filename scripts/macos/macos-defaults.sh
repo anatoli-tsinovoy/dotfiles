@@ -235,6 +235,10 @@ defaults write com.apple.screencapture target -string "file"
 
 # Open a Ghostty window in the selected Finder directory (Shift+Cmd+Right)
 defaults write pbs NSServicesStatus -dict-add 'com.mitchellh.ghostty - New Ghostty Window Here - openWindow' '{ key_equivalent = "@$\Uf703"; }'
+if [[ -d /Applications/Ghostty.app ]]; then
+  /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -f /Applications/Ghostty.app
+  /System/Library/CoreServices/pbs -flush
+fi
 
 # Disable Mission Control space switching shortcuts (Ctrl+1, Ctrl+2, etc.)
 # These interfere with Aerospace and terminal shortcuts
