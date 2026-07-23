@@ -25,6 +25,12 @@ if [[ -d "$HOME/.cargo/bin" ]]; then
   export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
+# === History ===
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=10000
+setopt extended_history hist_expire_dups_first hist_ignore_dups hist_ignore_space hist_verify share_history
+
 # Termux-specific config (must be before compinit for completions)
 is_termux() {
   [[ -n "${TERMUX_VERSION:-}" ]] || [[ "${PREFIX:-}" == *"com.termux"* ]]
@@ -50,6 +56,17 @@ else
   compinit -C -d "$_zcompdump"
 fi
 unset _zcompdump _zcompdump_old
+zmodload -i zsh/complist
+WORDCHARS=''
+unsetopt menu_complete flowcontrol
+setopt auto_menu complete_in_word always_to_end
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' use-cache true
+zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+
 
 ZSH_PLUGIN_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
 if [[ -z "$IS_OMP_COMMAND_SHELL" ]]; then
@@ -63,6 +80,9 @@ export EDITOR='nvim'
 # === Common Aliases ===
 alias vim="nvim"
 alias ls="eza -la --icons --group-directories-first"
+alias ..='cd ..'
+alias -- -='cd -'
+
 
 # bat theming (ansi theme uses terminal colors, also used by git-delta)
 export BAT_THEME="ansi"
@@ -91,6 +111,46 @@ export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p
 
 # fzf with bat preview
 alias fzf='fzf --preview-window=right:60%:wrap --preview "bat --color=always --style=numbers {} 2>/dev/null || printf %s "{}" | bat --color=always --wrap=auto -l zsh -p"'
+# Cross-platform system clipboard helpers.
+clipcopy() {
+  local source="${1:-/dev/stdin}"
+  if [[ "$OSTYPE" == darwin* ]] && command -v pbcopy &>/dev/null; then
+    command pbcopy <"$source"
+  elif is_termux && command -v termux-clipboard-set &>/dev/null; then
+    command termux-clipboard-set <"$source"
+  elif [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v wl-copy &>/dev/null; then
+    command wl-copy <"$source"
+  elif [[ -n "${DISPLAY:-}" ]] && command -v xsel &>/dev/null; then
+    command xsel --clipboard --input <"$source"
+  elif [[ -n "${DISPLAY:-}" ]] && command -v xclip &>/dev/null; then
+    command xclip -selection clipboard -in <"$source"
+  elif [[ -n "${TMUX:-}" ]] && command -v tmux &>/dev/null; then
+    command tmux load-buffer -w "$source"
+  else
+    print -u2 'clipcopy: no supported clipboard provider found'
+    return 1
+  fi
+}
+
+clippaste() {
+  if [[ "$OSTYPE" == darwin* ]] && command -v pbpaste &>/dev/null; then
+    command pbpaste
+  elif is_termux && command -v termux-clipboard-get &>/dev/null; then
+    command termux-clipboard-get
+  elif [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v wl-paste &>/dev/null; then
+    command wl-paste --no-newline
+  elif [[ -n "${DISPLAY:-}" ]] && command -v xsel &>/dev/null; then
+    command xsel --clipboard --output
+  elif [[ -n "${DISPLAY:-}" ]] && command -v xclip &>/dev/null; then
+    command xclip -selection clipboard -out
+  elif [[ -n "${TMUX:-}" ]] && command -v tmux &>/dev/null; then
+    command tmux save-buffer -
+  else
+    print -u2 'clippaste: no supported clipboard provider found'
+    return 1
+  fi
+}
+
 
 is_inside_container() {
   [[ -f /.dockerenv || -n "${container:-}" ]] && return 0
@@ -187,6 +247,10 @@ if [[ -z "$IS_OMP_COMMAND_SHELL" && -o zle ]]; then
   bindkey -M vicmd '^R' vi-redo
   bindkey -M viins '^[f' forward-word
   bindkey -M viins '^[b' backward-word
+  autoload -Uz up-line-or-beginning-search down-line-or-beginning-search edit-command-line
+  zle -N up-line-or-beginning-search
+  zle -N down-line-or-beginning-search
+  zle -N edit-command-line
 
   # === Fancy ^Z ===
   # Source - https://superuser.com/a/378045
