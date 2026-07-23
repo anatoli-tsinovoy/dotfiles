@@ -30,6 +30,9 @@ Macos = ' '
 NixOS = ' '
 Ubuntu = ' '
 
+[container]
+disabled = true
+
 [directory]
 style = 'bold fg:blue'
 

@@ -157,9 +157,8 @@ setup_zsh_completions() {
   if command -v starship &>/dev/null; then
     starship completions zsh >"$completions_dir/_starship"
   fi
-  if command -v bun &>/dev/null; then
-    # bun completions
-    [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+  if [[ -s "$HOME/.bun/_bun" ]]; then
+    cp "$HOME/.bun/_bun" "$completions_dir/_bun"
   fi
 }
 
