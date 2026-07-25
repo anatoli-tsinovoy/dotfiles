@@ -139,15 +139,31 @@ omp-ssh() {
 }
 
 # Use Eternal Terminal's reconnectable reverse tunnel for both audio and shell.
+# OMP_MIC_REMOTE_BIND may name a bridge address reachable from a container.
 omp-et() {
   local port="${OMP_MIC_PORT:-47130}"
+  local remote_bind="${OMP_MIC_REMOTE_BIND:-127.0.0.1}"
+  local tunnel="$port:$port"
+
   _omp_mic_prepare "$port" || return
-  print "Forwarding the default microphone to remote TCP port $port"
-  command et --reversetunnel "$port:$port" "$@"
+  if [[ "$remote_bind" != "127.0.0.1" && "$remote_bind" != "localhost" ]]; then
+    tunnel="$remote_bind:$port:127.0.0.1:$port"
+  fi
+  print "Forwarding the default microphone to $remote_bind:$port"
+  command et --reversetunnel "$tunnel" "$@"
+}
+
+# The default Docker bridge used by the remote workstation.
+omp-et-container() {
+  OMP_MIC_REMOTE_BIND="${OMP_MIC_REMOTE_BIND:-172.18.0.1}" omp-et "$@"
 }
 
 omp-remote() {
-  PULSE_SERVER="tcp:127.0.0.1:${OMP_MIC_PORT:-47130}" command omp "$@"
+  local host="${OMP_MIC_HOST:-}"
+  if [[ -z "$host" && -f /.dockerenv ]] && command -v ip &>/dev/null; then
+    host="$(ip route show default | command awk 'NR == 1 { print $3 }')"
+  fi
+  PULSE_SERVER="tcp:${host:-127.0.0.1}:${OMP_MIC_PORT:-47130}" command omp "$@"
 }
 
 # bat theming (ansi theme uses terminal colors, also used by git-delta)
