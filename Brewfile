@@ -142,6 +142,8 @@ brew "podman"
 brew "podman-compose"
 # Write once, build anywhere Lua-based build system
 brew "premake"
+# Networked sound server used to forward a Mac microphone over SSH
+brew "pulseaudio"
 # Python bindings for v6 of Qt
 brew "pyqt"
 # Tools for and transforming and inspecting PDF files

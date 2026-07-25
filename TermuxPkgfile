@@ -30,6 +30,8 @@ lftp
 
 # === System tools ===
 proot
+# Forward the Android microphone to remote OMP sessions
+pulseaudio
 
 # === Shell enhancements ===
 zsh-completions

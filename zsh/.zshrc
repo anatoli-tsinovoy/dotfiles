@@ -83,6 +83,66 @@ alias ls="eza -la --icons --group-directories-first"
 alias ..='cd ..'
 alias -- -='cd -'
 
+# Start a local PulseAudio microphone server for OMP forwarding.
+_omp_mic_prepare() {
+  local port="$1"
+  local source_index source_name source_driver source_details
+  local default_source
+
+  if ! command -v pulseaudio &>/dev/null || ! command -v pactl &>/dev/null; then
+    print -u2 'OMP microphone forwarding requires pulseaudio and pactl'
+    return 1
+  fi
+
+  if ! pulseaudio --check &>/dev/null; then
+    pulseaudio --start --exit-idle-time=-1 || return
+  fi
+
+  if is_termux && ! pactl list short modules | command grep -q $'\tmodule-sles-source\t'; then
+    pactl load-module module-sles-source >/dev/null || return
+  fi
+
+  if is_termux; then
+    while IFS=$'\t' read -r source_index source_name source_driver source_details; do
+      if [[ "$source_driver" == "module-sles-source.c" ]]; then
+        pactl set-default-source "$source_name" || return
+        break
+      fi
+    done < <(pactl list short sources)
+  fi
+
+  if ! pactl list short modules | command grep -q $'\tmodule-native-protocol-tcp\t.*port='"$port"; then
+    pactl load-module module-native-protocol-tcp \
+      "listen=127.0.0.1" "port=$port" "auth-anonymous=1" >/dev/null || return
+  fi
+
+  default_source="$(pactl get-default-source)" || return
+  if [[ -z "$default_source" || "$default_source" == *.monitor ]]; then
+    print -u2 'PulseAudio has no default microphone source'
+    return 1
+  fi
+}
+
+# Use SSH only for the audio tunnel and interactive connection.
+omp-ssh() {
+  local port="${OMP_MIC_PORT:-47130}"
+  _omp_mic_prepare "$port" || return
+  print "Forwarding the default microphone to remote TCP port $port"
+  command ssh -o ExitOnForwardFailure=yes \
+    -R "127.0.0.1:$port:127.0.0.1:$port" "$@"
+}
+
+# Use Eternal Terminal's reconnectable reverse tunnel for both audio and shell.
+omp-et() {
+  local port="${OMP_MIC_PORT:-47130}"
+  _omp_mic_prepare "$port" || return
+  print "Forwarding the default microphone to remote TCP port $port"
+  command et --reversetunnel "$port:$port" "$@"
+}
+
+omp-remote() {
+  PULSE_SERVER="tcp:127.0.0.1:${OMP_MIC_PORT:-47130}" command omp "$@"
+}
 
 # bat theming (ansi theme uses terminal colors, also used by git-delta)
 export BAT_THEME="ansi"
@@ -247,10 +307,21 @@ if [[ -z "$IS_OMP_COMMAND_SHELL" && -o zle ]]; then
   bindkey -M vicmd '^R' vi-redo
   bindkey -M viins '^[f' forward-word
   bindkey -M viins '^[b' backward-word
-  autoload -Uz up-line-or-beginning-search down-line-or-beginning-search edit-command-line
+  autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
   zle -N up-line-or-beginning-search
   zle -N down-line-or-beginning-search
-  zle -N edit-command-line
+  zmodload -i zsh/terminfo
+  for keymap in viins vicmd; do
+    # Terminals switch between CSI and SS3 cursor sequences depending on mode.
+    bindkey -M "$keymap" '^[[A' up-line-or-beginning-search
+    bindkey -M "$keymap" '^[OA' up-line-or-beginning-search
+    bindkey -M "$keymap" '^[[B' down-line-or-beginning-search
+    bindkey -M "$keymap" '^[OB' down-line-or-beginning-search
+    [[ -n "${terminfo[kcuu1]:-}" ]] && bindkey -M "$keymap" "${terminfo[kcuu1]}" up-line-or-beginning-search
+    [[ -n "${terminfo[kcud1]:-}" ]] && bindkey -M "$keymap" "${terminfo[kcud1]}" down-line-or-beginning-search
+  done
+  unset keymap
+
 
   # === Fancy ^Z ===
   # Source - https://superuser.com/a/378045
