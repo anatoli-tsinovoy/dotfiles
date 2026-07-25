@@ -102,8 +102,7 @@ _omp_mic_prepare() {
     if ! pactl load-module module-sles-source >/dev/null 2>&1; then
       print -u2 'Unable to open the Android microphone.'
       print -u2 'Install the Termux:API Android app from the same source as Termux,'
-      print -u2 'run `pkg install termux-api`, grant Termux:API microphone permission,'
-      print -u2 'then run `pulseaudio -k` and retry `omp-et`.'
+      print -u2 'grant Termux:API microphone permission, then retry the connection.'
       return 1
     fi
   fi

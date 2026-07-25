@@ -32,7 +32,6 @@ lftp
 proot
 # Forward the Android microphone to remote OMP sessions
 pulseaudio
-termux-api
 
 # === Shell enhancements ===
 zsh-completions
