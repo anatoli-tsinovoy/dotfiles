@@ -79,7 +79,9 @@ omp-et-container() {
 omp-remote() {
   local host="${OMP_MIC_HOST:-}"
   local port="${OMP_MIC_PORT:-47130}"
-  local runtime_dir fifo alsa_config bridge_pid fifo_keeper command_name
+  local playback_rate="${OMP_AUDIO_PLAYBACK_RATE:-24000}"
+  local runtime_dir capture_fifo playback_fifo alsa_config
+  local capture_pid playback_pid capture_fifo_keeper playback_fifo_keeper command_name
 
   if [[ -z "$host" && -f /.dockerenv ]] && command -v ip &>/dev/null; then
     host="$(ip route show default | command awk 'NR == 1 { print $3 }')"
@@ -93,14 +95,16 @@ omp-remote() {
     fi
   done
 
-  runtime_dir="$(command mktemp -d "${TMPDIR:-/tmp}/omp-mic.XXXXXXXX")" || return
-  fifo="$runtime_dir/capture.f32le"
+  runtime_dir="$(command mktemp -d "${TMPDIR:-/tmp}/omp-audio.XXXXXXXX")" || return
+  capture_fifo="$runtime_dir/capture.f32le"
+  playback_fifo="$runtime_dir/playback.f32le"
   alsa_config="$runtime_dir/asound.conf"
-  command mkfifo "$fifo" || {
+  command mkfifo "$capture_fifo" "$playback_fifo" || {
     command rm -rf "$runtime_dir"
     return 1
   }
-  exec {fifo_keeper}<>"$fifo"
+  exec {capture_fifo_keeper}<>"$capture_fifo"
+  exec {playback_fifo_keeper}<>"$playback_fifo"
 
   print -r -- "pcm.null {
   type null
@@ -109,24 +113,32 @@ omp-remote() {
 pcm.!default {
   type file
   slave.pcm \"null\"
-  file \"/dev/null\"
-  infile \"$fifo\"
+  file \"$playback_fifo\"
+  infile \"$capture_fifo\"
   format \"raw\"
 }" >"$alsa_config"
 
   PULSE_SERVER="tcp:$host:$port" command ffmpeg \
     -nostdin -y -hide_banner -loglevel error \
-    -f pulse -i default -ac 1 -ar 16000 -f f32le "$fifo" \
-    2>"$runtime_dir/ffmpeg.log" &
-  bridge_pid=$!
+    -f pulse -i default -ac 1 -ar 16000 -f f32le "$capture_fifo" \
+    2>"$runtime_dir/capture.log" &
+  capture_pid=$!
 
-  print "Bridging tcp:$host:$port into OMP's default ALSA microphone"
+  PULSE_SERVER="tcp:$host:$port" command ffmpeg \
+    -nostdin -hide_banner -loglevel error \
+    -f f32le -ac 1 -ar "$playback_rate" -i "$playback_fifo" \
+    -f pulse default \
+    2>"$runtime_dir/playback.log" &
+  playback_pid=$!
+
+  print "Bridging OMP microphone and speaker audio through tcp:$host:$port"
   {
     command env -u PULSE_SERVER ALSA_CONFIG_PATH="$alsa_config" omp "$@"
   } always {
-    command kill "$bridge_pid" 2>/dev/null
-    command wait "$bridge_pid" 2>/dev/null
-    exec {fifo_keeper}>&-
+    command kill "$capture_pid" "$playback_pid" 2>/dev/null
+    command wait "$capture_pid" "$playback_pid" 2>/dev/null
+    exec {capture_fifo_keeper}>&-
+    exec {playback_fifo_keeper}>&-
     command rm -rf "$runtime_dir"
   }
 }
