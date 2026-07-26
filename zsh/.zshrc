@@ -86,6 +86,26 @@ alias -- -='cd -'
 # OMP remote microphone forwarding and shell helpers.
 [[ -r "$HOME/.zsh/omp-remote.zsh" ]] && source "$HOME/.zsh/omp-remote.zsh"
 
+
+git-lfs-dl() {
+  local input_file relative_path
+  local -a include
+
+  for input_file in "$@"; do
+    relative_path="$(git ls-files --full-name -- "$input_file")" || return
+    [[ -n "$relative_path" ]] || {
+      print -u2 "git-lfs-dl: not a tracked file: $input_file"
+      return 1
+    }
+    include+=("$relative_path")
+  done
+
+  (( ${#include} )) || {
+    print -u2 "Usage: git-lfs-dl file [...]"
+    return 2
+  }
+  git lfs pull --exclude="" --include="${(j:,:)include}"
+}
 # bat theming (ansi theme uses terminal colors, also used by git-delta)
 export BAT_THEME="ansi"
 # Force delta to use the stowed git config when it is called outside Git

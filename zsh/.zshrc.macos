@@ -92,11 +92,6 @@ quickaction() {
   automator -i "$absolute_path" "$HOME/Library/Services/$service_name.workflow"
 }
 
-git-lfs-dl() {
-  for input_file in "$@"; do
-    quickaction "Download from Git LFS" "$input_file"
-  done
-}
 
 export CLIPSSH_HOST=anatoli@orange
 export CLIPSSH_REMOTE_DIR=/data/tmp
