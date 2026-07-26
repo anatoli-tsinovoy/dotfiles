@@ -281,6 +281,12 @@ if [[ -z "$IS_OMP_COMMAND_SHELL" && -o zle ]]; then
     bindkey -M "$keymap" '^[OB' down-line-or-beginning-search
     [[ -n "${terminfo[kcuu1]:-}" ]] && bindkey -M "$keymap" "${terminfo[kcuu1]}" up-line-or-beginning-search
     [[ -n "${terminfo[kcud1]:-}" ]] && bindkey -M "$keymap" "${terminfo[kcud1]}" down-line-or-beginning-search
+    bindkey -M "$keymap" '^[[H' beginning-of-line
+    bindkey -M "$keymap" '^[OH' beginning-of-line
+    bindkey -M "$keymap" '^[[F' end-of-line
+    bindkey -M "$keymap" '^[OF' end-of-line
+    [[ -n "${terminfo[khome]:-}" ]] && bindkey -M "$keymap" "${terminfo[khome]}" beginning-of-line
+    [[ -n "${terminfo[kend]:-}" ]] && bindkey -M "$keymap" "${terminfo[kend]}" end-of-line
   done
   unset keymap
 

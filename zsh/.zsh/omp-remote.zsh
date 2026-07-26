@@ -2,6 +2,77 @@
 # Client-side helpers expose the device microphone over SSH or Eternal Terminal;
 # omp-remote bridges that PulseAudio stream into OMP's default ALSA microphone.
 
+# Match PulseAudio's CoreAudio devices to the devices currently selected by macOS.
+_omp_pulse_use_coreaudio_default() {
+  local device_type="$1"
+  local pulse_type="$2"
+  local coreaudio_device pulse_device previous_device previous_index
+  local stream_type move_command line device_index device_name device_details
+  local stream_index attached_index stream_details
+
+  coreaudio_device="$(SwitchAudioSource -c -t "$device_type")" || return
+  while IFS= read -r line; do
+    if [[ "$line" == $'\tName: '* ]]; then
+      pulse_device="${line#$'\tName: '}"
+    elif [[ "$line" == $'\t\tdevice.string = "'* ]]; then
+      line="${line#$'\t\tdevice.string = \"'}"
+      line="${line%\"}"
+      if [[ "$line" == "$coreaudio_device" ]]; then
+        previous_device="$(pactl "get-default-$pulse_type")" || return
+        [[ "$pulse_device" == "$previous_device" ]] && return 0
+        pactl "set-default-$pulse_type" "$pulse_device" || return
+
+        while IFS=$'\t' read -r device_index device_name device_details; do
+          if [[ "$device_name" == "$previous_device" ]]; then
+            previous_index="$device_index"
+            break
+          fi
+        done < <(pactl list short "${pulse_type}s")
+        [[ -n "$previous_index" ]] || return 0
+
+        if [[ "$pulse_type" == sink ]]; then
+          stream_type="sink-inputs"
+          move_command="move-sink-input"
+        else
+          stream_type="source-outputs"
+          move_command="move-source-output"
+        fi
+        while IFS=$'\t' read -r stream_index attached_index stream_details; do
+          if [[ "$attached_index" == "$previous_index" ]]; then
+            pactl "$move_command" "$stream_index" "$pulse_device" || return
+          fi
+        done < <(pactl list short "$stream_type")
+        return 0
+      fi
+    fi
+  done < <(pactl list "${pulse_type}s")
+
+  print -u2 "PulseAudio has no $pulse_type matching the current macOS $device_type: $coreaudio_device"
+  return 1
+}
+
+_omp_pulse_sync_coreaudio_defaults() {
+  [[ "$OSTYPE" == darwin* ]] || return 0
+  if ! command -v SwitchAudioSource &>/dev/null; then
+    print -u2 'OMP audio forwarding on macOS requires SwitchAudioSource'
+    return 1
+  fi
+
+  _omp_pulse_use_coreaudio_default input source || return
+  _omp_pulse_use_coreaudio_default output sink
+}
+
+_omp_pulse_watch_coreaudio_defaults() {
+  local parent_pid="$1"
+  local interval="${OMP_AUDIO_DEVICE_POLL_INTERVAL:-10}"
+
+  while command kill -0 "$parent_pid" 2>/dev/null; do
+    command sleep "$interval"
+    command kill -0 "$parent_pid" 2>/dev/null || return
+    _omp_pulse_sync_coreaudio_defaults
+  done
+}
+
 # Start a local PulseAudio microphone server for OMP forwarding.
 _omp_mic_prepare() {
   local port="$1"
@@ -16,6 +87,8 @@ _omp_mic_prepare() {
   if ! pulseaudio --check &>/dev/null; then
     pulseaudio --start --exit-idle-time=-1 || return
   fi
+
+  _omp_pulse_sync_coreaudio_defaults || return
 
   if is_termux && ! pactl list short modules | command grep -q $'\tmodule-sles-source\t'; then
     if ! pactl load-module module-sles-source >/dev/null 2>&1; then
@@ -50,10 +123,23 @@ _omp_mic_prepare() {
 # Use SSH only for the audio tunnel and interactive connection.
 omp-ssh() {
   local port="${OMP_MIC_PORT:-47130}"
+  local watcher_pid
+
   _omp_mic_prepare "$port" || return
+  if [[ "$OSTYPE" == darwin* ]]; then
+    _omp_pulse_watch_coreaudio_defaults "$$" &
+    watcher_pid=$!
+  fi
   print "Forwarding the default microphone to remote TCP port $port"
-  command ssh -o ExitOnForwardFailure=yes \
-    -R "127.0.0.1:$port:127.0.0.1:$port" "$@"
+  {
+    command ssh -o ExitOnForwardFailure=yes \
+      -R "127.0.0.1:$port:127.0.0.1:$port" "$@"
+  } always {
+    if [[ -n "$watcher_pid" ]]; then
+      command kill "$watcher_pid" 2>/dev/null
+      command wait "$watcher_pid" 2>/dev/null
+    fi
+  }
 }
 
 # Use Eternal Terminal's reconnectable reverse tunnel for both audio and shell.
@@ -62,13 +148,25 @@ omp-et() {
   local port="${OMP_MIC_PORT:-47130}"
   local remote_bind="${OMP_MIC_REMOTE_BIND:-127.0.0.1}"
   local tunnel="$port:$port"
+  local watcher_pid
 
   _omp_mic_prepare "$port" || return
   if [[ "$remote_bind" != "127.0.0.1" && "$remote_bind" != "localhost" ]]; then
     tunnel="$remote_bind:$port:127.0.0.1:$port"
   fi
+  if [[ "$OSTYPE" == darwin* ]]; then
+    _omp_pulse_watch_coreaudio_defaults "$$" &
+    watcher_pid=$!
+  fi
   print "Forwarding the default microphone to $remote_bind:$port"
-  command et --reversetunnel "$tunnel" "$@"
+  {
+    command et --reversetunnel "$tunnel" "$@"
+  } always {
+    if [[ -n "$watcher_pid" ]]; then
+      command kill "$watcher_pid" 2>/dev/null
+      command wait "$watcher_pid" 2>/dev/null
+    fi
+  }
 }
 
 # The default Docker bridge used by the remote workstation.
