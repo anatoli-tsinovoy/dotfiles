@@ -18,6 +18,21 @@ fi
 # Force Kitty graphics for Oh My Pi; the timg wrapper below does the same.
 export PI_FORCE_IMAGE_PROTOCOL=kitty
 
+# Use the host-side PulseAudio tunnel, via loopback or the container gateway.
+if [[ -z "${PULSE_SERVER:-}" ]]; then
+  _pulse_server_host=127.0.0.1
+  if is_inside_container && command -v ip &>/dev/null; then
+    while read -r _route _via _gateway _rest; do
+      if [[ "$_route" == default && "$_via" == via && -n "$_gateway" ]]; then
+        _pulse_server_host="$_gateway"
+      fi
+      break
+    done < <(command ip route show default)
+  fi
+  export PULSE_SERVER="tcp:$_pulse_server_host:${PULSE_FORWARD_PORT:-47130}"
+  unset _pulse_server_host _route _via _gateway _rest
+fi
+
 # timg wrapper: default to Kitty protocol; explicit -p* overrides it
 timg() {
   local has_protocol=false

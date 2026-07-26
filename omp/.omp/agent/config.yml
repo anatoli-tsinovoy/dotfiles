@@ -48,7 +48,7 @@ marketplace:
 stt:
   enabled: true
 speech:
-  enabled: true
+  enabled: false
 statusLine:
   sessionAccent: true
   transparent: true

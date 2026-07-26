@@ -83,8 +83,8 @@ alias ls="eza -la --icons --group-directories-first"
 alias ..='cd ..'
 alias -- -='cd -'
 
-# OMP remote microphone forwarding and shell helpers.
-[[ -r "$HOME/.zsh/omp-remote.zsh" ]] && source "$HOME/.zsh/omp-remote.zsh"
+# PulseAudio forwarding helpers.
+[[ -r "$HOME/.zsh/pulse-forward.zsh" ]] && source "$HOME/.zsh/pulse-forward.zsh"
 
 
 git-lfs-dl() {
