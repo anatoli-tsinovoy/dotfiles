@@ -65,11 +65,21 @@ _omp_pulse_sync_coreaudio_defaults() {
 _omp_pulse_watch_coreaudio_defaults() {
   local parent_pid="$1"
   local interval="${OMP_AUDIO_DEVICE_POLL_INTERVAL:-10}"
+  local previous_input previous_output current_input current_output
 
+  previous_input="$(SwitchAudioSource -c -t input)" || return
+  previous_output="$(SwitchAudioSource -c -t output)" || return
   while command kill -0 "$parent_pid" 2>/dev/null; do
     command sleep "$interval"
     command kill -0 "$parent_pid" 2>/dev/null || return
-    _omp_pulse_sync_coreaudio_defaults
+    current_input="$(SwitchAudioSource -c -t input)" || continue
+    current_output="$(SwitchAudioSource -c -t output)" || continue
+    if [[ "$current_input" != "$previous_input" || "$current_output" != "$previous_output" ]]; then
+      if _omp_pulse_sync_coreaudio_defaults; then
+        previous_input="$current_input"
+        previous_output="$current_output"
+      fi
+    fi
   done
 }
 

@@ -12,6 +12,7 @@ bell-features = system,no-attention,no-title
 desktop-notifications = true
 keybind = alt+left=csi:1;5D
 keybind = alt+right=csi:1;5C
+keybind = shift+minus=text:_
 keybind = cmd+left=text:\x01
 keybind = cmd+right=text:\x05
 macos-titlebar-style = hidden
