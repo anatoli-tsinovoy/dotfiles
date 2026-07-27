@@ -101,7 +101,7 @@ style = 'bold fg:cyan'
 
 [python]
 style = 'bold fg:blue'
-symbol = ' '
+symbol = ' '
 # Resolve the interpreter the way `uv run` would (project .venv / .python-version)
 # instead of reporting whatever `python3` happens to be on PATH. The helper never
 # executes an interpreter; the plain binaries stay as a fallback if it is missing.
