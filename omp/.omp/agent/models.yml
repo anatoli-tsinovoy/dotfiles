@@ -1,6 +1,8 @@
 providers:
   openai:
     apiKey: "!cat $HOME/.omp/agent/keys/openai"
+  amazon-bedrock:
+    apiKey: "!cat $HOME/.omp/agent/keys/bedrock"
 
   mlx-lm:
     baseUrl: http://localhost:8080/v1
