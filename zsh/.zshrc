@@ -269,6 +269,8 @@ if [[ -z "$IS_OMP_COMMAND_SHELL" && -o zle ]]; then
   bindkey -M vicmd '^R' vi-redo
   bindkey -M viins '^[f' forward-word
   bindkey -M viins '^[b' backward-word
+  bindkey -M viins '^[[1;5D' backward-word
+  bindkey -M viins '^[[1;5C' forward-word
   autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
   zle -N up-line-or-beginning-search
   zle -N down-line-or-beginning-search
