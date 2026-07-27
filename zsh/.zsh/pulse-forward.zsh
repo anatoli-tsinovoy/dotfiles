@@ -84,6 +84,11 @@ _pa_watch_coreaudio_defaults() {
 # Start a local PulseAudio server for forwarding.
 _pa_prepare() {
   local port="$1"
+  # PULSE_SERVER may point at this TCP tunnel before the local server is ready.
+  # Always prepare PulseAudio through its native local connection.
+  local PULSE_SERVER
+  unset PULSE_SERVER
+
   local source_index source_name source_driver source_details
   local default_source
 
