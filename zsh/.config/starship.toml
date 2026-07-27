@@ -101,7 +101,13 @@ style = 'bold fg:cyan'
 
 [python]
 style = 'bold fg:blue'
-symbol = ' '
+symbol = ' '
+# Resolve the interpreter the way `uv run` would (project .venv / .python-version)
+# instead of reporting whatever `python3` happens to be on PATH. The helper never
+# executes an interpreter; the plain binaries stay as a fallback if it is missing.
+python_binary = [['starship-python-version'], ['python3'], ['python']]
+# Show the project directory instead of a meaningless `(.venv)` when activated.
+generic_venv_names = ['.venv', 'venv', 'env', '.env']
 
 [conda]
 style = 'bold fg:blue'

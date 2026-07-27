@@ -271,6 +271,29 @@ stow_force_cleanup() {
   done <<<"$output"
 }
 
+# Stow "folds" a directory into a single symlink when the target does not exist
+# yet (e.g. ~/.local => dotfiles/shims/linux/.local on a fresh machine). Once
+# folded, stowing a second package that owns the same directory from a different
+# -d fails outright, and any tool installing into ~/.local writes into the repo.
+# Undo the fold so the directory is real before stowing; every package that owns
+# it is re-stowed later in this run.
+ensure_real_dir() {
+  local dir="$1" target repo
+  repo="$(cd -- "$SCRIPT_DIR" && pwd -P)"
+
+  if [[ -L "$dir" ]]; then
+    target="$(cd -- "$dir" 2>/dev/null && pwd -P)"
+    if [[ -n "$target" && "$target" == "$repo"/* ]]; then
+      log_warn "Unfolding stow symlink: $dir -> $target"
+      rm -f "$dir"
+    else
+      log_warn "$dir is a symlink to ${target:-<broken>} (not this repo); stow may report a conflict — rerun with --force to replace it"
+    fi
+  fi
+
+  mkdir -p "$dir"
+}
+
 run_stow() {
   local stow_args=()
   if [[ $STOW_ADOPT -eq 1 ]]; then
@@ -386,8 +409,11 @@ main() {
 
   setup_omp_plugins
 
-  # Stow unified zsh package
+  # zsh/.local/bin holds prompt helpers, so ~/.local{,/bin} must be real
+  # directories (not stow folds) before the zsh package is stowed.
   log_info "Stowing zsh configuration..."
+  ensure_real_dir "$HOME/.local"
+  ensure_real_dir "$HOME/.local/bin"
   run_stow -t ~ zsh
 
   if [[ "$os" == "mac" ]]; then
