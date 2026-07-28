@@ -18,3 +18,4 @@ keybind = cmd+right=text:\x05
 macos-titlebar-style = hidden
 clipboard-paste-protection = false
 clipboard-read = allow
+link-url = true
