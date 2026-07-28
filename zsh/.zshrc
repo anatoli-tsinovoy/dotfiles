@@ -27,9 +27,15 @@ fi
 
 # === History ===
 HISTFILE="$HOME/.zsh_history"
-HISTSIZE=50000
-SAVEHIST=10000
+# SAVEHIST must be >= HISTSIZE, otherwise the on-disk file is trimmed to
+# SAVEHIST on every write and the in-memory HISTSIZE is never reachable.
+HISTSIZE=200000
+SAVEHIST=200000
 setopt extended_history hist_expire_dups_first hist_ignore_dups hist_ignore_space hist_verify share_history
+setopt hist_fcntl_lock hist_reduce_blanks
+# `history` is `fc -l`, which defaults to the last 16 entries only.
+# oh-my-zsh used to alias this; keep it after dropping omz.
+alias history='fc -il 1'
 
 # Termux-specific config (must be before compinit for completions)
 is_termux() {
