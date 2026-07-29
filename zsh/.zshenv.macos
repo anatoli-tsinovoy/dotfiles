@@ -1,2 +1,1 @@
-export PATH="/usr/local/et-bin:/usr/local/bin:/opt/homebrew/bin:$PATH"
-
+source ~/.zsh/path-macos.zsh

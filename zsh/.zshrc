@@ -53,7 +53,10 @@ ZSH_SITE_FUNCTIONS="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions"
 [[ "$OSTYPE" == darwin* && -d /opt/homebrew/share/zsh/site-functions ]] && fpath=(/opt/homebrew/share/zsh/site-functions "${fpath[@]}")
 
 autoload -Uz compinit
-typeset _zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+# `compinit -C` below skips compinit's own version check, so a dump written by a
+# different zsh (Apple's /bin/zsh vs Homebrew's) would be sourced as-is, with
+# completion paths from the other installation. Key the cache by version.
+typeset _zcompdump="${ZDOTDIR:-$HOME}/.zcompdump-$ZSH_VERSION"
 typeset -a _zcompdump_old
 _zcompdump_old=("$_zcompdump"(N.mh+24))
 if [[ ! -s "$_zcompdump" ]] || (( ${#_zcompdump_old} )); then
@@ -336,3 +339,4 @@ if [[ -z "$IS_OMP_COMMAND_SHELL" && -f "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/
   source "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
+source /Users/anatoli/.safe-chain/scripts/init-posix.sh # Safe-chain Zsh initialization script

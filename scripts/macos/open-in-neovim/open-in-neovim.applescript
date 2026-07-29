@@ -11,7 +11,7 @@ end open
 
 on openInGhosttyAndVim(p)
 	set d to do shell script "dirname " & quoted form of p
-	set cmd to "/bin/zsh -lc " & quoted form of ("cd -- " & quoted form of d & " && exec nvim -- " & quoted form of p)
+	set cmd to "/usr/bin/env zsh -lc " & quoted form of ("cd -- " & quoted form of d & " && exec nvim -- " & quoted form of p)
 	
 	tell application "Ghostty"
 		activate

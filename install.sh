@@ -246,6 +246,35 @@ install_termux_font() {
   log_ok "Hack Nerd Font installed"
 }
 
+# Apple ships zsh 5.9 and bash 3.2 and will not update them. The PATH ordering in
+# zsh/.zsh/path-macos.zsh puts Homebrew ahead of /usr/bin for anything launched
+# from a shell; the login shell itself is stored per-user and needs chsh.
+set_macos_default_shell() {
+  local shell="/opt/homebrew/bin/zsh"
+  local current
+
+  if [[ ! -x "$shell" ]]; then
+    log_warn "$shell not found; keeping the current login shell"
+    return 0
+  fi
+
+  # Only shells listed in /etc/shells are accepted by chsh for non-root users.
+  if ! grep -qxF "$shell" /etc/shells; then
+    log_info "Registering $shell in /etc/shells..."
+    printf '%s\n' "$shell" | run_privileged tee -a /etc/shells >/dev/null
+  fi
+
+  current="$(dscl . -read "/Users/$USER" UserShell 2>/dev/null | awk '{print $2}')"
+  if [[ "$current" == "$shell" ]]; then
+    log_ok "Login shell already $shell"
+    return 0
+  fi
+
+  log_info "Setting login shell to $shell (was ${current:-unknown})..."
+  run_privileged chsh -s "$shell" "$USER"
+  log_ok "Login shell set to $shell (open a new terminal to apply)"
+}
+
 stow_force_cleanup() {
   local args=("$@")
   local target="$HOME"
@@ -394,7 +423,7 @@ main() {
 
   # Remove files that would conflict with stow, including the legacy p10k symlink
   log_info "Removing conflicting files before stow..."
-  rm -f ~/.zshenv ~/.zshenv.macos ~/.zshenv.linux
+  rm -f ~/.zshenv ~/.zshenv.macos ~/.zshenv.linux ~/.zprofile
   rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.zshrc.termux ~/.p10k.zsh
   rm -f ~/.gitconfig ~/.vimrc
   rm -rf ~/.config/nvim ~/.config/opencode ~/.config/btop
@@ -437,6 +466,8 @@ main() {
     # Stow macOS shims (podman -> docker)
     log_info "Stowing macOS shims..."
     run_stow -t ~ -d shims macos
+
+    set_macos_default_shell
 
   elif [[ "$os" == "linux" ]]; then
     # Linux-specific setup

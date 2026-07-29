@@ -89,6 +89,26 @@ The `.zshrc` is **order-sensitive**. Sections must execute in sequence:
 
 **Termux detection:** `is_termux()` checks `$TERMUX_VERSION` or `$PREFIX` containing `com.termux`.
 
+**Startup order (macOS):** `~/.zshenv` → `/etc/zprofile` → `~/.zprofile` → `~/.zshrc`.
+`/etc/zprofile` runs `path_helper`, which rebuilds PATH with `/etc/paths` first and
+drops Homebrew behind `/usr/bin`, so `~/.zprofile` re-sources
+`~/.zsh/path-macos.zsh` afterwards. That ordering is what makes
+`#!/usr/bin/env bash` resolve to brew's bash 5 instead of Apple's 3.2 — `emojify`
+(the git pager) refuses to run under 3.2 and sketchybar scripts use `mapfile`. The
+module is idempotent: `typeset -U path PATH` makes the re-source a reorder.
+
+**Login shell (macOS):** `/opt/homebrew/bin/zsh`, registered in `/etc/shells` and
+applied by `set_macos_default_shell` in `install.sh` (needs sudo). `~/.zcompdump` is
+keyed by `$ZSH_VERSION` because `compinit -C` skips its own version check and would
+otherwise load a dump written by the other zsh.
+
+**GUI launchers** (`aerospace.toml`, `open-in-neovim.applescript`) use
+`/usr/bin/env zsh|bash`, never a Homebrew path. They can: AeroSpace substitutes its
+own PATH for `exec-and-forget` (`aerospace list-exec-env-vars` — Homebrew first,
+unlike the AeroSpace process env), and Ghostty, which executes the `-e` command and
+surface commands, inherits that same PATH. Only launchd-spawned processes
+(Automator, `do shell script`) get the bare `/usr/bin:/bin:/usr/sbin:/sbin`.
+
 ## Stow Package Layout
 
 Packages mirror home directory structure:
