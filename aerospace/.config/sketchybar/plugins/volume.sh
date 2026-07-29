@@ -30,6 +30,7 @@ auto_hide_detail() {
 
 volume_change() {
   source "$CONFIG_DIR/icons.sh"
+  source "$CONFIG_DIR/plugins/volume_common.sh"
 
   case $INFO in
   [6-9][0-9] | 100)
@@ -51,22 +52,18 @@ volume_change() {
   esac
 
   # TODO: Store this as some property that's periodically updated instead of making an expensive call on every volume change
-  CURRENT_OUTPUT_UID="$(SwitchAudioSource -ct output -f json | jq -r ".uid")"
-  case "$CURRENT_OUTPUT_UID" in
-  "BuiltInSpeakerDevice")
-    OUTPUT_ICON=$SPEAKERS
-    ;;
-  "BlackHole2ch_UID")
-    OUTPUT_ICON=$BLACK_HOLE
-    ;;
-  *)
-    OUTPUT_ICON=$HEADPHONES
-    ;;
-  esac
+  OUTPUT_ICON="$(audio_output_icon "$(current_output_uid)")"
 
   sketchybar --set volume_source label="$OUTPUT_ICON" \
     --set volume_icon label="$ICON" \
     --set "$NAME" slider.percentage=$INFO
+
+  # Keep the bar geometry still while the output-device popup is open, otherwise
+  # revealing the slider drags the popup sideways.
+  if slider_suppressed; then
+    collapse_slider_now
+    return 0
+  fi
 
   INITIAL_WIDTH="$(sketchybar --query "$NAME" | jq -r ".slider.width")"
   if [ "$INITIAL_WIDTH" -eq "0" ]; then

@@ -14,7 +14,7 @@ volume_slider=(
 )
 
 volume_source=(
-  click_script="$PLUGIN_DIR/volume_source_click.sh"
+  click_script="$PLUGIN_DIR/volume_source.sh toggle"
   icon.color=$GREY
   icon.font="$FONT:Regular:14.0"
   label.width=24

@@ -203,6 +203,15 @@ persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 
       'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh'
     ]
     alt-shift-s = 'exec-and-forget screencapture -i -c'
+
+    # Walk the audio output device (same list as the sketchybar volume_source
+    # popup, which pops open to show the highlighted device). Press repeatedly to
+    # reach a device several entries away: the highlight moves per press and the
+    # switch is applied once, shortly after the last press.
+    # AeroSpace has no 'fn' modifier, so these are alt+pageUp/pageDown --
+    # fn+alt+up / fn+alt+down on the built-in keyboard.
+    alt-pageUp = 'exec-and-forget ~/.config/sketchybar/plugins/volume_source.sh prev'
+    alt-pageDown = 'exec-and-forget ~/.config/sketchybar/plugins/volume_source.sh next'
  
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
     alt-shift-semicolon = 'mode service'
