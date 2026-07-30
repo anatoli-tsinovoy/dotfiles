@@ -19,7 +19,7 @@ compaction:
   strategy: context-full
   thresholdPercent: 70
   handoffSaveToDisk: true
-  thresholdTokens: 200000
+  thresholdTokens: 229000
   remoteEnabled: true
 lsp: 
   formatOnWrite: true

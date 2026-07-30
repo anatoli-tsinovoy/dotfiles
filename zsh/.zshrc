@@ -339,4 +339,3 @@ if [[ -z "$IS_OMP_COMMAND_SHELL" && -f "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/
   source "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
-source /Users/anatoli/.safe-chain/scripts/init-posix.sh # Safe-chain Zsh initialization script
