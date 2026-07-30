@@ -419,14 +419,13 @@ main() {
 
   # Install standalone zsh plugins
   setup_zsh_plugins
-  setup_zsh_completions
 
   # Remove files that would conflict with stow, including the legacy p10k symlink
   log_info "Removing conflicting files before stow..."
   rm -f ~/.zshenv ~/.zshenv.macos ~/.zshenv.linux ~/.zprofile
   rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.zshrc.termux ~/.p10k.zsh
   rm -f ~/.gitconfig ~/.vimrc
-  rm -rf ~/.config/nvim ~/.config/opencode ~/.config/btop
+  rm -rf ~/.config/nvim ~/.config/opencode ~/.config/glow ~/.config/btop
   mkdir -p ~/.config/btop
   printf '%s\n' 'color_theme = "TTY"' 'theme_background = False' >~/.config/btop/btop.conf
   rm -f ~/.omp/agent/config.yml
@@ -435,6 +434,7 @@ main() {
 
   log_info "Stowing common dotfiles..."
   run_stow -t ~ nvim git opencode omp glow tmux
+  setup_zsh_completions
 
   setup_omp_plugins
 
