@@ -51,6 +51,7 @@ stt:
   enabled: true
 speech: 
   enabled: false
+  enhanced: true
 statusLine: 
   sessionAccent: true
   transparent: true
