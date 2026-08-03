@@ -138,12 +138,25 @@ _pa_parse_remote_bind() {
   shift
   reply=("$@")
 
-  if (( ${#reply} >= 1 )) && [[ "$reply[-1]" == --container ]]; then
-    REPLY=172.18.0.1
-    reply[-1]=()
-  elif (( ${#reply} >= 2 )) && [[ "$reply[-2]" == --container ]]; then
+  if (( ${#reply} >= 3 )) && [[ "$reply[-2]" == --container ]]; then
     REPLY="$reply[-1]"
     reply[-2,-1]=()
+  elif (( ${#reply} >= 1 )) && [[ "$reply[-1]" == --container ]]; then
+    REPLY=172.18.0.1
+    reply[-1]=()
+  else
+    local index
+    for (( index = 1; index <= ${#reply}; index++ )); do
+      if [[ "$reply[$index]" == --container ]]; then
+        REPLY=172.18.0.1
+        reply[$index]=()
+        break
+      elif [[ "$reply[$index]" == --container=* ]]; then
+        REPLY="${reply[$index]#--container=}"
+        reply[$index]=()
+        break
+      fi
+    done
   fi
 }
 
