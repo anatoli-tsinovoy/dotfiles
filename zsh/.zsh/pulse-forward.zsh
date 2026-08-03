@@ -91,13 +91,14 @@ _pa_watch_coreaudio_defaults() {
   done
 }
 
-# Start a local PulseAudio server for forwarding.
+# Prepare a PulseAudio server for forwarding.
 _pa_prepare() {
   local port="$1"
   # PULSE_SERVER may point at this TCP tunnel before the local server is ready.
-  # Always prepare PulseAudio through its native local connection.
+  # Reuse an existing PulseAudio listener left by an earlier invocation; otherwise,
+  # prepare PulseAudio through its native local connection.
   local PULSE_SERVER
-  unset PULSE_SERVER
+  local tcp_server="tcp:127.0.0.1:$port"
 
   local source_index source_name source_driver source_details
   local default_source
@@ -107,8 +108,14 @@ _pa_prepare() {
     return 1
   fi
 
-  if ! pulseaudio --check &>/dev/null; then
-    pulseaudio --start --exit-idle-time=-1 || return
+  if PULSE_SERVER="$tcp_server" pactl info &>/dev/null; then
+    PULSE_SERVER="$tcp_server"
+    export PULSE_SERVER
+  else
+    unset PULSE_SERVER
+    if ! pulseaudio --check &>/dev/null; then
+      pulseaudio --start --exit-idle-time=-1 || return
+    fi
   fi
 
   _pa_sync_coreaudio_defaults || return
@@ -131,9 +138,14 @@ _pa_prepare() {
     done < <(pactl list short sources)
   fi
 
-  if ! pactl list short modules | command grep -q $'\tmodule-native-protocol-tcp\t.*port='"$port"; then
-    pactl load-module module-native-protocol-tcp \
-      "listen=127.0.0.1" "port=$port" "auth-anonymous=1" >/dev/null || return
+  if [[ "$PULSE_SERVER" != "$tcp_server" ]] &&
+    ! pactl list short modules | command grep -q $'\tmodule-native-protocol-tcp\t.*port='"$port"; then
+    if ! pactl load-module module-native-protocol-tcp \
+      "listen=127.0.0.1" "port=$port" "auth-anonymous=1" >/dev/null 2>&1; then
+      print -u2 "Unable to expose PulseAudio on 127.0.0.1:$port."
+      print -u2 'Check whether another process is already using that port.'
+      return 1
+    fi
   fi
 
   default_source="$(pactl get-default-source)" || return
