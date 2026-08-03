@@ -4,7 +4,8 @@
 _pa_use_coreaudio_default() {
   local device_type="$1"
   local pulse_type="$2"
-  local coreaudio_device pulse_device previous_device previous_index
+  local coreaudio_device pulse_device pulse_coreaudio_device pulse_device_class
+  local previous_device previous_index
   local stream_type move_command line device_index device_name device_details
   local stream_index attached_index stream_details
 
@@ -12,41 +13,50 @@ _pa_use_coreaudio_default() {
   while IFS= read -r line; do
     if [[ "$line" == $'\tName: '* ]]; then
       pulse_device="${line#$'\tName: '}"
+      pulse_coreaudio_device=
+      pulse_device_class=
     elif [[ "$line" == $'\t\tdevice.string = "'* ]]; then
-      line="${line#$'\t\tdevice.string = \"'}"
-      line="${line%\"}"
-      if [[ "$line" == "$coreaudio_device" ]]; then
-        previous_device="$(pactl "get-default-$pulse_type")" || return
-        [[ "$pulse_device" == "$previous_device" ]] && return 0
-        pactl "set-default-$pulse_type" "$pulse_device" || return
+      pulse_coreaudio_device="${line#$'\t\tdevice.string = \"'}"
+      pulse_coreaudio_device="${pulse_coreaudio_device%\"}"
+    elif [[ "$line" == $'\t\tdevice.class = "'* ]]; then
+      pulse_device_class="${line#$'\t\tdevice.class = \"'}"
+      pulse_device_class="${pulse_device_class%\"}"
+    fi
 
-        while IFS=$'\t' read -r device_index device_name device_details; do
-          if [[ "$device_name" == "$previous_device" ]]; then
-            previous_index="$device_index"
-            break
-          fi
-        done < <(pactl list short "${pulse_type}s")
-        [[ -n "$previous_index" ]] || return 0
-
-        if [[ "$pulse_type" == sink ]]; then
-          stream_type="sink-inputs"
-          move_command="move-sink-input"
-        else
-          stream_type="source-outputs"
-          move_command="move-source-output"
-        fi
-        while IFS=$'\t' read -r stream_index attached_index stream_details; do
-          if [[ "$attached_index" == "$previous_index" ]]; then
-            pactl "$move_command" "$stream_index" "$pulse_device" || return
-          fi
-        done < <(pactl list short "$stream_type")
-        return 0
-      fi
+    if [[ "$pulse_coreaudio_device" == "$coreaudio_device" && "$pulse_device_class" == sound ]]; then
+      break
     fi
   done < <(pactl list "${pulse_type}s")
 
-  print -u2 "PulseAudio has no $pulse_type matching the current macOS $device_type: $coreaudio_device"
-  return 1
+  if [[ "$pulse_coreaudio_device" != "$coreaudio_device" || "$pulse_device_class" != sound ]]; then
+    print -u2 "PulseAudio has no $pulse_type matching the current macOS $device_type: $coreaudio_device"
+    return 1
+  fi
+
+  previous_device="$(pactl "get-default-$pulse_type")" || return
+  [[ "$pulse_device" == "$previous_device" ]] && return 0
+  pactl "set-default-$pulse_type" "$pulse_device" || return
+
+  while IFS=$'\t' read -r device_index device_name device_details; do
+    if [[ "$device_name" == "$previous_device" ]]; then
+      previous_index="$device_index"
+      break
+    fi
+  done < <(pactl list short "${pulse_type}s")
+  [[ -n "$previous_index" ]] || return 0
+
+  if [[ "$pulse_type" == sink ]]; then
+    stream_type="sink-inputs"
+    move_command="move-sink-input"
+  else
+    stream_type="source-outputs"
+    move_command="move-source-output"
+  fi
+  while IFS=$'\t' read -r stream_index attached_index stream_details; do
+    if [[ "$attached_index" == "$previous_index" ]]; then
+      pactl "$move_command" "$stream_index" "$pulse_device" || return
+    fi
+  done < <(pactl list short "$stream_type")
 }
 
 _pa_sync_coreaudio_defaults() {
