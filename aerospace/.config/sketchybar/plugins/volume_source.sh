@@ -126,7 +126,11 @@ render() {
 
   list_key="$(printf '%s\n' "${DEVICE_NAMES[@]}")"
   cached="$(cat "$DEVICES_CACHE" 2>/dev/null || true)"
-  if [ "$list_key" = "$cached" ]; then rebuild=0; else rebuild=1; fi
+  if [ "$list_key" = "$cached" ] && sketchybar --query volume.device.0 >/dev/null 2>&1; then
+    rebuild=0
+  else
+    rebuild=1
+  fi
 
   args=(--set "$ITEM" popup.drawing="$drawing" label="$(audio_output_icon "$(uid_for "$highlight")")")
   if [ "$rebuild" -eq 1 ]; then
