@@ -2,3 +2,5 @@ app.suspend: Ctrl+Z
 app.thinking.cycle: Ctrl+T
 app.thinking.toggle: []
 app.stt.toggle: Ctrl+Alt+S
+app.live.toggle: []
+app.display.reset: Ctrl+L
