@@ -259,10 +259,37 @@ fi
 
 # === AWS SSO Login with Profile ===
 awslogin() {
-  local -a login_args=(--profile "$1")
+  local persist=0
+  local profile
+
+  if (( $# == 2 )) && [[ "$1" == "-p" || "$1" == "--persist" ]]; then
+    persist=1
+    profile="$2"
+  elif (( $# == 1 )); then
+    profile="$1"
+  else
+    echo "Usage: awslogin [-p|--persist] <profile>" >&2
+    return 2
+  fi
+
+  local credentials
+  local -a login_args=(--profile "$profile")
   [[ "$OSTYPE" == linux* ]] && ! is_termux && login_args+=(--no-browser)
-  aws sso login "${login_args[@]}"
-  export AWS_PROFILE="$1"
+
+  aws sso login "${login_args[@]}" || return
+
+  if (( persist )); then
+    unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
+    export AWS_PROFILE="$profile"
+    return
+  fi
+
+  credentials="$(aws configure export-credentials --profile "$profile" --format env)" || return
+
+  # Logout clears the shared SSO cache; the exported session remains valid only in this shell.
+  aws sso logout || return
+  eval "$credentials"
+  export AWS_PROFILE="$profile"
 }
 
 # === Vi-mode keybindings ===
