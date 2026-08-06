@@ -294,6 +294,14 @@ awslogin() {
 
 # === Vi-mode keybindings ===
 if [[ -z "$IS_OMP_COMMAND_SHELL" && -o zle ]]; then
+  # A suspended TUI can leave the terminal's Kitty keyboard protocol enabled.
+  # Reset its flags before ZLE reads shifted keys as CSI-u escape sequences.
+  autoload -Uz add-zsh-hook
+  reset-terminal-keyboard-protocol() {
+    printf '\e[=0u'
+  }
+  add-zsh-hook precmd reset-terminal-keyboard-protocol
+
   bindkey -v
   bindkey -v '^?' backward-delete-char
   bindkey '^K' kill-line
