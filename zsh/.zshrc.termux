@@ -5,6 +5,3 @@
 if [[ -d "$PREFIX/share/zsh-completions" ]]; then
   fpath=("$PREFIX/share/zsh-completions" $fpath)
 fi
-
-# Termux theme toggle alias
-alias termux-theme='termux-theme-toggle'
