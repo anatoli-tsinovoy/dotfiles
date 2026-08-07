@@ -94,6 +94,8 @@ alias -- -='cd -'
 
 # PulseAudio forwarding helpers.
 [[ -r "$HOME/.zsh/pulse-forward.zsh" ]] && source "$HOME/.zsh/pulse-forward.zsh"
+# Termux palette switching, including remote shells reached through ET and tmux.
+[[ -r "$HOME/.zsh/termux-theme.zsh" ]] && source "$HOME/.zsh/termux-theme.zsh"
 
 
 git-lfs-dl() {
