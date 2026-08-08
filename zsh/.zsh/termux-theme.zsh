@@ -1,50 +1,138 @@
+_TERMUX_THEME_DIR="${${(%):-%N}:A:h}/termux-themes"
+
 _termux_theme_usage() {
-  print -u2 'Usage: termux-theme light|dark'
+  print -u2 'Usage: termux-theme [light|dark]'
   return 2
 }
 
+_termux_theme_file() {
+  print -r -- "$_TERMUX_THEME_DIR/$1.properties"
+}
+
 _termux_theme_emit_osc() {
-  local payload="$1"
-  if [[ -n ${TMUX:-} ]]; then
-    printf '\033Ptmux;\033\033]%s\033\033\\\033\\' "$payload"
+  printf '\033]%s\033\\' "$1"
+}
+
+_termux_theme_detect() {
+  local tty_fd saved_tty response
+  local red green blue
+  local read_status=1
+
+  exec {tty_fd}<>/dev/tty || return 1
+  saved_tty="$(stty -g <&$tty_fd)" || {
+    exec {tty_fd}>&-
+    return 1
+  }
+
+  {
+    stty raw -echo <&$tty_fd || return 1
+    printf '\033]11;?\a' >&$tty_fd
+    IFS= read -r -t 1 -d $'\a' response <&$tty_fd
+    read_status=$?
+  } always {
+    stty "$saved_tty" <&$tty_fd
+    exec {tty_fd}>&-
+  }
+
+  (( read_status == 0 )) || return 1
+  [[ "$response" =~ $'\033]11;rgb:([[:xdigit:]]{4})/([[:xdigit:]]{4})/([[:xdigit:]]{4})$' ]] || return 1
+
+  red=$(( 16#${match[1]} ))
+  green=$(( 16#${match[2]} ))
+  blue=$(( 16#${match[3]} ))
+  if (( 299 * red + 587 * green + 114 * blue >= 32768000 )); then
+    print light
   else
-    printf '\033]%s\033\\' "$payload"
+    print dark
   fi
 }
 
-function termux-theme {
-  if [[ -n ${TERMUX_VERSION:-} || ${PREFIX:-} == *com.termux* ]]; then
-    command termux-theme-toggle "$@"
-    return
-  fi
+_termux_theme_detect_or_explain() {
+  local theme
+  theme="$(_termux_theme_detect)" || {
+    print -u2 'Could not query the active terminal background; use termux-theme light|dark.'
+    return 1
+  }
+  print -r -- "$theme"
+}
 
-  (( $# == 1 )) || {
-    _termux_theme_usage
-    return
+_termux_theme_emit() {
+  local theme_file="$1"
+  local key value index palette_payload='4'
+  local -A colors
+
+  [[ -r "$theme_file" ]] || {
+    print -u2 "Theme file not found: $theme_file"
+    return 1
   }
 
-  local foreground background cursor
-  local -a palette
-  case "$1" in
-    dark)
-      foreground='#F3F0DF'
-      background='#110034'
-      cursor='#8217FF'
-      palette=(
-        '#110034' '#FF4F44' '#00C8AB' '#FFD44F' '#8217FF' '#FFC9D7' '#00E6BB' '#F3F0DF'
-        '#330D81' '#FF6767' '#00E6BB' '#FFE680' '#9A67FF' '#FFC9D7' '#00E6CC' '#F3F0DF'
-        '#FF6767' '#FFC9D7' '#9A67FF' '#00E6BB' '#00E6CC' '#FFE680'
-      )
+  while IFS='=' read -r key value; do
+    case "$key" in
+      foreground|background|cursor|color*) colors[$key]="$value" ;;
+    esac
+  done <"$theme_file"
+
+  for key in foreground background cursor; do
+    [[ -n ${colors[$key]:-} ]] || {
+      print -u2 "Missing $key in $theme_file"
+      return 1
+    }
+  done
+
+  for (( index = 0; index <= 21; index++ )); do
+    key="color$index"
+    value="${colors[$key]:-}"
+    [[ -n "$value" ]] || {
+      print -u2 "Missing $key in $theme_file"
+      return 1
+    }
+    palette_payload+=";$index;$value"
+  done
+
+  _termux_theme_emit_osc "$palette_payload"
+  _termux_theme_emit_osc "10;${colors[foreground]}"
+  _termux_theme_emit_osc "11;${colors[background]}"
+  _termux_theme_emit_osc "12;${colors[cursor]}"
+}
+
+_termux_theme_set_local() {
+  local theme="$1"
+  local theme_file="$(_termux_theme_file "$theme")"
+  local termux_dir="$HOME/.termux"
+
+  [[ -d "$termux_dir" ]] || {
+    print -u2 "Termux directory not found: $termux_dir"
+    return 1
+  }
+  [[ -r "$theme_file" ]] || {
+    print -u2 "Theme file not found: $theme_file"
+    return 1
+  }
+
+  cp "$theme_file" "$termux_dir/colors.properties"
+  print -r -- "$theme" >"$termux_dir/.current-theme"
+  command -v termux-reload-settings &>/dev/null && command termux-reload-settings
+  print "Theme set to: $theme"
+}
+
+function termux-theme {
+  local requested_theme
+  local is_termux=false
+  [[ -n ${TERMUX_VERSION:-} || ${PREFIX:-} == *com.termux* ]] && is_termux=true
+
+  case "$#" in
+    0)
+      case "$(_termux_theme_detect_or_explain)" in
+        light) requested_theme=dark ;;
+        dark) requested_theme=light ;;
+        *) return 1 ;;
+      esac
       ;;
-    light)
-      foreground='#110034'
-      background='#E5E1CC'
-      cursor='#8217FF'
-      palette=(
-        '#110034' '#CC3E34' '#009A81' '#CD9A1B' '#330D81' '#E69AB3' '#00B39A' '#5F5873'
-        '#330D81' '#CC3E34' '#00B39A' '#E6B334' '#6734CD' '#E69AB3' '#009A81' '#5F5873'
-        '#CC3E34' '#E69AB3' '#6734CD' '#00B39A' '#009A81' '#E6B334'
-      )
+    1)
+      case "$1" in
+        light|dark) requested_theme="$1" ;;
+        *) _termux_theme_usage; return ;;
+      esac
       ;;
     *)
       _termux_theme_usage
@@ -52,11 +140,9 @@ function termux-theme {
       ;;
   esac
 
-  local index palette_payload='4'
-  for (( index = 1; index <= ${#palette}; index++ )); do
-    palette_payload+=";$(( index - 1 ));${palette[$index]}"
-  done
-
-  _termux_theme_emit_osc "$palette_payload"
-  _termux_theme_emit_osc "10;$foreground;$background;$cursor"
+  if $is_termux; then
+    _termux_theme_set_local "$requested_theme"
+  else
+    _termux_theme_emit "$(_termux_theme_file "$requested_theme")"
+  fi
 }

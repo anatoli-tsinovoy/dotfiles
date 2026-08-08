@@ -487,15 +487,14 @@ main() {
     # Create empty gitconfig.local (no OS-specific overrides needed)
     touch "$HOME/.gitconfig.local"
 
-    # Stow Termux config with --no-folding to create file symlinks (not directory symlink)
-    # This allows user files (font.ttf, colors.properties, etc.) to coexist with stowed themes
+    # Stow Termux config with --no-folding so generated files can coexist with symlinks.
     log_info "Stowing Termux configuration..."
     mkdir -p ~/.termux ~/.local/bin
     run_stow --no-folding -t ~ termux
 
-    # Initialize colors.properties with dark theme (uses copy, not symlink)
+    # Initialize colors.properties from the shared palette (uses copy, not symlink).
     if [[ ! -f "$HOME/.termux/colors.properties" ]]; then
-      cp "$HOME/.termux/colors.properties.dark" "$HOME/.termux/colors.properties"
+      cp "$HOME/.zsh/termux-themes/dark.properties" "$HOME/.termux/colors.properties"
       echo "dark" >"$HOME/.termux/.current-theme"
       log_ok "Initialized Termux theme to dark"
     fi

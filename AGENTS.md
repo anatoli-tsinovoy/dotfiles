@@ -36,8 +36,8 @@ dotfiles/
 │   ├── linux/.local/bin/  # bat fallback, fd→fdfind, node→bun
 │   └── macos/.local/bin/  # docker→podman
 ├── termux/                # Termux-specific config
-│   ├── .termux/           # colors.properties (light/dark themes)
-│   └── .local/bin/        # termux-theme-toggle script
+│   ├── .termux/           # Termux app settings
+│   └── .local/bin/        # Termux-specific helpers
 ├── zsh/                   # Unified zsh config (ORDER-SENSITIVE)
 ├── nvim/                  # LazyVim-based Neovim config
 ├── git/                   # .gitconfig + .gitconfig.macos
