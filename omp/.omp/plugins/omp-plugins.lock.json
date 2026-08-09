@@ -1,10 +1,5 @@
 {
   "plugins": {
-    "@local/omp-prompt-stash": {
-      "version": "0.1.0",
-      "enabledFeatures": null,
-      "enabled": true
-    },
     "@dietrichgebert/ponytail": {
       "version": "4.8.4",
       "enabledFeatures": null,
@@ -14,13 +9,17 @@
       "version": "0.24.2",
       "enabledFeatures": null,
       "enabled": true
+    },
+    "omp-code-review": {
+      "version": "0.1.0",
+      "enabledFeatures": null,
+      "enabled": true
+    },
+    "omp-prompt-stash": {
+      "version": "0.1.0",
+      "enabledFeatures": null,
+      "enabled": true
     }
   },
-  "settings": {
-    "@local/omp-prompt-stash": {
-      "shortcut": "ctrl+h",
-      "deleteShortcuts": "ctrl+r,delete",
-      "deleteAllShortcuts": "ctrl+x"
-    }
-  }
+  "settings": {}
 }

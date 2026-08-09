@@ -173,27 +173,13 @@ setup_omp_plugins() {
   local plugin
   local remote_plugins=(
     "@plannotator/pi-extension"
+    "github:anatoli-tsinovoy/omp-code-review"
+    "github:anatoli-tsinovoy/omp-prompt-stash"
   )
   for plugin in "${remote_plugins[@]}"; do
     omp plugin install "$plugin"
   done
 
-  install_local_omp_plugin() {
-    local name="$1"
-    local dir="$2"
-    local link="${3:-0}"
-
-    if [[ -d "$dir" ]]; then
-      if [[ "$link" == "1" ]]; then
-        omp plugin link -l "$dir"
-      fi
-      omp plugin install "$dir"
-    else
-      log_warn "OMP $name plugin missing at $dir"
-    fi
-  }
-
-  install_local_omp_plugin "prompt stash" "$HOME/.omp/plugins/local/omp-prompt-stash" 1
 }
 
 install_linux_prerequisites() {
