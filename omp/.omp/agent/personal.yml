@@ -1,0 +1,24 @@
+# Personal ChatGPT subscription overlay. Use with:
+#   omp --config ~/.omp/agent/personal.yml
+# Authenticate once in the shared/default agent store with:
+#   /login openai-codex
+modelRoles:
+  default: openai-codex/gpt-5.6-sol:medium
+  smol: openai-codex/gpt-5.6-luna:xhigh
+  slow: openai-codex/gpt-5.6-sol:xhigh
+  designer: openai-codex/gpt-5.6-sol
+  vision: openai-codex/gpt-5.6-sol
+  plan: openai-codex/gpt-5.6-sol:high
+  task: openai-codex/gpt-5.6-luna:max
+  commit: openai-codex/gpt-5.6-luna:off
+  tiny: openai-codex/gpt-5.6-luna:medium
+  advisor: openai-codex/gpt-5.6-sol:high
+
+enabledModels:
+  - openai-codex/*
+
+disabledProviders:
+  - openai
+  - amazon-bedrock
+  - bedrock-mantle
+  - bedrock-openai

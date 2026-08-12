@@ -222,6 +222,10 @@ fi
 export PLANNOTATOR_REMOTE=1
 export PLANNOTATOR_PORT=9999
 
+pomp() {
+  omp --config "$HOME/.omp/agent/personal.yml" "$@"
+}
+
 # uv environment (if installed via install script)
 if [[ -f "$HOME/.local/bin/env" ]]; then
   . "$HOME/.local/bin/env"
