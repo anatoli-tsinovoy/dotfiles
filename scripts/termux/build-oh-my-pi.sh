@@ -172,36 +172,6 @@ NODE
   npm install --prefix "$TOOLS_DIR" --ignore-scripts "@napi-rs/cli@$required_version"
 }
 
-patch_audiopus_sys_android() {
-  local build_script
-  build_script=$(
-    cargo metadata --manifest-path "$SOURCE_DIR/crates/pi-natives/Cargo.toml" --format-version 1 |
-      node -e '
-        let input = "";
-        process.stdin.setEncoding("utf8");
-        process.stdin.on("data", chunk => input += chunk);
-        process.stdin.on("end", () => {
-          const pkg = JSON.parse(input).packages.find(candidate => candidate.name === "audiopus_sys");
-          if (!pkg) throw new Error("audiopus_sys package not found in Cargo metadata");
-          process.stdout.write(require("node:path").join(require("node:path").dirname(pkg.manifest_path), "build.rs"));
-        });
-      '
-  )
-
-  node - "$build_script" <<'NODE'
-const fs = require("node:fs");
-const buildScript = process.argv[2];
-const androidCfg = '#[cfg(any(windows, target_os = "android", target_os = "macos", target_env = "musl"))]';
-const upstreamCfg = '#[cfg(any(windows, target_os = "macos", target_env = "musl"))]';
-const source = fs.readFileSync(buildScript, "utf8");
-if (source.includes(androidCfg)) process.exit(0);
-if (!source.includes(upstreamCfg)) {
-  throw new Error(`Unsupported audiopus_sys build script: ${buildScript}`);
-}
-fs.writeFileSync(buildScript, source.replace(upstreamCfg, androidCfg));
-NODE
-}
-
 build_addon() {
   local napi="$TOOLS_DIR/node_modules/.bin/napi"
 
@@ -251,19 +221,6 @@ validate_source_versions() {
   log_ok "Source natives and coding-agent versions match: $natives_version"
 }
 
-patch_loader_android() {
-  node - "$1" <<'NODE'
-const fs = require("node:fs");
-const loader = process.argv[2];
-let source = fs.readFileSync(loader, "utf8");
-if (!source.includes('"android-arm64"')) {
-  const marker = "const SUPPORTED_PLATFORMS = [";
-  if (!source.includes(marker)) throw new Error(`Platform list not found in ${loader}`);
-  source = source.replace(marker, `${marker}"android-arm64", `);
-  fs.writeFileSync(loader, source);
-}
-NODE
-}
 
 resolve_installed_natives_root() {
   bun -e '
@@ -351,7 +308,7 @@ verify_provider() {
 install_omp() {
   local source_natives_version source_agent_version npm_root npm_prefix package_root
   local installed_agent_version installed_natives_version natives_root core_addon loader
-  local selected_addon omp_bin built_addon
+  local selected_addon omp_bin built_addon package_tarball
 
   source_natives_version=$(read_package_version "$SOURCE_DIR/packages/natives")
   source_agent_version=$(read_package_version "$SOURCE_DIR/packages/coding-agent")
@@ -362,35 +319,33 @@ install_omp() {
   npm_prefix=$(npm prefix -g)
   package_root="$npm_root/@oh-my-pi/pi-coding-agent"
   omp_bin="$npm_prefix/bin/omp"
-  log_info "Source JS provenance: $SOURCE_DIR/packages/coding-agent@$source_agent_version"
-  log_info "npm JS provenance: $package_root (global bin $omp_bin)"
 
-  if [[ ! -f "$package_root/package.json" ]] ||
-    [[ "$(read_package_version "$package_root" 2>/dev/null || true)" != "$source_agent_version" ]]; then
-    log_info "Installing matching OMP CLI $source_agent_version..."
-    npm install -g "@oh-my-pi/pi-coding-agent@$source_agent_version"
-  else
-    log_skip "OMP CLI $source_agent_version already installed"
-  fi
+  log_info "Packing CLI JavaScript from OMP commit ${EXPECTED_SHA:-$(git -C "$SOURCE_DIR" rev-parse HEAD)}..."
+  package_tarball=$(
+    cd "$SOURCE_DIR/packages/coding-agent"
+    bun pm pack --ignore-scripts --destination "$OUTPUT_DIR" |
+      sed -n 's#^.*/\([^/]*\.tgz\)$#\1#p'
+  )
+  [[ -f "$OUTPUT_DIR/$package_tarball" ]] ||
+    fail "local coding-agent package was not created: $OUTPUT_DIR/$package_tarball"
+  npm install -g --ignore-scripts "$OUTPUT_DIR/$package_tarball"
 
   [[ -x "$omp_bin" ]] || fail "npm-global omp binary not found or not executable: $omp_bin"
   [[ "$package_root" -ef "$SOURCE_DIR/packages/coding-agent" ]] &&
-    fail "npm JS provenance error: installed coding-agent resolves to the source checkout"
+    fail "local package installation unexpectedly symlinked the disposable source checkout"
 
   installed_agent_version=$(read_package_version "$package_root")
   [[ "$installed_agent_version" == "$source_agent_version" ]] ||
-    fail "version mismatch: npm coding-agent $installed_agent_version != source $source_agent_version"
+    fail "version mismatch: installed coding-agent $installed_agent_version != source $source_agent_version"
   natives_root=$(resolve_installed_natives_root "$package_root")
-  [[ -d "$natives_root" ]] || fail "npm-native package not found for $package_root"
-  [[ "$natives_root" -ef "$SOURCE_DIR/packages/natives" ]] &&
-    fail "npm JS provenance error: installed natives resolves to the source checkout"
+  [[ -d "$natives_root" ]] || fail "installed native package not found for $package_root"
   installed_natives_version=$(read_package_version "$natives_root")
   [[ "$installed_natives_version" == "$source_natives_version" ]] ||
-    fail "version mismatch: npm natives $installed_natives_version != source $source_natives_version"
+    fail "version mismatch: installed natives $installed_natives_version != source $source_natives_version"
+  log_ok "Installed CLI JavaScript from the selected local stack commit"
 
   loader="$natives_root/native/loader-state.js"
   [[ -f "$loader" ]] || fail "Native loader not found: $loader"
-  patch_loader_android "$loader"
   if ! selected_addon=$(resolve_android_loader_candidate "$loader"); then
     fail "loader shadowing: could not resolve an Android loader candidate"
   fi
@@ -429,6 +384,5 @@ configure_output_dir
 update_source
 validate_source_versions
 install_napi_cli
-patch_audiopus_sys_android
 build_addon
 install_omp
