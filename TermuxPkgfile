@@ -30,6 +30,8 @@ lftp
 
 # === System tools ===
 proot
+# Clipboard bridge requires the matching F-Droid Termux:API APK
+termux-api
 # Forward the Android microphone to remote OMP sessions
 pulseaudio
 

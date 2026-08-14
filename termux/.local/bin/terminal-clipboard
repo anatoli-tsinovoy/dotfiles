@@ -1,0 +1,403 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly internal_flag='--__terminal-clipboard-runner'
+readonly internal_marker_value='terminal-clipboard-internal-v1'
+
+write_status_atomic() {
+  local status_file=$1
+  local status=$2
+  local status_dir temporary_file
+
+  if [[ $status_file == */* ]]; then
+    status_dir=${status_file%/*}
+    [[ -n $status_dir ]] || status_dir=/
+  else
+    status_dir=.
+  fi
+
+  if ! temporary_file=$(mktemp "$status_dir/.terminal-clipboard-status.XXXXXX" 2>/dev/null); then
+    return 1
+  fi
+
+  if printf '%d\n' "$status" >"$temporary_file" &&
+    mv -f -- "$temporary_file" "$status_file"; then
+    return 0
+  fi
+  rm -f -- "$temporary_file" 2>/dev/null || :
+  return 1
+}
+
+run_internal() {
+  local flag=$1
+  local args_file=$2
+  local gate_fifo=$3
+  local status_file=$4
+  local record executable gate_value command_status
+  local -a records=()
+  local -a command_args=()
+
+  [[ $flag == "$internal_flag" ]] || return 255
+  [[ -f $args_file && -r $args_file && ! -L $args_file ]] || return 255
+  [[ -p $gate_fifo && ! -L $gate_fifo ]] || return 255
+  [[ -n $status_file ]] || return 255
+  if [[ -e $status_file || -L $status_file ]]; then
+    [[ -f $status_file && ! -L $status_file ]] || return 255
+  fi
+
+  if ! exec 8<"$args_file"; then
+    return 255
+  fi
+  while :; do
+    record=
+    if IFS= read -r -d '' record <&8; then
+      records+=("$record")
+    else
+      exec 8<&-
+      [[ -z $record ]] || return 255
+      break
+    fi
+  done
+
+  (( ${#records[@]} > 0 )) || return 255
+  executable=${records[0]}
+  [[ $executable == /* && -f $executable && -x $executable ]] || return 255
+  command_args=("${records[@]:1}")
+
+  gate_value=
+  if ! IFS= read -r gate_value <"$gate_fifo"; then
+    [[ -n $gate_value ]] || return 255
+  fi
+
+  if "$executable" "${command_args[@]}"; then
+    command_status=0
+  else
+    command_status=$?
+  fi
+
+  write_status_atomic "$status_file" "$command_status" || :
+  return "$command_status"
+}
+
+if [[ ${_TERMINAL_CLIPBOARD_INTERNAL+x} == x ]]; then
+  internal_marker=${_TERMINAL_CLIPBOARD_INTERNAL}
+  unset _TERMINAL_CLIPBOARD_INTERNAL
+  if [[ $internal_marker == "$internal_marker_value" && $# == 4 && ${1:-} == "$internal_flag" ]]; then
+    internal_status=255
+    if run_internal "$@"; then
+      internal_status=0
+    else
+      internal_status=$?
+    fi
+    exit "$internal_status"
+  fi
+fi
+
+if (( $# == 0 )); then
+  printf '%s\n' 'terminal-clipboard: command required' >&2
+  exit 64
+fi
+
+resolve_external() {
+  local requested=$1
+  local candidate parent basename canonical_parent
+
+  if [[ $requested == */* ]]; then
+    candidate=$requested
+  else
+    if ! candidate=$(type -P -- "$requested" 2>/dev/null); then
+      return 127
+    fi
+    # type -P resolves only external commands on PATH.
+    [[ $candidate == */* ]] || return 127
+  fi
+
+  if [[ $candidate == */ ]]; then
+    if ! canonical_parent=$(realpath "$candidate" 2>/dev/null); then
+      return 127
+    fi
+    [[ -e $canonical_parent ]] || return 127
+    return 126
+  fi
+
+  parent=${candidate%/*}
+  [[ $candidate == */* ]] || parent=.
+  [[ -n $parent ]] || parent=/
+  basename=${candidate##*/}
+  [[ -n $basename ]] || return 126
+
+  if ! canonical_parent=$(realpath "$parent" 2>/dev/null); then
+    return 127
+  fi
+  if [[ $canonical_parent == / ]]; then
+    resolved_command="/$basename"
+  else
+    resolved_command="$canonical_parent/$basename"
+  fi
+
+  [[ -e $resolved_command ]] || return 127
+  [[ -f $resolved_command && -x $resolved_command ]] || return 126
+}
+
+requested_command=$1
+shift
+resolved_command=
+if resolve_external "$requested_command"; then
+  :
+else
+  resolution_status=$?
+  case $resolution_status in
+    126)
+      printf 'terminal-clipboard: command is not executable: %s\n' "$requested_command" >&2
+      ;;
+    127)
+      printf 'terminal-clipboard: external command not found: %s\n' "$requested_command" >&2
+      ;;
+    *)
+      printf 'terminal-clipboard: cannot resolve command: %s\n' "$requested_command" >&2
+      ;;
+  esac
+  exit "$resolution_status"
+fi
+
+# Keep non-proxy invocations indistinguishable from the resolved command.
+if [[ -z ${TERMUX_VERSION:-} || -n ${TMUX:-} || ! -t 0 || ! -t 1 ]]; then
+  exec "$resolved_command" "$@"
+fi
+
+private_dir=
+socket=
+args_file=
+status_file=
+gate_fifo=
+bridge_path=
+gate_pid=
+bridge_pid=
+server_started=0
+gate_fd_open=0
+chosen_status=255
+cleanup_running=0
+
+cleanup() {
+  local final_status=$chosen_status
+
+  if (( cleanup_running )); then
+    return
+  fi
+  cleanup_running=1
+  trap - EXIT
+  trap '' HUP INT TERM
+  if [[ -n ${gate_pid:-} ]]; then
+    if kill -0 "$gate_pid" 2>/dev/null; then
+      kill "$gate_pid" 2>/dev/null || :
+    fi
+    wait "$gate_pid" 2>/dev/null || :
+  fi
+
+  if [[ -n ${bridge_pid:-} ]]; then
+    if kill -0 "$bridge_pid" 2>/dev/null; then
+      kill "$bridge_pid" 2>/dev/null || :
+    fi
+    wait "$bridge_pid" 2>/dev/null || :
+  fi
+
+  if (( server_started )) && [[ -n ${socket:-} ]]; then
+    TMUX= tmux -S "$socket" kill-server >/dev/null 2>&1 || :
+  fi
+
+  if (( gate_fd_open )); then
+    exec 9>&- 2>/dev/null || :
+    gate_fd_open=0
+  fi
+
+  if [[ -n ${private_dir:-} ]]; then
+    rm -rf -- "$private_dir" 2>/dev/null || :
+  fi
+
+  exit "$final_status"
+}
+
+on_signal() {
+  chosen_status=$1
+  exit "$chosen_status"
+}
+
+trap cleanup EXIT
+trap 'on_signal 129' HUP
+trap 'on_signal 130' INT
+trap 'on_signal 143' TERM
+
+fail() {
+  local status=$1
+  local message=${2:-terminal-clipboard: setup failed}
+  printf '%s\n' "$message" >&2
+  chosen_status=$status
+  exit "$status"
+}
+
+required_command=
+for required_command in tmux tmux-termux-clipboard-bridge termux-clipboard-set mktemp mkfifo realpath; do
+  command -v -- "$required_command" >/dev/null 2>&1 ||
+    fail 127 "terminal-clipboard: required command not found: $required_command"
+done
+
+config_path=${HOME:-}/.config/tmux/terminal-clipboard.conf
+[[ -n ${HOME:-} && -r $config_path ]] ||
+  fail 1 "terminal-clipboard: proxy config is not readable: $config_path"
+
+if ! script_path=$(realpath "$0" 2>/dev/null); then
+  fail 1 'terminal-clipboard: cannot resolve wrapper path'
+fi
+if ! bridge_path=$(command -v -- tmux-termux-clipboard-bridge 2>/dev/null); then
+  fail 127 'terminal-clipboard: cannot resolve clipboard bridge'
+fi
+
+umask 077
+tmp_root=${TMPDIR:-${PREFIX:-}/tmp}
+if ! private_dir=$(mktemp -d "$tmp_root/terminal-clipboard.XXXXXX" 2>/dev/null); then
+  fail 1 'terminal-clipboard: cannot create private directory'
+fi
+socket=$private_dir/socket
+args_file=$private_dir/args
+status_file=$private_dir/status
+gate_fifo=$private_dir/gate
+
+printf '%s\0' "$resolved_command" "$@" >"$args_file" ||
+  fail 1 'terminal-clipboard: cannot store command arguments'
+mkfifo "$gate_fifo" 2>/dev/null ||
+  fail 1 'terminal-clipboard: cannot create readiness FIFO'
+
+rows=24
+cols=80
+if [[ -r /dev/tty ]] && command -v -- stty >/dev/null 2>&1; then
+  terminal_size=
+  if terminal_size=$(stty size </dev/tty 2>/dev/null); then
+    detected_rows=
+    detected_cols=
+    read -r detected_rows detected_cols <<<"$terminal_size"
+    if [[ ${detected_rows:-} =~ ^[0-9]+$ && ${detected_cols:-} =~ ^[0-9]+$ ]] &&
+      (( detected_rows >= 1 && detected_rows <= 1000 && detected_cols >= 1 && detected_cols <= 10000 )); then
+      rows=$detected_rows
+      cols=$detected_cols
+    fi
+  fi
+fi
+
+# Keep one read/write descriptor open so releasing the gate cannot race a
+# runner that has not opened the FIFO yet.
+if ! exec 9<>"$gate_fifo"; then
+  fail 1 'terminal-clipboard: cannot open readiness FIFO'
+fi
+gate_fd_open=1
+
+# The server receives only this fixed runner flag and private paths. The
+# resolved command and caller arguments remain exclusively in the NUL file.
+server_started=1
+if _TERMINAL_CLIPBOARD_INTERNAL="$internal_marker_value" TMUX= tmux -S "$socket" -f "$config_path" \
+  new-session -d -s terminal-clipboard -x "$cols" -y "$rows" \
+  "$script_path" "$internal_flag" "$args_file" "$gate_fifo" "$status_file"; then
+  :
+else
+  fail 1 'terminal-clipboard: cannot start proxy tmux server'
+fi
+
+TMPDIR="$private_dir" TMUX="$socket,0,0" "$bridge_path" >"$private_dir/bridge.log" 2>&1 &
+bridge_pid=$!
+
+bridge_ready=0
+for ((attempt = 0; attempt < 100; attempt++)); do
+  if ! kill -0 "$bridge_pid" 2>/dev/null; then
+    break
+  fi
+
+  client_modes=
+  if client_modes=$(TMUX= tmux -S "$socket" list-clients -F '#{client_control_mode}' 2>/dev/null); then
+    while IFS= read -r client_mode; do
+      if [[ $client_mode == 1 || $client_mode == client_control_mode=1 ]]; then
+        bridge_ready=1
+        break
+      fi
+    done <<<"$client_modes"
+  fi
+  if (( bridge_ready )); then
+    break
+  fi
+  sleep 0.05
+done
+
+if (( ! bridge_ready )) || ! kill -0 "$bridge_pid" 2>/dev/null; then
+  fail 1 'terminal-clipboard: clipboard bridge did not become ready'
+fi
+
+(
+  gate_ready=0
+  for ((attempt = 0; attempt < 100; attempt++)); do
+    if ! kill -0 "$bridge_pid" 2>/dev/null; then
+      exit 1
+    fi
+    if ! TMUX= tmux -S "$socket" has-session -t terminal-clipboard >/dev/null 2>&1; then
+      exit 1
+    fi
+
+    client_modes=
+    if client_modes=$(TMUX= tmux -S "$socket" list-clients -F '#{client_control_mode}' 2>/dev/null); then
+      while IFS= read -r client_mode; do
+        if [[ $client_mode == 0 || $client_mode == client_control_mode=0 ]]; then
+          gate_ready=1
+          break
+        fi
+      done <<<"$client_modes"
+    fi
+    if (( gate_ready )); then
+      if ! kill -0 "$bridge_pid" 2>/dev/null ||
+        ! TMUX= tmux -S "$socket" has-session -t terminal-clipboard >/dev/null 2>&1; then
+        exit 1
+      fi
+      printf '%s\n' ready >&9 || exit 1
+      exit 0
+    fi
+    sleep 0.05
+  done
+  exit 1
+) &
+gate_pid=$!
+
+attach_status=0
+if TMUX= tmux -S "$socket" attach-session -t terminal-clipboard; then
+  attach_status=0
+else
+  attach_status=$?
+fi
+
+gate_status=0
+if wait "$gate_pid"; then
+  gate_status=0
+else
+  gate_status=$?
+fi
+gate_pid=
+
+# A failed gate, or a missing or malformed status, means the interactive
+# proxy was detached or otherwise interrupted before the command could report.
+chosen_status=255
+if (( gate_status == 0 )) && [[ -f $status_file && -r $status_file ]]; then
+  reported_status=
+  trailing_status=
+  if exec 7<"$status_file"; then
+    if IFS= read -r reported_status <&7; then
+      trailing_status=
+      if ! IFS= read -r trailing_status <&7 &&
+        [[ -z $trailing_status ]] &&
+        [[ $reported_status =~ ^[0-9]{1,3}$ ]] &&
+        (( 10#$reported_status >= 0 && 10#$reported_status <= 255 )); then
+        chosen_status=$((10#$reported_status))
+      fi
+    fi
+    exec 7<&-
+  fi
+fi
+
+# attach_status is intentionally not used when there is no status file:
+# abrupt detach must consistently report 255.
+: "$attach_status"
+exit "$chosen_status"

@@ -199,7 +199,7 @@ sshpa() {
   fi
   print "Forwarding PulseAudio to $remote_bind:$port"
   {
-    command ssh -o ExitOnForwardFailure=yes -R "$tunnel" "${reply[@]}"
+    _remote_exec ssh -o ExitOnForwardFailure=yes -R "$tunnel" "${reply[@]}"
   } always {
     if [[ -n "$watcher_pid" ]]; then
       command kill "$watcher_pid" 2>/dev/null
@@ -229,7 +229,7 @@ etpa() {
   fi
   print "Forwarding PulseAudio to $remote_bind:$port"
   {
-    command et --reversetunnel "$tunnel" "${reply[@]}"
+    _remote_exec et --reversetunnel "$tunnel" "${reply[@]}"
   } always {
     if [[ -n "$watcher_pid" ]]; then
       command kill "$watcher_pid" 2>/dev/null

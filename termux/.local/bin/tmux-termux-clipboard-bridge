@@ -1,0 +1,189 @@
+#!/usr/bin/env bash
+# Bridge tmux OSC 52 paste-buffer notifications to the Termux clipboard.
+set -euo pipefail
+
+[[ -n ${TERMUX_VERSION:-} ]] || exit 0
+[[ -n ${TMUX:-} ]] || exit 0
+
+for required_command in tmux termux-clipboard-set flock mktemp mkfifo setsid sha256sum; do
+  command -v "$required_command" >/dev/null 2>&1 || exit 0
+done
+
+socket=${TMUX%%,*}
+[[ -S $socket ]] || exit 0
+
+tmp_root=${TMPDIR:-${PREFIX:-}/tmp}
+socket_hash=
+if ! socket_hash=$(printf '%s' "$socket" | sha256sum 2>/dev/null); then
+  printf '%s\n' 'tmux-termux-clipboard-bridge: cannot hash tmux socket' >&2
+  exit 1
+fi
+socket_hash=${socket_hash%% *}
+[[ -n $socket_hash ]] || {
+  printf '%s\n' 'tmux-termux-clipboard-bridge: empty socket hash' >&2
+  exit 1
+}
+
+lock_file="$tmp_root/tmux-termux-clipboard-bridge.$socket_hash.lock"
+lock_fd=
+if ! exec {lock_fd}>"$lock_file"; then
+  printf '%s\n' 'tmux-termux-clipboard-bridge: cannot open lock' >&2
+  exit 1
+fi
+flock -n "$lock_fd" || exit 0
+
+private_dir=
+input_fifo=
+control_fifo=
+fd8_open=0
+tmux_pid=
+control_reader_pid=
+
+cleanup() {
+  local exit_status=$?
+
+  trap - EXIT HUP INT TERM
+
+  if [[ -n ${tmux_pid:-} ]]; then
+    kill "$tmux_pid" 2>/dev/null || :
+  fi
+  if [[ -n ${control_reader_pid:-} ]]; then
+    kill "$control_reader_pid" 2>/dev/null || :
+  fi
+  if [[ -n ${tmux_pid:-} ]]; then
+    wait "$tmux_pid" 2>/dev/null || :
+  fi
+  if [[ -n ${control_reader_pid:-} ]]; then
+    wait "$control_reader_pid" 2>/dev/null || :
+  fi
+
+  if (( fd8_open )); then
+    exec 8>&- 2>/dev/null || :
+  fi
+  if [[ -n ${private_dir:-} ]]; then
+    rm -rf -- "$private_dir" 2>/dev/null || :
+  fi
+
+  return "$exit_status"
+}
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+if ! private_dir=$(mktemp -d "$tmp_root/tmux-termux-clipboard-bridge.XXXXXX" 2>/dev/null); then
+  printf '%s\n' 'tmux-termux-clipboard-bridge: cannot create private directory' >&2
+  exit 1
+fi
+input_fifo="$private_dir/input"
+control_fifo="$private_dir/control"
+if ! mkfifo "$input_fifo" "$control_fifo" 2>/dev/null; then
+  printf '%s\n' 'tmux-termux-clipboard-bridge: cannot create FIFOs' >&2
+  exit 1
+fi
+if ! exec 8<>"$input_fifo"; then
+  printf '%s\n' 'tmux-termux-clipboard-bridge: cannot open input FIFO' >&2
+  exit 1
+fi
+fd8_open=1
+
+session=
+for ((attempt = 0; attempt < 100; attempt++)); do
+  session_lines=()
+  if tmux -S "$socket" display-message -p '#{session_id}' \
+    >"$private_dir/session" 2>/dev/null; then
+    mapfile -t session_lines <"$private_dir/session"
+    if (( ${#session_lines[@]} == 1 )) && [[ -n ${session_lines[0]} ]]; then
+      session=${session_lines[0]}
+      break
+    fi
+  fi
+  if (( attempt < 99 )); then
+    sleep 0.05
+  fi
+done
+if [[ -z $session ]]; then
+  printf '%s\n' 'tmux-termux-clipboard-bridge: cannot resolve current session' >&2
+  exit 1
+fi
+
+bridge_diag() {
+  printf 'tmux-termux-clipboard-bridge: %s\n' "$1" >&2
+}
+
+process_control() {
+  local line name buffer_file setter_status
+  local last_buffer_name=
+  local paste_prefix='%paste-buffer-changed '
+  local setter_pid=
+
+  stop_setter() {
+    local exit_status=$1
+
+    trap - HUP INT TERM
+    if [[ -n ${setter_pid:-} ]]; then
+      kill -TERM -- "-$setter_pid" 2>/dev/null || kill "$setter_pid" 2>/dev/null || :
+      wait "$setter_pid" 2>/dev/null || :
+    fi
+    exit "$exit_status"
+  }
+  trap 'stop_setter 129' HUP
+  trap 'stop_setter 130' INT
+  trap 'stop_setter 143' TERM
+
+  while IFS= read -r line || [[ -n $line ]]; do
+    [[ $line == "$paste_prefix"* ]] || continue
+    name=${line#"$paste_prefix"}
+    [[ $name =~ ^buffer[0-9]+$ ]] || continue
+    if [[ -n $last_buffer_name && $name == "$last_buffer_name" ]]; then
+      continue
+    fi
+
+    if ! buffer_file=$(mktemp "$private_dir/buffer.XXXXXX" 2>/dev/null); then
+      bridge_diag 'cannot create buffer file'
+      continue
+    fi
+    if ! TMUX= tmux -S "$socket" save-buffer -b "$name" "$buffer_file" 2>/dev/null; then
+      bridge_diag 'cannot save tmux buffer'
+      rm -f -- "$buffer_file"
+      continue
+    fi
+
+    setsid termux-clipboard-set <"$buffer_file" &
+    setter_pid=$!
+    setter_status=0
+    wait "$setter_pid" || setter_status=$?
+    setter_pid=
+    if (( setter_status != 0 )); then
+      bridge_diag 'cannot update Termux clipboard'
+      rm -f -- "$buffer_file"
+      continue
+    fi
+
+    last_buffer_name=$name
+    rm -f -- "$buffer_file"
+  done <"$control_fifo"
+}
+
+process_control &
+control_reader_pid=$!
+
+TMUX= tmux -C -S "$socket" attach-session \
+  -f 'read-only,ignore-size,no-output,no-detach-on-destroy' \
+  -t "$session" <&8 >"$control_fifo" 2>"$private_dir/tmux.stderr" &
+tmux_pid=$!
+
+reader_status=0
+wait "$control_reader_pid" || reader_status=$?
+tmux_status=0
+wait "$tmux_pid" || tmux_status=$?
+
+if (( reader_status != 0 )); then
+  printf '%s\n' 'tmux-termux-clipboard-bridge: control reader exited' >&2
+  exit 1
+fi
+if (( tmux_status != 0 )); then
+  printf '%s\n' 'tmux-termux-clipboard-bridge: control client exited' >&2
+  exit 1
+fi
+exit 0
