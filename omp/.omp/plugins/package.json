@@ -3,6 +3,7 @@
   "private": true,
   "dependencies": {
     "@plannotator/pi-extension": "^0.24.2",
+    "fork-in-tmux": "https://github.com/anatoli-tsinovoy/fork-in-tmux",
     "omp-code-review": "github:anatoli-tsinovoy/omp-code-review",
     "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash"
   }

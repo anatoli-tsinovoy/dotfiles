@@ -6,8 +6,9 @@
       "name": "omp-plugins",
       "dependencies": {
         "@plannotator/pi-extension": "^0.24.2",
-        "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash",
+        "fork-in-tmux": "https://github.com/anatoli-tsinovoy/fork-in-tmux",
         "omp-code-review": "github:anatoli-tsinovoy/omp-code-review",
+        "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash",
       },
     },
   },
@@ -425,6 +426,8 @@
     "fetch-blob": ["fetch-blob@3.2.0", "", { "dependencies": { "node-domexception": "^1.0.0", "web-streams-polyfill": "^3.0.3" } }, "sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ=="],
 
     "flatbuffers": ["flatbuffers@25.9.23", "", {}, "sha512-MI1qs7Lo4Syw0EOzUl0xjs2lsoeqFku44KpngfIduHBYvzm8h2+7K8YMQh1JtVVVrUvhLpNwqVi4DERegUJhPQ=="],
+
+    "fork-in-tmux": ["fork-in-tmux@github:anatoli-tsinovoy/fork-in-tmux#2740515", {}, "anatoli-tsinovoy-fork-in-tmux-2740515", "sha512-bkgW9M/nGp9BPEoLKg6opcN9kjJTQS4WvknbrtIywO/xWm/z5JEVFovQM37l/mBarKwRRl930anEp9n9bsg04Q=="],
 
     "formdata-polyfill": ["formdata-polyfill@4.0.10", "", { "dependencies": { "fetch-blob": "^3.1.2" } }, "sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g=="],
 

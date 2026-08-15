@@ -175,6 +175,7 @@ setup_omp_plugins() {
     "@plannotator/pi-extension"
     "github:anatoli-tsinovoy/omp-code-review"
     "github:anatoli-tsinovoy/omp-prompt-stash"
+    "github:anatoli-tsinovoy/fork-in-tmux"
   )
   for plugin in "${remote_plugins[@]}"; do
     omp plugin install "$plugin"
