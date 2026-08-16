@@ -5,14 +5,27 @@ osascript <<'APPLESCRIPT'
 tell application "System Events"
   set notificationCenterOpened to false
 
+  -- macOS Tahoe moved status items from ControlCenter to grouped items
+  -- owned by MenuBarAgent. The clock is the rightmost group.
   try
-    tell application process "SystemUIServer"
-      click menu bar item "Notification Center" of menu bar 1
+    tell application process "MenuBarAgent"
+      click menu bar item 1 of last group of menu bar 1
     end tell
     set notificationCenterOpened to true
   on error
     set notificationCenterOpened to false
   end try
+
+  if notificationCenterOpened is false then
+    try
+      tell application process "SystemUIServer"
+        click menu bar item "Notification Center" of menu bar 1
+      end tell
+      set notificationCenterOpened to true
+    on error
+      set notificationCenterOpened to false
+    end try
+  end if
 
   if notificationCenterOpened is false then
     try
