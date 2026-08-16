@@ -1,7 +1,6 @@
 tap "anomalyco/tap", trusted: true
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae", trusted: true
 tap "grishka/grishka", trusted: true
-tap "mistertea/et", "https://github.com/MisterTea/homebrew-et", trusted: true
 tap "nikitabobko/tap", trusted: true
 tap "oven-sh/bun", trusted: true
 # Codec library for encoding and decoding AV1 video streams
@@ -207,7 +206,7 @@ brew "felixkratz/formulae/borders"
 # Custom macOS statusbar with shell plugin, interaction and graph support
 brew "felixkratz/formulae/sketchybar"
 # Remote terminal with IP roaming
-brew "mistertea/et/et", trusted: true
+brew "et"
 # Incredibly fast JavaScript runtime, bundler, transpiler and package manager - all in one.
 brew "oven-sh/bun/bun"
 # AeroSpace is an i3-like tiling window manager for macOS
