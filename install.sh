@@ -176,6 +176,7 @@ setup_omp_plugins() {
     "github:anatoli-tsinovoy/omp-code-review"
     "github:anatoli-tsinovoy/omp-prompt-stash"
     "github:anatoli-tsinovoy/fork-in-tmux"
+    "git:github.com/anatoli-tsinovoy/omp-model-service-tier"
   )
   for plugin in "${remote_plugins[@]}"; do
     omp plugin install "$plugin"

@@ -38,6 +38,7 @@ github:
 task: 
   showResolvedModelBadge: true
   enableLsp: true
+  eager: preferred
 tools: 
   {}
 providers: 
