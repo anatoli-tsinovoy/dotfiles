@@ -16,11 +16,12 @@ theme:
 symbolPreset: nerd
 colorBlindMode: false
 compaction: 
-  strategy: context-full
   thresholdPercent: 70
   handoffSaveToDisk: true
   thresholdTokens: 229000
-  remoteEnabled: true
+  methodOrder: 
+    - remote
+    - soft
 lsp: 
   formatOnWrite: true
   diagnosticsOnEdit: true
@@ -28,7 +29,7 @@ bashInterceptor:
   enabled: true
 browser: 
   headless: true
-setupVersion: 1
+setupVersion: 2
 contextPromotion: 
   enabled: false
 dev: 
@@ -72,3 +73,5 @@ edit:
   mode: hashline
 astGrep: 
   enabled: true
+composer: 
+  shape: box

@@ -2,6 +2,7 @@
 vim.lsp.enable("ty")
 
 return {
+  { import = "lazyvim.plugins.extras.lang.dart" },
   {
     "neovim/nvim-lspconfig",
     opts = {

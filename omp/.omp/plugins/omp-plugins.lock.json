@@ -1,10 +1,5 @@
 {
   "plugins": {
-    "@dietrichgebert/ponytail": {
-      "version": "4.8.4",
-      "enabledFeatures": null,
-      "enabled": true
-    },
     "@plannotator/pi-extension": {
       "version": "0.24.2",
       "enabledFeatures": null,
@@ -27,6 +22,11 @@
     },
     "omp-model-service-tier": {
       "version": "1.2.1",
+      "enabledFeatures": null,
+      "enabled": true
+    },
+    "omp-fork-in-tmux": {
+      "version": "0.1.0",
       "enabledFeatures": null,
       "enabled": true
     }

@@ -20,6 +20,18 @@
     },
     "ruff": {
       "rootMarkers": ["pyproject.toml", "ruff.toml", ".ruff.toml", "requirements.txt", ".git"]
+    },
+    "dartls": {
+      "command": "dart",
+      "args": ["language-server", "--protocol=lsp"],
+      "fileTypes": [".dart"],
+      "languageId": "dart",
+      "rootMarkers": ["pubspec.yaml", "pubspec.lock"],
+      "initOptions": {
+        "closingLabels": true,
+        "flutterOutline": true,
+        "outline": true
+      }
     }
   }
 }
