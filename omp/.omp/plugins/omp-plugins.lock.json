@@ -20,7 +20,7 @@
       "enabledFeatures": null,
       "enabled": true
     },
-    "fork-in-tmux": {
+    "omp-fork-in-tmux": {
       "version": "0.1.0",
       "enabledFeatures": null,
       "enabled": true

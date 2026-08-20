@@ -217,8 +217,6 @@ cask "betterdisplay"
 cask "blackhole-2ch"
 # OpenAI's official ChatGPT desktop app
 cask "chatgpt"
-# Write, edit, and chat about your code with AI
-cask "cursor"
 # Databases and SQL IDE
 cask "datagrip"
 # Reclaim storage used for Xcode caches

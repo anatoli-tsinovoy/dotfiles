@@ -175,7 +175,7 @@ setup_omp_plugins() {
     "@plannotator/pi-extension"
     "github:anatoli-tsinovoy/omp-code-review"
     "github:anatoli-tsinovoy/omp-prompt-stash"
-    "github:anatoli-tsinovoy/fork-in-tmux"
+    "github:anatoli-tsinovoy/omp-fork-in-tmux"
     "github:anatoli-tsinovoy/omp-model-service-tier"
   )
   for plugin in "${remote_plugins[@]}"; do
