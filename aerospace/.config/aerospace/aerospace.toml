@@ -230,7 +230,8 @@ persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 
 [mode.service.binding]
     esc = [
       'reload-config',
-      'trigger-binding alt-shift-b --mode service',
+      'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh sync',
+      'exec-and-forget sketchybar --trigger aerospace_focus_change',
       'trigger-binding alt-shift-m --mode service',
       'mode main',
     ]
@@ -253,10 +254,10 @@ persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 
         'workspace 1', 'workspace 3', 'workspace 2', 'mode main',
     ]
     
-    # Refresh janky borders and sketchybar
+    # Hard-restart janky borders and SketchyBar on explicit request
     alt-shift-b = [
         'exec-and-forget ~/.config/aerospace/fullscreen-borders.sh sync',
-        'exec-and-forget brew services restart sketchybar',
+        'exec-and-forget ~/.config/aerospace/restart-sketchybar.sh',
         'mode main'
     ]
 
