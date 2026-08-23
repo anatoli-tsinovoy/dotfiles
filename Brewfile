@@ -167,8 +167,6 @@ brew "swift-format"
 brew "swiftlint"
 # Change macOS audio source from the command-line
 brew "switchaudio-osx"
-# Easiest, most secure way to use WireGuard and 2FA
-brew "tailscale"
 # Powerful free data recovery utility
 brew "testdisk"
 # Programmatically correct mistyped console commands
@@ -249,6 +247,8 @@ cask "sf-symbols"
 cask "slack"
 # Music streaming service
 cask "spotify"
+# Mesh VPN with GUI, exit-node support, and bundled CLI
+cask "tailscale-app"
 # Native desktop client for WhatsApp
 cask "whatsapp"
 # Video communication and virtual meeting platform

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Tailscale + Eternal Terminal (ET) remote access setup
-# Supports: macOS (brew services) and Linux (systemd)
+# Supports: macOS (Tailscale Standalone + native sshd, ET via brew) and Linux (systemd)
 #
 # Tailscale: VPN mesh network for secure connectivity
 # ET: Persistent terminal sessions that survive network interruptions
@@ -55,12 +55,17 @@ fi
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════════════╗"
-echo "║          Tailscale SSH & Eternal Terminal Setup                  ║"
+echo "║          Tailscale + Eternal Terminal Setup                      ║"
 echo "╠══════════════════════════════════════════════════════════════════╣"
 echo "║  This will:                                                      ║"
-echo "║  • Start tailscale service (sudo)                                ║"
-echo "║  • Run 'tailscale up' to connect to your tailnet                 ║"
-echo "║  • Start ET (Eternal Terminal) service (sudo)                    ║"
+if [[ "$OS" == "mac" ]]; then
+  echo "║  • Use the installed Tailscale Standalone app                    ║"
+  echo "║  • Start ET (Eternal Terminal) service (sudo)                    ║"
+else
+  echo "║  • Start tailscale service (sudo)                                ║"
+  echo "║  • Run 'tailscale up' to connect to your tailnet                 ║"
+  echo "║  • Start ET (Eternal Terminal) service (sudo)                    ║"
+fi
 echo "║                                                                  ║"
 echo "║  SECURITY: This exposes your machine to your tailnet for SSH    ║"
 echo "╚══════════════════════════════════════════════════════════════════╝"
@@ -75,13 +80,20 @@ fi
 # Tailscale Setup
 ###############################################################################
 
-if ! command_exists tailscale; then
-  if [[ "$OS" == "mac" ]]; then
-    log_warn "tailscale not found. Install with: brew install tailscale"
-  else
-    log_warn "tailscale not found. Install with: curl -fsSL https://tailscale.com/install.sh | sh"
+if [[ "$OS" == "mac" ]]; then
+  TAILSCALE_APP="/Applications/Tailscale.app"
+  if ! brew list --cask tailscale-app &>/dev/null || [[ ! -d "$TAILSCALE_APP" ]]; then
+    log_warn "Tailscale Standalone not found. Install it with: brew install --cask tailscale-app"
+    exit 1
   fi
-  exit 1
+  log_info "Opening Tailscale Standalone..."
+  open -a "$TAILSCALE_APP"
+  log_info "Complete Tailscale login or system-extension approval in the GUI if prompted."
+else
+  if ! command_exists tailscale; then
+    log_warn "tailscale not found. Install with: curl -fsSL https://tailscale.com/install.sh | sh"
+    exit 1
+  fi
 fi
 
 if [[ "$OS" == "mac" ]]; then
@@ -94,17 +106,15 @@ if [[ "$OS" == "mac" ]]; then
   fi
 fi
 
-log_info "Starting tailscale service..."
-if [[ "$OS" == "mac" ]]; then
-  run_privileged brew services start tailscale
-else
+if [[ "$OS" == "linux" ]]; then
+  log_info "Starting tailscale service..."
   run_privileged systemctl enable --now tailscaled
+
+  log_info "Connecting to tailnet (this may open a browser for auth)..."
+  run_privileged tailscale up
+
+  log_ok "Tailscale connected"
 fi
-
-log_info "Connecting to tailnet (this may open a browser for auth)..."
-run_privileged tailscale up
-
-log_ok "Tailscale connected"
 
 ###############################################################################
 # Eternal Terminal Setup
@@ -138,10 +148,12 @@ echo ""
 echo "══════════════════════════════════════════════════════════════════"
 echo "  Setup complete!"
 echo ""
-echo "  Tailscale status:  tailscale status"
 if [[ "$OS" == "mac" ]]; then
+  echo "  Tailscale: official Standalone app"
+  echo "  Tailscale status:  tailscale status (after GUI login)"
   echo "  ET service status: sudo brew services list | grep et"
 else
+  echo "  Tailscale status:  tailscale status"
   echo "  ET service status: systemctl status et"
 fi
 echo ""
