@@ -80,7 +80,9 @@ zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 ZSH_PLUGIN_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
 if [[ -z "$IS_OMP_COMMAND_SHELL" ]]; then
   [[ -f "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && source "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  [[ -r "$ZSH_PLUGIN_DIR/zsh-async/async.zsh" ]] && source "$ZSH_PLUGIN_DIR/zsh-async/async.zsh"
   command -v starship &>/dev/null && eval "$(starship init zsh)"
+  [[ -r "$HOME/.zsh/starship-async.zsh" ]] && source "$HOME/.zsh/starship-async.zsh"
 fi
 
 # === Editor ===

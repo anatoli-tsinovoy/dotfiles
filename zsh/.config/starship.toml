@@ -2,6 +2,12 @@
 
 palette = 'p10k_rainbow'
 format = '$os$all'
+# Slow modules render outside ZLE; let cold toolchains complete in the background.
+command_timeout = 3000
+
+[profiles]
+async-fast = '$os$directory$git_branch$git_commit${git_state}__STARSHIP_ASYNC_FAST_SPLIT__$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
+async-slow = '__STARSHIP_ASYNC_SLOW_BEGIN__${all}__STARSHIP_ASYNC_SLOW_END__$os$directory$git_branch$git_commit$git_state$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
 
 [palettes.p10k_rainbow]
 blue = '4'

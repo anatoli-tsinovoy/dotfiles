@@ -123,12 +123,20 @@ install_aptfile() {
 
 setup_zsh_plugins() {
   local plugins_dir="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
+  local plugin_spec
   local plugin
   local plugin_dir
   local repo
+  local -a plugins=(
+    "zsh-autosuggestions|https://github.com/zsh-users/zsh-autosuggestions.git"
+    "zsh-syntax-highlighting|https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    "zsh-async|https://github.com/mafredri/zsh-async.git"
+  )
 
   mkdir -p "$plugins_dir"
-  for plugin in zsh-autosuggestions zsh-syntax-highlighting; do
+  for plugin_spec in "${plugins[@]}"; do
+    plugin="${plugin_spec%%|*}"
+    repo="${plugin_spec#*|}"
     plugin_dir="$plugins_dir/$plugin"
     if [[ -d "$plugin_dir/.git" ]] && git -C "$plugin_dir" rev-parse --is-inside-work-tree &>/dev/null; then
       log_ok "$plugin already installed"
@@ -136,7 +144,6 @@ setup_zsh_plugins() {
     fi
 
     rm -rf "$plugin_dir"
-    repo="https://github.com/zsh-users/$plugin.git"
     log_info "Installing $plugin..."
     git clone --depth=1 "$repo" "$plugin_dir"
   done
