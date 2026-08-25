@@ -13,6 +13,10 @@ _termux_theme_emit_osc() {
   printf '\033]%s\033\\' "$1"
 }
 
+_termux_theme_passthrough_osc() {
+  printf '\033Ptmux;\033\033]%s\a\033\\' "$1"
+}
+
 _termux_theme_detect() {
   local tty_fd saved_tty response
   local red green blue
@@ -88,6 +92,18 @@ _termux_theme_emit() {
     }
     palette_payload+=";$index;$value"
   done
+
+  # The terminal-clipboard tmux proxy consumes palette OSCs. Send a complete
+  # copy through it first so Termux updates the outer session and its decor;
+  # the bare copy below remains authoritative for tmux's palette state.
+  case "${TERM:-}" in
+    screen*|tmux*)
+      _termux_theme_passthrough_osc "$palette_payload"
+      _termux_theme_passthrough_osc "10;${colors[foreground]}"
+      _termux_theme_passthrough_osc "11;${colors[background]}"
+      _termux_theme_passthrough_osc "12;${colors[cursor]}"
+      ;;
+  esac
 
   _termux_theme_emit_osc "$palette_payload"
   _termux_theme_emit_osc "10;${colors[foreground]}"
