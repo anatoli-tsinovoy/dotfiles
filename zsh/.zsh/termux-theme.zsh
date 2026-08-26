@@ -16,6 +16,9 @@ _termux_theme_emit_osc() {
 _termux_theme_passthrough_osc() {
   printf '\033Ptmux;\033\033]%s\a\033\\' "$1"
 }
+_termux_theme_passthrough_twice_osc() {
+  printf '\033Ptmux;\033\033Ptmux;\033\033\033\033]%s\a\033\033\\\033\\' "$1"
+}
 
 _termux_theme_detect() {
   local tty_fd saved_tty response
@@ -93,10 +96,15 @@ _termux_theme_emit() {
     palette_payload+=";$index;$value"
   done
 
-  # SSH startup normalizes TERM to xterm-256color, so it cannot reveal the
-  # terminal-clipboard tmux proxy. Send a complete passthrough copy first;
-  # direct terminals ignore the DCS wrapper, while the bare copy below remains
-  # authoritative for tmux's palette state.
+  # Send deepest-first copies for the two tmux layers in the container path:
+  # the local terminal-clipboard proxy and the container's tmux server. Each
+  # layer consumes one wrapper and keeps the next bare copy as its own palette
+  # state. Direct terminals ignore wrappers they do not need.
+  _termux_theme_passthrough_twice_osc "$palette_payload"
+  _termux_theme_passthrough_twice_osc "10;${colors[foreground]}"
+  _termux_theme_passthrough_twice_osc "11;${colors[background]}"
+  _termux_theme_passthrough_twice_osc "12;${colors[cursor]}"
+
   _termux_theme_passthrough_osc "$palette_payload"
   _termux_theme_passthrough_osc "10;${colors[foreground]}"
   _termux_theme_passthrough_osc "11;${colors[background]}"
