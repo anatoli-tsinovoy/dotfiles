@@ -342,6 +342,11 @@ if [[ -z "$IS_OMP_COMMAND_SHELL" && -o zle ]]; then
   zle -N up-line-or-beginning-search
   zle -N down-line-or-beginning-search
   zmodload -i zsh/terminfo
+  # Shift-Tab walks completion candidates in the opposite direction.
+  for keymap in viins menuselect; do
+    bindkey -M "$keymap" '^[[Z' reverse-menu-complete
+    [[ -n "${terminfo[kcbt]:-}" ]] && bindkey -M "$keymap" "${terminfo[kcbt]}" reverse-menu-complete
+  done
   for keymap in viins vicmd; do
     # Terminals switch between CSI and SS3 cursor sequences depending on mode.
     bindkey -M "$keymap" '^[[A' up-line-or-beginning-search
