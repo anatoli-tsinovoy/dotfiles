@@ -134,6 +134,15 @@ symbol = ' '
 [aws]
 style = 'bold fg:red'
 symbol = ' '
+disabled = true
+
+[custom.aws_identity]
+command = 'starship-aws-identity'
+when = true
+style = 'bold fg:red'
+symbol = ' '
+format = '([$symbol$output]($style) )'
+description = 'Authenticated AWS caller identity'
 
 [nix_shell]
 style = 'bold fg:cyan'

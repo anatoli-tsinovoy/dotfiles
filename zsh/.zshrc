@@ -302,8 +302,7 @@ awslogin() {
   aws sso login "${login_args[@]}" || return
 
   if (( persist )); then
-    unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
-    export AWS_PROFILE="$profile"
+    unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_PROFILE
     return
   fi
 
@@ -312,7 +311,7 @@ awslogin() {
   # Logout clears the shared SSO cache; the exported session remains valid only in this shell.
   aws sso logout || return
   eval "$credentials"
-  export AWS_PROFILE="$profile"
+  unset AWS_PROFILE
 }
 
 # === Vi-mode keybindings ===
