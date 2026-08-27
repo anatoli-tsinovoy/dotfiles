@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+arn="$(aws sts get-caller-identity --query Arn --output text 2>/dev/null)"
+[[ -n "$arn" && "$arn" != "None" ]]
+
+case "$arn" in
+  *:assumed-role/*)
+    identity="${arn#*:assumed-role/}"
+    identity="${identity%%/*}"
+    ;;
+  *:user/*)
+    identity="${arn#*:user/}"
+    ;;
+  *)
+    identity="${arn##*:}"
+    ;;
+esac
+
+# SSO role names encode the permission-set name and a generated hexadecimal suffix.
+if [[ "$identity" =~ ^AWSReservedSSO_(.+)_[[:xdigit:]]{16}$ ]]; then
+  identity="${BASH_REMATCH[1]}"
+fi
+
+printf '%s\n' "$identity"
