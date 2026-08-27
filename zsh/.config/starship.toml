@@ -6,8 +6,9 @@ format = '$os$all'
 command_timeout = 3000
 
 [profiles]
-async-fast = '$os$directory$git_branch$git_commit${git_state}__STARSHIP_ASYNC_FAST_SPLIT__$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
-async-slow = '__STARSHIP_ASYNC_SLOW_BEGIN__${all}__STARSHIP_ASYNC_SLOW_END__$os$directory$git_branch$git_commit$git_state$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
+async-fast = '$os$username$directory$git_branch$git_commit${git_state}__STARSHIP_ASYNC_FAST_SPLIT__$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
+async-slow = '__STARSHIP_ASYNC_SLOW_BEGIN__${all}__STARSHIP_ASYNC_SLOW_END__${custom.aws_identity}$os$username$directory$git_branch$git_commit$git_state$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
+async-superslow = '__STARSHIP_ASYNC_SUPERSLOW_BEGIN__${custom.aws_identity}__STARSHIP_ASYNC_SUPERSLOW_END__'
 
 [palettes.p10k_rainbow]
 blue = '4'
@@ -138,7 +139,9 @@ disabled = true
 
 [custom.aws_identity]
 command = 'starship-aws-identity'
-when = true
+when = 'test "${STARSHIP_ASYNC_SUPERSLOW:-}" = 1'
+# The helper enforces its own five-second timeout around the AWS process.
+ignore_timeout = true
 style = 'bold fg:red'
 symbol = ' '
 format = '([$symbol$output]($style) )'

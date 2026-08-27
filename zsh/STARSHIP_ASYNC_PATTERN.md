@@ -17,7 +17,7 @@ git clone --depth=1 https://github.com/mafredri/zsh-async.git \
 
 ## 1. Split the Starship format
 
-Keep the normal format for shells that do not load the async integration. Add two profiles to `~/.config/starship.toml`:
+Keep the normal format for shells that do not load the async integration. Add fast, slow, and superslow profiles to `~/.config/starship.toml`:
 
 ```toml
 format = '$os$all'
@@ -26,11 +26,12 @@ format = '$os$all'
 command_timeout = 3000
 
 [profiles]
-async-fast = '$os$directory$git_branch$git_commit${git_state}__STARSHIP_ASYNC_FAST_SPLIT__$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
-async-slow = '__STARSHIP_ASYNC_SLOW_BEGIN__${all}__STARSHIP_ASYNC_SLOW_END__$os$directory$git_branch$git_commit$git_state$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
+async-fast = '$os$username$directory$git_branch$git_commit${git_state}__STARSHIP_ASYNC_FAST_SPLIT__$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
+async-slow = '__STARSHIP_ASYNC_SLOW_BEGIN__${all}__STARSHIP_ASYNC_SLOW_END__${custom.aws_identity}$os$username$directory$git_branch$git_commit$git_state$cmd_duration$line_break$jobs$battery$time$status$container$netns$shell$character'
+async-superslow = '__STARSHIP_ASYNC_SUPERSLOW_BEGIN__${custom.aws_identity}__STARSHIP_ASYNC_SUPERSLOW_END__'
 ```
 
-Modules named explicitly in `async-slow` are excluded from `${all}`. The text between the slow markers therefore contains every module not assigned to the fast profile. Keep the same explicit module list in both profiles.
+Modules named explicitly in `async-slow` are excluded from `${all}`. The text between the slow markers therefore contains every module not assigned to the fast or superslow profiles. Keep the fast module list explicit after the slow end marker, and name every superslow module there as well so `${all}` cannot run it on the ordinary slow worker.
 
 ## 2. Load components in order
 
@@ -47,25 +48,27 @@ If `zsh-async` is optional, guard both `source` calls with `[[ -r ... ]]`. The w
 
 ## 3. Implement the wrapper
 
-The wrapper is a small state machine around one `zsh-async` worker:
+The wrapper is a small state machine around separate `zsh-async` workers for slow and superslow work:
+
+Scheduling class and cache scope are independent. A job chooses a worker from its latency class (`slow` or `superslow`) and separately declares a cache scope (`directory` or `shell`) plus a cache key. The current slow-module job is directory-scoped; the AWS identity job happens to be both superslow and shell-scoped.
 
 1. Save Starship's original dynamic `PROMPT` and `RPROMPT`.
-2. Start one unique worker with `async_start_worker NAME -u -n` and register a callback.
+2. Start unique slow and superslow workers with `async_start_worker NAME -u -n` and register the same callback for both.
 3. In a later `precmd` hook:
-   - Flush the previous job.
-   - Increment a generation number.
+   - Flush both workers' previous jobs.
+   - Increment a shared generation number.
    - Resolve a physical PWD (`${PWD:A}`).
    - Run `starship prompt --profile async-fast` synchronously with Starship's captured `--status`, `--pipestatus`, `--cmd-duration`, `--jobs`, terminal width, and keymap.
    - Split the output at `__STARSHIP_ASYNC_FAST_SPLIT__`.
-   - Insert the cached slow string for this PWD between the two fast pieces.
-   - Queue `starship prompt --profile async-slow` with the same arguments, generation, and PWD.
-4. In the worker callback:
+   - Read each result through the scope-aware cache API: slow modules from `directory:slow_modules:$PWD`, AWS identity from `shell:aws_identity`.
+   - Queue the slow-module job on the slow worker and the AWS identity job on the superslow worker.
+4. In the shared worker callback:
    - Reject nonzero results.
    - Reject results whose generation or physical PWD no longer matches.
-   - Extract only the text between `__STARSHIP_ASYNC_SLOW_BEGIN__` and `__STARSHIP_ASYNC_SLOW_END__`.
-   - Cache it by physical PWD and rebuild the prompt.
-   - Call `zle reset-prompt` only when zsh-async reports no buffered result remains.
-5. Flush jobs in `preexec`; stop the worker in `zshexit`.
+   - Select markers, cache scope, and cache key from the completed job identity—not from its worker or latency class.
+   - Extract only the text between that profile's begin and end markers.
+   - Update the declared cache scope, rebuild from both cache keys, and redraw without waiting for the other worker.
+5. Flush both workers in `preexec`; stop both in `zshexit`.
 6. Preserve Starship's existing `zle-keymap-select` widget and refresh only the fast profile when the keymap changes.
 
 ### Required safety invariant

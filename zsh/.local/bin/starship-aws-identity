@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-arn="$(aws sts get-caller-identity --query Arn --output text 2>/dev/null)"
+timeout_seconds=5
+if command -v timeout &>/dev/null; then
+  timeout_command=timeout
+else
+  timeout_command=gtimeout
+fi
+
+arn="$("$timeout_command" "$timeout_seconds" aws sts get-caller-identity \
+  --cli-connect-timeout "$timeout_seconds" \
+  --cli-read-timeout "$timeout_seconds" \
+  --query Arn \
+  --output text 2>/dev/null)"
 [[ -n "$arn" && "$arn" != "None" ]]
 
 case "$arn" in
