@@ -40,10 +40,8 @@ task:
   showResolvedModelBadge: true
   enableLsp: true
   eager: preferred
-tools:
-  {}
-providers:
-  {}
+tools: {}
+providers: {}
 advisor:
   enabled: false
 doubleEscapeAction: tree
@@ -59,7 +57,7 @@ statusLine:
   transparent: true
   compactThinkingLevel: true
   showHookStatus: true
-tui: 
+tui:
   scrollbackRebuild: true
   textSizing: false
 display:
