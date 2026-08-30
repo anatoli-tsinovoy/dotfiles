@@ -25,8 +25,8 @@
       "enabledFeatures": null,
       "enabled": true
     },
-    "omp-fork-in-tmux": {
-      "version": "0.1.0",
+    "omp-subagent-costs": {
+      "version": "1.0.1",
       "enabledFeatures": null,
       "enabled": true
     }

@@ -6,10 +6,11 @@
       "name": "omp-plugins",
       "dependencies": {
         "@plannotator/pi-extension": "^0.24.2",
-        "omp-fork-in-tmux": "github:anatoli-tsinovoy/omp-fork-in-tmux",
         "omp-code-review": "github:anatoli-tsinovoy/omp-code-review",
+        "omp-fork-in-tmux": "github:anatoli-tsinovoy/omp-fork-in-tmux",
         "omp-model-service-tier": "github:anatoli-tsinovoy/omp-model-service-tier",
         "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash",
+        "omp-subagent-costs": "github:anatoli-tsinovoy/omp-subagent-costs",
       },
     },
   },
@@ -565,6 +566,8 @@
     "omp-model-service-tier": ["omp-model-service-tier@github:anatoli-tsinovoy/omp-model-service-tier#6fee043", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=17.2.10", "@oh-my-pi/pi-utils": ">=17.2.10" } }, "anatoli-tsinovoy-omp-model-service-tier-6fee043", "sha512-6zT4tr7UDZG6hsbzKvIjvnZo5SPPIDx0FMeZTNbHQHNmUlcNwZgrmxNDe8rZoktQwyBFsuE6IgvX85z6KwZ+PQ=="],
 
     "omp-prompt-stash": ["omp-prompt-stash@github:anatoli-tsinovoy/omp-prompt-stash#19159fa", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=17.2.9", "@oh-my-pi/pi-tui": ">=17.2.9", "@oh-my-pi/pi-utils": ">=17.2.9" } }, "anatoli-tsinovoy-omp-prompt-stash-19159fa", "sha512-A8Qvgc0ytI9fhMpCFw4lgDJgTM9b7Zr+3JmitFs6We15uW0k0845/aSWtAjlrGJP1CG8dukSR9RcjSZ5JHe5hQ=="],
+
+    "omp-subagent-costs": ["omp-subagent-costs@github:anatoli-tsinovoy/omp-subagent-costs#fa5caf7", {}, "anatoli-tsinovoy-omp-subagent-costs-fa5caf7", "sha512-RSF6IKXGr9qsQzUv1ai/f8191QjPcXSUc62WVs/zKqV+0twZkafnPpMlc7YvkiddfZRKuAw+nHWT4hmTKOyzGg=="],
 
     "oniguruma-parser": ["oniguruma-parser@0.12.2", "", {}, "sha512-6HVa5oIrgMC6aA6WF6XyyqbhRPJrKR02L20+2+zpDtO5QAzGHAUGw5TKQvwi5vctNnRHkJYmjAhRVQF2EKdTQw=="],
 

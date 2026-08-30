@@ -6,6 +6,7 @@
     "omp-code-review": "github:anatoli-tsinovoy/omp-code-review",
     "omp-fork-in-tmux": "github:anatoli-tsinovoy/omp-fork-in-tmux",
     "omp-model-service-tier": "github:anatoli-tsinovoy/omp-model-service-tier",
-    "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash"
+    "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash",
+    "omp-subagent-costs": "github:anatoli-tsinovoy/omp-subagent-costs"
   }
 }

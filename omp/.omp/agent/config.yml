@@ -55,7 +55,7 @@ speech:
   enabled: false
   enhanced: true
 statusLine:
-  sessionAccent: true
+  sessionAccent: false
   transparent: true
   compactThinkingLevel: true
   showHookStatus: true
@@ -64,7 +64,7 @@ tui:
   textSizing: false
 display:
   cacheMissMarker: true
-  showTokenUsage: false
+  showTokenUsage: true
 terminal:
   showImages: true
 generate_image:
