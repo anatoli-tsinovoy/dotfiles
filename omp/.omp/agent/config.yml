@@ -40,8 +40,10 @@ task:
   showResolvedModelBadge: true
   enableLsp: true
   eager: preferred
-tools: {}
-providers: {}
+tools:
+  {}
+providers:
+  {}
 advisor:
   enabled: false
 doubleEscapeAction: tree
@@ -62,7 +64,8 @@ tui:
   textSizing: false
 display:
   cacheMissMarker: true
-  showTokenUsage: true
+  showTokenUsage: false
+  showTurnTime: true
 terminal:
   showImages: true
 generate_image:
