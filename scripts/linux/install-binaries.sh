@@ -538,6 +538,18 @@ install_yaml_language_server() {
   log_ok "yaml-language-server installed"
 }
 
+install_typescript_lsp() {
+  if ! command_exists bun; then
+    log_warn "bun not found, skipping TypeScript native LSP installation"
+    return 1
+  fi
+
+  log_info "Installing latest TypeScript native LSP..."
+  bun install -g typescript@latest
+  log_ok "TypeScript native LSP installed"
+}
+
+
 
 install_lazydocker() {
   # Only install if NOT inside a container
@@ -680,6 +692,7 @@ main() {
   install_omp
   install_bash_language_server
   install_yaml_language_server
+  install_typescript_lsp
 
   # Optional: LazyVim (only if nvim config doesn't exist)
   # Uncomment if you want LazyVim on fresh installs:

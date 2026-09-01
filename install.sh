@@ -367,6 +367,9 @@ main() {
     log_info "Installing oh-my-pi via bun..."
     bun install -g @oh-my-pi/pi-coding-agent --safe-chain-skip-minimum-package-age
 
+    log_info "Installing latest TypeScript native LSP..."
+    bun install -g typescript@latest --safe-chain-skip-minimum-package-age
+
     log_info "Installing sentry-cli via bun..."
     bun install -g @sentry/cli --safe-chain-skip-minimum-package-age
 
