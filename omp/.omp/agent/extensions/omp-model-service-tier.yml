@@ -1,4 +1,4 @@
 # Provider-qualified selectors take precedence over bare model IDs.
 # `none` and `auto` remove service_tier from matching requests.
 gpt-5.6-luna: priority
-gpt-5.6-sol: none
+gpt-5.6-sol: flex
