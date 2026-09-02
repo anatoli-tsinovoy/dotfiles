@@ -213,8 +213,6 @@ cask "nikitabobko/tap/aerospace", trusted: true
 cask "betterdisplay"
 # Virtual Audio Driver
 cask "blackhole-2ch"
-# OpenAI's official ChatGPT desktop app
-cask "chatgpt"
 # Databases and SQL IDE
 cask "datagrip"
 # Reclaim storage used for Xcode caches

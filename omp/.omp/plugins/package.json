@@ -3,6 +3,7 @@
   "private": true,
   "dependencies": {
     "@plannotator/pi-extension": "^0.24.2",
+    "omp-cache-miss-oof": "github:anatoli-tsinovoy/omp-cache-miss-oof",
     "omp-code-review": "github:anatoli-tsinovoy/omp-code-review",
     "omp-fork-in-tmux": "github:anatoli-tsinovoy/omp-fork-in-tmux",
     "omp-model-service-tier": "github:anatoli-tsinovoy/omp-model-service-tier",

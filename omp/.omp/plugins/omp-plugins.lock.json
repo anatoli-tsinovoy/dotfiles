@@ -29,6 +29,11 @@
       "version": "1.0.1",
       "enabledFeatures": null,
       "enabled": true
+    },
+    "omp-cache-miss-oof": {
+      "version": "0.1.1",
+      "enabledFeatures": null,
+      "enabled": true
     }
   },
   "settings": {}
