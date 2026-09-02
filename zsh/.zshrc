@@ -12,6 +12,10 @@ if [[ "$OSTYPE" == linux* && -z "${TMUX-}" ]]; then
   export COLORTERM=truecolor
 fi
 
+# Use semantic ANSI colors so file-listing tools follow each terminal palette.
+# Keep this portable: macOS and Termux do not provide GNU dircolors by default.
+export LS_COLORS='di=94:ln=36:so=35:pi=33:ex=32:bd=33:cd=33:or=1;31:mi=1;31'
+
 # === PATH setup (early, so tools are available for rest of config) ===
 export PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 
@@ -72,7 +76,7 @@ setopt auto_menu complete_in_word always_to_end
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' special-dirs true
-zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' use-cache true
 zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 

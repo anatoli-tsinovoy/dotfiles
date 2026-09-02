@@ -185,6 +185,7 @@ setup_omp_plugins() {
     "github:anatoli-tsinovoy/omp-fork-in-tmux"
     "github:anatoli-tsinovoy/omp-model-service-tier"
     "github:anatoli-tsinovoy/omp-subagent-costs"
+    "github:anatoli-tsinovoy/omp-cache-miss-oof"
   )
   for plugin in "${remote_plugins[@]}"; do
     omp plugin install "$plugin"
