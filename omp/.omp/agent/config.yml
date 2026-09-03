@@ -40,11 +40,13 @@ task:
   showResolvedModelBadge: true
   enableLsp: true
   eager: preferred
-tools: {}
-providers: {}
+tools:
+  {}
+providers:
+  {}
 advisor:
   enabled: false
-doubleEscapeAction: tree
+doubleEscapeAction: rewind
 marketplace:
   autoUpdate: auto
 stt:
@@ -75,3 +77,5 @@ astGrep:
 composer:
   shape: box
 extendedContext: false
+branchSummary:
+  enabled: true
