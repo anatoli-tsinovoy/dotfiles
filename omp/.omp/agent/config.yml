@@ -79,3 +79,5 @@ composer:
 extendedContext: false
 branchSummary:
   enabled: true
+memory:
+  backend: sharpshooter
