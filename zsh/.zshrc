@@ -99,21 +99,9 @@ alias ..='cd ..'
 alias -- -='cd -'
 
 # PulseAudio forwarding and remote transport helpers.
-if is_termux; then
-  _remote_exec() {
-    command terminal-clipboard "$@"
-  }
-  ssh() {
-    _remote_exec ssh "$@"
-  }
-  et() {
-    _remote_exec et "$@"
-  }
-else
-  _remote_exec() {
-    command "$@"
-  }
-fi
+_remote_exec() {
+  command "$@"
+}
 [[ -r "$HOME/.zsh/pulse-forward.zsh" ]] && source "$HOME/.zsh/pulse-forward.zsh"
 # Termux palette switching, including remote shells reached through ET and tmux.
 [[ -r "$HOME/.zsh/termux-theme.zsh" ]] && source "$HOME/.zsh/termux-theme.zsh"
