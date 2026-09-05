@@ -2,4 +2,7 @@
 # `none` and `auto` remove service_tier from matching requests.
 gpt-5.6-luna: priority
 gpt-5.6-sol: flex
+gpt-6-astra: flex
+openai-codex/gpt-5.6-luna: none
 openai-codex/gpt-5.6-sol: none
+openai-codex/gpt-6-astra: none
