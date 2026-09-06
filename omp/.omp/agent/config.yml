@@ -81,3 +81,5 @@ branchSummary:
   enabled: true
 memory:
   backend: sharpshooter
+codexResets:
+  autoRedeem: "no"
