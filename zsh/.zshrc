@@ -352,6 +352,8 @@ if [[ -z "$IS_OMP_COMMAND_SHELL" && -o zle ]]; then
     bindkey -M "$keymap" '^[[F' end-of-line
     bindkey -M "$keymap" '^[OF' end-of-line
     bindkey -M "$keymap" '^[[4~' end-of-line
+    bindkey -M "$keymap" '^[[3~' delete-char
+    [[ -n "${terminfo[kdch1]:-}" ]] && bindkey -M "$keymap" "${terminfo[kdch1]}" delete-char
     [[ -n "${terminfo[khome]:-}" ]] && bindkey -M "$keymap" "${terminfo[khome]}" beginning-of-line
     [[ -n "${terminfo[kend]:-}" ]] && bindkey -M "$keymap" "${terminfo[kend]}" end-of-line
     bindkey -M "$keymap" '^[[5~' up-line-or-beginning-search
