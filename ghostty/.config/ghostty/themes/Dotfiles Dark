@@ -14,6 +14,14 @@ palette = 12=#9A67FF
 palette = 13=#FFC9D7
 palette = 14=#00E6CC
 palette = 15=#F3F0DF
+# Delta removed-line fill (22)
+palette = 22=#3e2435
+# Delta removed-word emphasis (23)
+palette = 23=#61364b
+# Delta added-line fill (24)
+palette = 24=#163b38
+# Delta added-word emphasis (25)
+palette = 25=#26564b
 background = #110034
 foreground = #F3F0DF
 cursor-color = #8217FF

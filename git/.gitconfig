@@ -54,6 +54,15 @@
   side-by-side = true
   max-line-length = 0
   wrap-max-lines = unlimited
+  # Theme-owned indexed fills: removed line/word (22/23), added line/word (24/25).
+  minus-style = normal 22
+  minus-emph-style = normal 23
+  plus-style = normal 24
+  plus-emph-style = normal 25
+  syntax-theme = ansi
+  line-numbers-minus-style = red
+  line-numbers-plus-style = green
+  line-numbers-zero-style = normal
 [merge]
   conflictstyle = zdiff3
 

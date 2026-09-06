@@ -83,7 +83,7 @@ _termux_theme_emit() {
     }
   done
 
-  for (( index = 0; index <= 21; index++ )); do
+  for (( index = 0; index <= 25; index++ )); do
     key="color$index"
     value="${colors[$key]:-}"
     [[ -n "$value" ]] || {
