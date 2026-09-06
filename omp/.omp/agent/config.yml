@@ -83,3 +83,4 @@ memory:
   backend: sharpshooter
 codexResets:
   autoRedeem: "no"
+steeringMode: all
