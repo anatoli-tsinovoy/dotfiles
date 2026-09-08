@@ -31,7 +31,7 @@
       "enabled": true
     },
     "omp-cache-miss-oof": {
-      "version": "0.1.1",
+      "version": "0.1.4",
       "enabledFeatures": null,
       "enabled": true
     }
