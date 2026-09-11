@@ -1,4 +1,7 @@
 modelRoles:
+  # OMP instructions: ~/dotfiles/omp/.omp/agent/SYSTEM.md, stowed to ~/.omp/agent/SYSTEM.md.
+  # Native discovery activates it on a new session; no systemPrompt setting is needed.
+  # Main-session-wide: switching models does not switch prompts. CLI/project overrides win.
   default: openai/gpt-6-astra:medium
   smol: openai/gpt-5.6-luna:xhigh
   slow: openai/gpt-5.6-sol:xhigh
@@ -40,10 +43,8 @@ task:
   showResolvedModelBadge: true
   enableLsp: true
   eager: preferred
-tools:
-  {}
-providers:
-  {}
+tools: {}
+providers: {}
 advisor:
   enabled: false
 doubleEscapeAction: rewind
@@ -84,3 +85,5 @@ memory:
 codexResets:
   autoRedeem: "no"
 steeringMode: all
+ttsr:
+  contextMode: discard
