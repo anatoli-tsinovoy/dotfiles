@@ -14,6 +14,18 @@ modelRoles:
   tiny: openai-codex/gpt-5.6-luna:medium
   advisor: openai-codex/gpt-6-astra:high
 
+# Codex shares the OpenAI tier family: no Flex support or paid Priority.
+tier:
+  openai: none
+  subagent: none
+  advisor: none
+task:
+  # Mappings deep-merge; explicitly neutralize every base-config override.
+  agentServiceTierOverrides:
+    scout: none
+    task: none
+    sonic: none
+
 enabledModels:
   - openai-codex/*
 

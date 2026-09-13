@@ -20,11 +20,6 @@
       "enabledFeatures": null,
       "enabled": true
     },
-    "omp-model-service-tier": {
-      "version": "1.2.1",
-      "enabledFeatures": null,
-      "enabled": true
-    },
     "omp-subagent-costs": {
       "version": "1.0.1",
       "enabledFeatures": null,

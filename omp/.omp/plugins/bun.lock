@@ -9,7 +9,6 @@
         "omp-cache-miss-oof": "github:anatoli-tsinovoy/omp-cache-miss-oof",
         "omp-code-review": "github:anatoli-tsinovoy/omp-code-review",
         "omp-fork-in-tmux": "github:anatoli-tsinovoy/omp-fork-in-tmux",
-        "omp-model-service-tier": "github:anatoli-tsinovoy/omp-model-service-tier",
         "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash",
         "omp-subagent-costs": "github:anatoli-tsinovoy/omp-subagent-costs",
       },
@@ -567,8 +566,6 @@
     "omp-code-review": ["omp-code-review@github:anatoli-tsinovoy/omp-code-review#faba7e2", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=17.2.9", "@oh-my-pi/pi-tui": ">=17.2.9", "@oh-my-pi/pi-utils": ">=17.2.9" } }, "anatoli-tsinovoy-omp-code-review-faba7e2", "sha512-FXKo2YbKzlKFAc3r0V6f4vZ6VnbEcN+rKEZxBISPMOA25yhDrpgccLaVrKvu7y7GTctJxRZbB/4MancRvvKw/Q=="],
 
     "omp-fork-in-tmux": ["omp-fork-in-tmux@github:anatoli-tsinovoy/omp-fork-in-tmux#18696a4", {}, "anatoli-tsinovoy-omp-fork-in-tmux-18696a4", "sha512-+ZQ1x8w26nd/9jUEofXSdfIJkwC63R6uVhCTWLPR4KeHmB5XKmVyMYedqnaKBjfvYaoNffri1GgNkV5t8E/8Zw=="],
-
-    "omp-model-service-tier": ["omp-model-service-tier@github:anatoli-tsinovoy/omp-model-service-tier#6fee043", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=17.2.10", "@oh-my-pi/pi-utils": ">=17.2.10" } }, "anatoli-tsinovoy-omp-model-service-tier-6fee043", "sha512-6zT4tr7UDZG6hsbzKvIjvnZo5SPPIDx0FMeZTNbHQHNmUlcNwZgrmxNDe8rZoktQwyBFsuE6IgvX85z6KwZ+PQ=="],
 
     "omp-prompt-stash": ["omp-prompt-stash@github:anatoli-tsinovoy/omp-prompt-stash#19159fa", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=17.2.9", "@oh-my-pi/pi-tui": ">=17.2.9", "@oh-my-pi/pi-utils": ">=17.2.9" } }, "anatoli-tsinovoy-omp-prompt-stash-19159fa", "sha512-A8Qvgc0ytI9fhMpCFw4lgDJgTM9b7Zr+3JmitFs6We15uW0k0845/aSWtAjlrGJP1CG8dukSR9RcjSZ5JHe5hQ=="],
 
