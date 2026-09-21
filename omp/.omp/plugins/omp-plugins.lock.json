@@ -1,10 +1,5 @@
 {
   "plugins": {
-    "@plannotator/pi-extension": {
-      "version": "0.24.2",
-      "enabledFeatures": null,
-      "enabled": true
-    },
     "omp-code-review": {
       "version": "0.2.0",
       "enabledFeatures": null,

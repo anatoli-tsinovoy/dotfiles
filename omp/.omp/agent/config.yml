@@ -1,7 +1,4 @@
 modelRoles:
-  # OMP instructions: ~/dotfiles/omp/.omp/agent/SYSTEM.md, stowed to ~/.omp/agent/SYSTEM.md.
-  # Native discovery activates it on a new session; no systemPrompt setting is needed.
-  # Main-session-wide: switching models does not switch prompts. CLI/project overrides win.
   default: openai/gpt-6-astra:medium
   smol: openai/gpt-5.6-luna:xhigh
   slow: openai/gpt-5.6-sol:xhigh
@@ -12,10 +9,9 @@ modelRoles:
   commit: openai/gpt-5.6-luna:off
   tiny: openai/gpt-5.6-luna:medium
   advisor: openai/gpt-5.6-sol:high
-# Native tiers (per-agent overrides require upstream PR #9668).
-# These follow agent names, not model switches; Luna-backed agents use Priority below.
 tier:
   openai: flex
+  openai-codex: none
   subagent: inherit
   advisor: inherit
 hideThinkingBlock: true
@@ -48,13 +44,15 @@ github:
 task:
   showResolvedModelBadge: true
   enableLsp: true
-  eager: preferred
+  eager: always
   agentServiceTierOverrides:
     scout: priority
     task: priority
     sonic: priority
-tools: {}
-providers: {}
+tools:
+  {}
+providers:
+  {}
 advisor:
   enabled: false
 doubleEscapeAction: rewind
