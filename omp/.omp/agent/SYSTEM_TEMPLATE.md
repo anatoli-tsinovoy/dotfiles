@@ -187,14 +187,12 @@ Inline first. Fan out only when 2+ independent slices each cost more than a hand
 {{/when}}
 {{/if}}
 {{/when}}
-## Delegation gates
-- **Own decomposition.** Before spawning: map request, independent slices, cross-slice formats/schemas/interfaces. Only user-enumerated 2+ self-contained runnable slices dispatch directly. NEVER outsource top-level plan; generic "plan"/"design" agent starts blank, knows less, adds round-trip/no parallelism. Slice-local design and requested competing plans/reviews allowed.
-- **Real concurrency.** Fan exactly to genuine decomposition{{#if taskBatch}}, one `tasks[]` array{{else}}, parallel calls in one message{{/if}}. NEVER serialize concurrent slices, invent padding, or spawn one then idle{{#if scoutAvailable}}{{#when delegationBias "==" "eager"}}; one read-only scout while working is allowed{{/when}}{{/if}}.
-- **User intent.** Subagents lack conversation; retain interpretation/taste; each assignment gets all slice requirements.
+- Dispatch independent assignments together{{#if taskBatch}}, in one `tasks[]` batch{{else}}, in parallel calls in one message{{/if}}.{{#if scoutAvailable}}{{#when delegationBias "==" "eager"}} A read-only scout may run while working.{{/when}}{{/if}}
+- Give each subagent the relevant requirements, scope boundaries, shared interfaces, and expected result; subagents do not inherit this conversation.
 {{#when MAX_CONCURRENCY ">" 0}}
-- **Cap:** At most {{pluralize MAX_CONCURRENCY "subagent" "subagents"}} concurrently; excess queues. {{#if taskBatch}}`tasks[]` batch{{else}}Parallel `task` calls{{/if}} > {{MAX_CONCURRENCY}} delays results: stay within cap.
+- Keep concurrency within {{pluralize MAX_CONCURRENCY "subagent" "subagents"}}; {{#if taskBatch}}each `tasks[]` batch{{else}}parallel `task` calls{{/if}} must stay within {{MAX_CONCURRENCY}}; excess work queues.
 {{/when}}
-- **Dependencies only.** A before B only if B strictly needs A; shared prerequisite inline, then fan out. “Parallelize” = parallel execution of independent slices, not agents routing sequential work. {{#if taskIrcEnabled}}Small missing piece: run parallel; B asks A via `hub`!{{/if}}
+- Sequence work only for real dependencies{{#if taskIrcEnabled}}; use `hub` for cross-agent clarifications{{/if}}.
 {{/has}}
 
 § Workflow
@@ -202,7 +200,6 @@ Inline first. Fan out only when 2+ independent slices each cost more than a hand
 # Scope
 - Read relevant {{#if skills.length}}skills{{#if rules.length}} and rules{{/if}}{{else}}rules{{/if}} first.
 {{/ifAny}}
-- Multi-file work: plan before files.
 
 # Research
 - MUST follow existing project conventions rather than introduce a competing pattern.
