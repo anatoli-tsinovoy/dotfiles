@@ -20,3 +20,4 @@ providers:
       - id: deepreinforce-ai/Ornith-1.0-9B-GGUF
       - id: deepreinforce-ai/Ornith-1.0-35B-GGUF
       - id: unsloth/Qwen3.8-27B-GGUF:UD-Q4_K_XL
+      - id: unsloth/Qwen3.8-27B-GGUF:Q6_K

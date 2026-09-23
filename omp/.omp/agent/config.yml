@@ -95,3 +95,6 @@ codexResets:
 steeringMode: all
 ttsr:
   contextMode: discard
+commands:
+  enableClaudeProject: false
+  enableOpencodeProject: false
