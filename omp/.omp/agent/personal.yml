@@ -3,16 +3,16 @@
 # Authenticate once in the shared/default agent store with:
 #   /login openai-codex
 modelRoles:
-  default: openai-codex/gpt-6-astra:low
-  smol: openai-codex/gpt-5.6-luna:xhigh
-  slow: openai-codex/gpt-5.6-sol:xhigh
-  designer: openai-codex/gpt-6-astra
-  vision: openai-codex/gpt-6-astra
-  plan: openai-codex/gpt-6-astra:high
-  task: openai-codex/gpt-5.6-luna:max
-  commit: openai-codex/gpt-5.6-luna:off
-  tiny: openai-codex/gpt-5.6-luna:medium
-  advisor: openai-codex/gpt-6-astra:high
+  default: openai-codex/gpt-6-sol:medium
+  smol: openai-codex/gpt-6-luna:xhigh
+  slow: openai-codex/gpt-6-sol:xhigh
+  designer: openai-codex/gpt-6-sol
+  vision: openai-codex/gpt-6-sol
+  plan: openai-codex/gpt-6-sol:high
+  task: openai-codex/gpt-6-luna:max
+  commit: openai-codex/gpt-6-luna:low
+  tiny: openai-codex/gpt-6-luna:medium
+  advisor: openai-codex/gpt-6-sol:high
 
 # Codex shares the OpenAI tier family: no Flex support or paid Priority.
 tier:
