@@ -21,7 +21,6 @@ theme:
 symbolPreset: nerd
 colorBlindMode: false
 compaction:
-  thresholdPercent: 70
   handoffSaveToDisk: true
   thresholdTokens: 229000
   methodOrder:
@@ -49,10 +48,12 @@ task:
     scout: priority
     task: priority
     sonic: priority
-tools:
-  {}
-providers:
-  {}
+  agentCompactionThresholdOverrides:
+    scout: 500000
+    task: 500000
+    sonic: 500000
+tools: {}
+providers: {}
 advisor:
   enabled: false
 doubleEscapeAction: rewind
@@ -85,7 +86,7 @@ astGrep:
   enabled: true
 composer:
   shape: box
-extendedContext: false
+extendedContext: true
 branchSummary:
   enabled: true
 memory:
