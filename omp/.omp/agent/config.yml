@@ -9,6 +9,7 @@ modelRoles:
   commit: openai/gpt-6-luna:off
   tiny: openai/gpt-6-luna:medium
   advisor: openai/gpt-6-sol:high
+  web: openai/gpt-6-luna # Uses billed OpenAI API web search.
 tier:
   openai: flex
   openai-codex: none
