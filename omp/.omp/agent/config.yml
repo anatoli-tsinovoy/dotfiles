@@ -39,6 +39,7 @@ contextPromotion:
   enabled: false
 dev:
   autoqaConsent: denied
+  autoqa: false
 github:
   enabled: true
 task:
@@ -53,8 +54,8 @@ task:
     scout: 500000
     task: 500000
     sonic: 500000
-tools: {}
-providers: {}
+tools:
+  {}
 advisor:
   enabled: false
 doubleEscapeAction: rewind
@@ -100,3 +101,7 @@ ttsr:
 commands:
   enableClaudeProject: false
   enableOpencodeProject: false
+secrets:
+  enabled: true
+telemetry:
+  otlpExportEnabled: false
