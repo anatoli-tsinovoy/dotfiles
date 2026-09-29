@@ -8,6 +8,7 @@
         "omp-cache-miss-oof": "github:anatoli-tsinovoy/omp-cache-miss-oof",
         "omp-fork-in-tmux": "github:anatoli-tsinovoy/omp-fork-in-tmux",
         "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash",
+        "omp-session-progress": "github:kalugny/omp-session-progress",
         "omp-subagent-costs": "github:anatoli-tsinovoy/omp-subagent-costs",
       },
     },
@@ -294,6 +295,8 @@
     "omp-fork-in-tmux": ["omp-fork-in-tmux@github:anatoli-tsinovoy/omp-fork-in-tmux#18696a4", {}, "anatoli-tsinovoy-omp-fork-in-tmux-18696a4", "sha512-+ZQ1x8w26nd/9jUEofXSdfIJkwC63R6uVhCTWLPR4KeHmB5XKmVyMYedqnaKBjfvYaoNffri1GgNkV5t8E/8Zw=="],
 
     "omp-prompt-stash": ["omp-prompt-stash@github:anatoli-tsinovoy/omp-prompt-stash#19159fa", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=17.2.9", "@oh-my-pi/pi-tui": ">=17.2.9", "@oh-my-pi/pi-utils": ">=17.2.9" } }, "anatoli-tsinovoy-omp-prompt-stash-19159fa", "sha512-A8Qvgc0ytI9fhMpCFw4lgDJgTM9b7Zr+3JmitFs6We15uW0k0845/aSWtAjlrGJP1CG8dukSR9RcjSZ5JHe5hQ=="],
+
+    "omp-session-progress": ["omp-session-progress@github:kalugny/omp-session-progress#533d842", {}, "kalugny-omp-session-progress-533d842", "sha512-t7Ff4TaQyxwydqv3uEGl73ktTC3QYXsr/GK8kzLpJDUujmCe9yVpCbhCimiNi6B+jvxtAjjsN0Ilgw5BHAsQ1w=="],
 
     "omp-subagent-costs": ["omp-subagent-costs@github:anatoli-tsinovoy/omp-subagent-costs#fa5caf7", {}, "anatoli-tsinovoy-omp-subagent-costs-fa5caf7", "sha512-RSF6IKXGr9qsQzUv1ai/f8191QjPcXSUc62WVs/zKqV+0twZkafnPpMlc7YvkiddfZRKuAw+nHWT4hmTKOyzGg=="],
 
