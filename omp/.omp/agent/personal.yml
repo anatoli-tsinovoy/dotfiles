@@ -3,16 +3,16 @@
 # Authenticate once in the shared/default agent store with:
 #   /login openai-codex
 modelRoles:
-  default: openai-codex/gpt-6-sol:medium
+  default: openai-codex/gpt-6.1-sol:medium
   smol: openai-codex/gpt-6-luna:xhigh
-  slow: openai-codex/gpt-6-sol:xhigh
-  designer: openai-codex/gpt-6-sol
-  vision: openai-codex/gpt-6-sol
-  plan: openai-codex/gpt-6-sol:high
+  slow: openai-codex/gpt-6.1-sol:xhigh
+  designer: openai-codex/gpt-6.1-sol
+  vision: openai-codex/gpt-6.1-sol
+  plan: openai-codex/gpt-6.1-sol:high
   task: openai-codex/gpt-6-luna:max
   commit: openai-codex/gpt-6-luna:low
   tiny: openai-codex/gpt-6-luna:medium
-  advisor: openai-codex/gpt-6-sol:high
+  advisor: openai-codex/gpt-6-luna:high
   # Uses Codex OAuth web search, overriding the regular API web role.
   web: openai-codex/gpt-6-luna
 

@@ -1,20 +1,20 @@
 modelRoles:
-  default: openai/gpt-6-sol:medium
+  default: openai/gpt-6.1-sol:medium
   smol: openai/gpt-6-luna:xhigh
-  slow: openai/gpt-6-sol:xhigh
+  slow: openai/gpt-6.1-sol:xhigh
   designer: openai/gpt-6-astra
-  vision: openai/gpt-6-sol
+  vision: openai/gpt-6.1-sol
   plan: openai/gpt-6-astra:high
   task: openai/gpt-6-luna:max
   commit: openai/gpt-6-luna:off
   tiny: openai/gpt-6-luna:medium
-  advisor: openai/gpt-6-sol:high
+  advisor: openai/gpt-6-luna:high
   web: openai/gpt-6-luna # Uses billed OpenAI API web search.
 tier:
   openai: flex
   openai-codex: none
   subagent: inherit
-  advisor: inherit
+  advisor: priority
 hideThinkingBlock: true
 theme:
   light: light
@@ -54,10 +54,9 @@ task:
     scout: 500000
     task: 500000
     sonic: 500000
-tools:
-  {}
+tools: {}
 advisor:
-  enabled: false
+  enabled: true
 doubleEscapeAction: rewind
 marketplace:
   autoUpdate: auto
