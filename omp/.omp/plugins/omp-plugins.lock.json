@@ -10,11 +10,6 @@
       "enabledFeatures": null,
       "enabled": true
     },
-    "omp-subagent-costs": {
-      "version": "1.0.1",
-      "enabledFeatures": null,
-      "enabled": true
-    },
     "omp-cache-miss-oof": {
       "version": "0.1.7",
       "enabledFeatures": null,

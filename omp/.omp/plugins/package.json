@@ -5,7 +5,6 @@
     "omp-cache-miss-oof": "github:anatoli-tsinovoy/omp-cache-miss-oof",
     "omp-fork-in-tmux": "github:anatoli-tsinovoy/omp-fork-in-tmux",
     "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash",
-    "omp-session-progress": "github:kalugny/omp-session-progress",
-    "omp-subagent-costs": "github:anatoli-tsinovoy/omp-subagent-costs"
+    "omp-session-progress": "github:kalugny/omp-session-progress"
   }
 }

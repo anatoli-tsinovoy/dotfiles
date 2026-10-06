@@ -1,5 +1,5 @@
 modelRoles:
-  default: openai/gpt-6.1-sol:medium
+  default: amazon-bedrock/global.anthropic.claude-opus-5-5:medium
   smol: openai/gpt-6-luna:xhigh
   slow: openai/gpt-6.1-sol:xhigh
   designer: openai/gpt-6-astra
