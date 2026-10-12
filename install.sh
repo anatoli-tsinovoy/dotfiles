@@ -364,9 +364,6 @@ main() {
     log_info "Installing opencode via bun..."
     bun install -g opencode-ai@dev --safe-chain-skip-minimum-package-age
 
-    log_info "Installing oh-my-pi via bun..."
-    bun install -g @oh-my-pi/pi-coding-agent --safe-chain-skip-minimum-package-age
-
     log_info "Installing latest TypeScript native LSP..."
     bun install -g typescript@latest --safe-chain-skip-minimum-package-age
 
@@ -383,6 +380,9 @@ main() {
 
     log_info "Installing clipssh"
     curl -fsSL https://raw.githubusercontent.com/samuellawrentz/clipssh/main/install.sh | bash
+
+    log_info "Installing oh-my-pi"
+    curl -fsSL https://omp.sh/install | sh -s -- --binary
 
   elif [[ "$os" == "linux" ]]; then
     # === Linux Setup ===
