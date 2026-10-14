@@ -31,6 +31,7 @@ dotfiles/
 │   ├── linux/install-binaries.sh   # Tools not in apt (neovim, fzf, bun, uv)
 │   ├── termux/install-packages.sh  # Termux pkg installer
 │   ├── macos/macos-defaults.sh     # macOS system preferences
+│   ├── macos/sketchybar-app-font/  # Explicit installer generates local SVG overlays from overrides.json; startup loads existing artifacts only
 │   └── tailscale-et.sh             # Tailscale + ET setup (mac/linux only)
 ├── shims/                 # OS-specific binary wrappers
 │   ├── linux/.local/bin/  # bat fallback, fd→fdfind, node→bun
@@ -130,6 +131,14 @@ termux/.termux/colors.properties → ~/.termux/colors.properties
 | Termux | pkg | upstream | No sudo, no systemd, skips tailscale-et.sh |
 
 **Termux detection must happen BEFORE Linux** in `detect_os()` because `uname -s` returns "Linux" on both.
+
+## SketchyBar app font
+
+The `font-sketchybar-app-font` cask remains the untouched stock input. `install.sh` generates a separate local overlay font and cached app map from ordered app-pattern-to-ligature entries in `scripts/macos/sketchybar-app-font/overrides.json` and custom artwork in its `svgs/` directory. SketchyBar startup only loads the existing local font and generated map; it does not run the installer or rebuild artifacts. After changing an SVG or override, or upgrading the cask, refresh explicitly and reload SketchyBar:
+```sh
+scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh
+sketchybar --reload
+```
 
 ## Ghostty
 

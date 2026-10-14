@@ -6,6 +6,14 @@ source "$CONFIG_DIR/icons.sh"  # Loads all defined icons
 ITEM_DIR="$CONFIG_DIR/items"     # Directory where the items are configured
 PLUGIN_DIR="$CONFIG_DIR/plugins" # Directory where all the plugin scripts are stored
 
+SKETCHYBAR_APP_FONT="$HOME/Library/Fonts/sketchybar-app-font-local.ttf"
+if [[ ! -f "$SKETCHYBAR_APP_FONT" ]]; then
+  echo "Missing SketchyBar app font at $SKETCHYBAR_APP_FONT. Install it explicitly from the dotfiles checkout with: bash scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh" >&2
+  exit 1
+fi
+sketchybar --load-font "$SKETCHYBAR_APP_FONT" || exit "$?"
+
+
 FONT="SF Pro" # Needs to have Regular, Bold, Semibold, Heavy and Black variants
 PADDINGS=3    # All paddings use this value (icon, label, background)
 

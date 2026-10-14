@@ -377,6 +377,8 @@ main() {
     bash "$SCRIPT_DIR/scripts/macos/open-in-neovim/install-open-in-neovim.sh"
     log_info "Installing btop Spotlight integration..."
     bash "$SCRIPT_DIR/scripts/macos/btop/install-btop.sh"
+    log_info "Refreshing local sketchybar-app-font overlay..."
+    bash "$SCRIPT_DIR/scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh"
 
     log_info "Installing clipssh"
     curl -fsSL https://raw.githubusercontent.com/samuellawrentz/clipssh/main/install.sh | bash

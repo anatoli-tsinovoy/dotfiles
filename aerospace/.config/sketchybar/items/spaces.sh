@@ -33,7 +33,7 @@ while read -r i as_monitor; do
     label.color=$BLUE
     label.highlight_color=$GREEN
     label.highlight=$SID_LABEL_HIGHLIGHT
-    label.font="sketchybar-app-font:Regular:16.0"
+    label.font="sketchybar-app-font-local:Regular:16.0"
     label.y_offset=-1
     background.color=$BG0
     background.border_color=$SID_BORDER_COLOR
