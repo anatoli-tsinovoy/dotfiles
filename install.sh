@@ -361,9 +361,6 @@ main() {
     log_info "Installing Homebrew packages..."
     brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
 
-    log_info "Installing opencode via bun..."
-    bun install -g opencode-ai@dev --safe-chain-skip-minimum-package-age
-
     log_info "Installing latest TypeScript native LSP..."
     bun install -g typescript@latest --safe-chain-skip-minimum-package-age
 
@@ -382,9 +379,6 @@ main() {
 
     log_info "Installing clipssh"
     curl -fsSL https://raw.githubusercontent.com/samuellawrentz/clipssh/main/install.sh | bash
-
-    log_info "Installing oh-my-pi"
-    curl -fsSL https://omp.sh/install | sh -s -- --binary
 
   elif [[ "$os" == "linux" ]]; then
     # === Linux Setup ===
@@ -412,6 +406,11 @@ main() {
     install_termux_font
   fi
 
+  if [[ "$os" == "mac" || "$os" == "linux" ]]; then
+    log_info "Installing oh-my-pi (binary)..."
+    curl -fsSL https://omp.sh/install | sh -s -- --binary
+  fi
+
   # === Common Setup ===
 
   install_stow "$os"
@@ -426,7 +425,7 @@ main() {
   rm -f ~/.zshenv ~/.zshenv.macos ~/.zshenv.linux ~/.zprofile
   rm -f ~/.zshrc ~/.zshrc.macos ~/.zshrc.linux ~/.zshrc.termux ~/.p10k.zsh
   rm -f ~/.gitconfig ~/.vimrc
-  rm -rf ~/.config/nvim ~/.config/opencode ~/.config/glow ~/.config/btop
+  rm -rf ~/.config/nvim ~/.config/glow ~/.config/btop
   mkdir -p ~/.config/btop
   printf '%s\n' 'color_theme = "TTY"' 'theme_background = False' >~/.config/btop/btop.conf
   rm -f ~/.omp/agent/config.yml
@@ -434,7 +433,7 @@ main() {
   # Stow common packages (no --adopt: use the repository versions)
 
   log_info "Stowing common dotfiles..."
-  run_stow -t ~ nvim git opencode omp glow tmux
+  run_stow -t ~ nvim git omp glow tmux
   setup_zsh_completions
 
   setup_omp_plugins
@@ -507,14 +506,6 @@ main() {
       log_ok "Default shell set to zsh (restart Termux to apply)"
     fi
 
-  fi
-
-  # Setup rtk opencode plugin (if rtk installed)
-  if command -v rtk &>/dev/null; then
-    log_info "Setting up rtk opencode plugin..."
-    rtk telemetry disable
-    RTK_TELEMETRY_DISABLED=1 rtk init -g --opencode
-    log_ok "rtk configured (telemetry disabled)"
   fi
 
   # Tailscale + ET setup (skip on Termux - requires systemd)

@@ -463,20 +463,6 @@ install_emojify() {
   log_ok "emojify installed to ${install_dir}/emojify"
 }
 
-install_opencode() {
-  if command_exists opencode; then
-    log_skip "opencode already installed"
-    return 0
-  fi
-  if ! command_exists bun; then
-    log_warn "bun not found, skipping opencode installation"
-    return 1
-  fi
-
-  log_info "Installing opencode via bun..."
-  bun install -g opencode-ai@dev
-  log_ok "opencode installed"
-}
 
 install_sentry_cli() {
   if command_exists sentry-cli; then
@@ -491,21 +477,6 @@ install_sentry_cli() {
   log_info "Installing sentry-cli via bun..."
   bun install -g @sentry/cli
   log_ok "sentry-cli installed"
-}
-
-install_omp() {
-  if command_exists omp; then
-    log_skip "oh-my-pi already installed"
-    return 0
-  fi
-  if ! command_exists bun; then
-    log_warn "bun not found, skipping oh-my-pi installation"
-    return 1
-  fi
-
-  log_info "Installing oh-my-pi via bun..."
-  bun install -g @oh-my-pi/pi-coding-agent@latest
-  log_ok "oh-my-pi installed"
 }
 
 install_bash_language_server() {
@@ -591,16 +562,6 @@ install_lazydocker() {
   log_ok "lazydocker installed to $bindir/lazydocker"
 }
 
-install_rtk() {
-  if command_exists rtk; then
-    log_skip "rtk already installed ($(rtk --version))"
-    return 0
-  fi
-  log_info "Installing rtk (Rust Token Killer)..."
-  curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
-  log_ok "rtk installed"
-}
-
 install_lazyvim() {
   local nvim_config="$HOME/.config/nvim"
   if [[ -d "$nvim_config" ]] && [[ -f "$nvim_config/lazy-lock.json" || -f "$nvim_config/lazyvim.json" ]]; then
@@ -679,7 +640,6 @@ main() {
   install_lazydocker
   install_fzf
   install_starship
-  install_rtk
 
   # Tools that depend on uv/bun
   install_thefuck
@@ -687,9 +647,7 @@ main() {
   install_ty
   install_yt_dlp
   install_emojify
-  install_opencode
   install_sentry_cli
-  install_omp
   install_bash_language_server
   install_yaml_language_server
   install_typescript_lsp

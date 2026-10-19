@@ -43,8 +43,7 @@ dotfiles/
 ├── nvim/                  # LazyVim-based Neovim config
 ├── git/                   # .gitconfig + .gitconfig.macos
 ├── aerospace/             # Tiling WM + sketchybar (macOS only)
-├── ghostty/               # Ghostty config and light/dark themes
-└── opencode/              # OpenCode AI configuration
+└── ghostty/               # Ghostty config and light/dark themes
 ```
 
 ## Shell Script Style
