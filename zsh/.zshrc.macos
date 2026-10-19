@@ -15,7 +15,6 @@ HOMEBREW_AUTO_UPDATE_SECS=86400  # one day
 
 # === macOS Aliases ===
 alias python="/opt/homebrew/bin/python3"
-alias code="cursor"
 
 # Force Kitty graphics for Oh My Pi; the timg wrapper below does the same.
 export PI_FORCE_IMAGE_PROTOCOL=kitty

@@ -10,10 +10,6 @@ if [[ -z "${OMPCODE:-}" ]]; then
   fi
 fi
 
-# code -> cursor alias (if cursor exists but code doesn't)
-if ! command -v code &>/dev/null && command -v cursor &>/dev/null; then
-  alias code="cursor"
-fi
 
 # Force Kitty graphics for Oh My Pi; the timg wrapper below does the same.
 export PI_FORCE_IMAGE_PROTOCOL=kitty

@@ -448,11 +448,10 @@ main() {
   if [[ "$os" == "mac" ]]; then
     # Remove macOS-specific conflicts
     rm -rf "$HOME/.config/aerospace" "$HOME/.config/ghostty"
-    rm -rf ~/Library/Application\ Support/Cursor/User
 
     # macOS-specific stow packages
     log_info "Stowing macOS-specific dotfiles..."
-    run_stow -t ~ aerospace ghostty cursor-macos private-macos
+    run_stow -t ~ aerospace ghostty private-macos
 
     # Create macOS-specific gitconfig.local
     cp "$SCRIPT_DIR/git/.gitconfig.macos" "$HOME/.gitconfig.local"
