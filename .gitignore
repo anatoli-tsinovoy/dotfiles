@@ -9,6 +9,7 @@ termux/.termux/shell
 termux/.termux/.current-theme
 
 # omp user files (not tracked, user state)
+omp/.omp/agent/config.yml.lock
 omp/.omp/agent/last-changelog-version
 omp/.omp/stats.db*
 omp/.omp/agent/models.db*
