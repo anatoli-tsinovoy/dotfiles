@@ -30,6 +30,8 @@ task:
 
 enabledModels:
   - openai-codex/*
+  - llama.cpp/*
+  - mlx-lm/*
 
 disabledProviders:
   - openai

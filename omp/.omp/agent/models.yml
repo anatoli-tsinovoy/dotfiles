@@ -10,13 +10,11 @@ providers:
     baseUrl: http://localhost:8080/v1
     api: openai-completions
     apiKey: none
-    models:
-      - id: mlx-community/Qwen3.6-35B-A3B-8bit
-  llama-cpp:
+    discovery:
+      type: openai-models-list
+  llama.cpp:
     baseUrl: http://localhost:8000/v1
     api: openai-completions
     apiKey: none
-    models:
-      - id: deepreinforce-ai/Ornith-1.0-9B-GGUF
-      - id: deepreinforce-ai/Ornith-1.0-35B-GGUF
-      - id: unsloth/Qwen3.8-27B-GGUF:UD-Q4_K_XL
+    discovery:
+      type: llama.cpp
