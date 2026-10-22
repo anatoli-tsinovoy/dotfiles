@@ -131,6 +131,14 @@ termux/.termux/colors.properties → ~/.termux/colors.properties
 
 **Termux detection must happen BEFORE Linux** in `detect_os()` because `uname -s` returns "Linux" on both.
 
+## SketchyBar appearance reload
+
+The hidden `DARK_LIGHT` item subscribes to macOS `AppleInterfaceThemeChangedNotification`.
+On an appearance change, its plugin restarts the Homebrew service via
+`launchctl kickstart -kp "gui/$UID/sh.brew.sketchybar"` to reload the palette.
+The display-change plugin uses the same service target. Launchd enforces a 10-second
+minimum runtime, so allow for that delay when checking repeated appearance switches.
+
 ## SketchyBar app font
 
 The `font-sketchybar-app-font` cask remains the untouched stock input. `install.sh` generates a separate local overlay font and cached app map from ordered app-pattern-to-ligature entries in `scripts/macos/sketchybar-app-font/overrides.json` and custom artwork in its `svgs/` directory. SketchyBar startup only loads the existing local font and generated map; it does not run the installer or rebuild artifacts. After changing an SVG or override, or upgrading the cask, refresh explicitly and reload SketchyBar:

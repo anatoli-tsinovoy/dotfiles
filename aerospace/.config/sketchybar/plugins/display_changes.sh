@@ -7,5 +7,5 @@ sketchybar --set DISPLAY_CHANGE label="$current_displays" display=0
 if [ "$SENDER" != "forced" ] && [ "$previous_displays" != "$current_displays" ]; then
   # sketchybar --reload # for some odd reason this increments the number of bars in play on every theme change
   # Note that this has a 10-second back-off time set by the crash-loop detection in sketchybar's plist, so fast-toggling is off the table
-  launchctl kickstart -kp "gui/$UID/homebrew.mxcl.sketchybar"
+  launchctl kickstart -kp "gui/$UID/sh.brew.sketchybar"
 fi
