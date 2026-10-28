@@ -7,7 +7,6 @@
       "dependencies": {
         "omp-cache-miss-oof": "github:anatoli-tsinovoy/omp-cache-miss-oof",
         "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash",
-        "omp-session-progress": "github:kalugny/omp-session-progress",
       },
     },
   },
@@ -291,8 +290,6 @@
     "omp-cache-miss-oof": ["omp-cache-miss-oof@github:anatoli-tsinovoy/omp-cache-miss-oof#cf7569c", { "dependencies": { "@oh-my-pi/pi-natives": "^18.0.11" }, "peerDependencies": { "@oh-my-pi/pi-ai": ">=18.0.11", "@oh-my-pi/pi-coding-agent": ">=18.0.11" }, "optionalPeers": ["@oh-my-pi/pi-ai", "@oh-my-pi/pi-coding-agent"] }, "anatoli-tsinovoy-omp-cache-miss-oof-cf7569c", "sha512-5ABzmCyf4b1Y8jM9Dmq8MnoHO7z1sL1UGLS1bjEGfMKoOf6Kj0Y02a3f4/U9udULvGs3p6imTzqtt0Dj8EuJxQ=="],
 
     "omp-prompt-stash": ["omp-prompt-stash@github:anatoli-tsinovoy/omp-prompt-stash#19159fa", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=17.2.9", "@oh-my-pi/pi-tui": ">=17.2.9", "@oh-my-pi/pi-utils": ">=17.2.9" } }, "anatoli-tsinovoy-omp-prompt-stash-19159fa", "sha512-A8Qvgc0ytI9fhMpCFw4lgDJgTM9b7Zr+3JmitFs6We15uW0k0845/aSWtAjlrGJP1CG8dukSR9RcjSZ5JHe5hQ=="],
-
-    "omp-session-progress": ["omp-session-progress@github:kalugny/omp-session-progress#533d842", {}, "kalugny-omp-session-progress-533d842", "sha512-t7Ff4TaQyxwydqv3uEGl73ktTC3QYXsr/GK8kzLpJDUujmCe9yVpCbhCimiNi6B+jvxtAjjsN0Ilgw5BHAsQ1w=="],
 
     "onnxruntime-common": ["onnxruntime-common@1.24.3", "", {}, "sha512-GeuPZO6U/LBJXvwdaqHbuUmoXiEdeCjWi/EG7Y1HNnDwJYuk6WUbNXpF6luSUY8yASul3cmUlLGrCCL1ZgVXqA=="],
 

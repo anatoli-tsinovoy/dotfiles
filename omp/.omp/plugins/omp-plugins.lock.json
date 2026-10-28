@@ -9,11 +9,6 @@
       "version": "0.1.7",
       "enabledFeatures": null,
       "enabled": true
-    },
-    "omp-session-progress": {
-      "version": "1.0.0",
-      "enabledFeatures": null,
-      "enabled": true
     }
   },
   "settings": {}

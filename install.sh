@@ -179,11 +179,7 @@ setup_omp_plugins() {
 
   local plugin
   local remote_plugins=(
-    "@plannotator/pi-extension"
-    "github:anatoli-tsinovoy/omp-code-review"
     "github:anatoli-tsinovoy/omp-prompt-stash"
-    "github:anatoli-tsinovoy/omp-fork-in-tmux"
-    "github:anatoli-tsinovoy/omp-subagent-costs"
     "github:anatoli-tsinovoy/omp-cache-miss-oof"
   )
   for plugin in "${remote_plugins[@]}"; do
