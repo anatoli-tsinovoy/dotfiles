@@ -10,7 +10,7 @@ modelRoles:
   tiny: openai/gpt-6-luna:medium
   advisor: openai/gpt-6-luna:high
   web: openai/gpt-6-luna
-  judge: openai/gpt-6-luna
+  judge: openai/gpt-6-luna-decisions
 tier:
   openai: flex
   openai-codex: none
