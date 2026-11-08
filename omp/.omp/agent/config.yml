@@ -18,8 +18,8 @@ tier:
   advisor: priority
 hideThinkingBlock: true
 theme:
-  light: light
-  dark: dark
+  light: dotfiles-light
+  dark: dotfiles-dark
 symbolPreset: nerd
 colorBlindMode: false
 compaction:
@@ -35,7 +35,7 @@ bashInterceptor:
   enabled: true
 browser:
   headless: true
-setupVersion: 2
+setupVersion: 3
 contextPromotion:
   enabled: false
 dev:
@@ -92,7 +92,7 @@ extendedContext: true
 branchSummary:
   enabled: true
 memory:
-  backend: sharpshooter
+  backend: "off"
 codexResets:
   autoRedeem: "no"
 steeringMode: all
@@ -105,3 +105,5 @@ secrets:
   enabled: true
 telemetry:
   otlpExportEnabled: false
+update:
+  auto: false
