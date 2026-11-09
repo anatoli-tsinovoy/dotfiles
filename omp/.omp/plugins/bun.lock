@@ -7,6 +7,7 @@
       "dependencies": {
         "omp-cache-miss-oof": "github:anatoli-tsinovoy/omp-cache-miss-oof",
         "omp-prompt-stash": "github:anatoli-tsinovoy/omp-prompt-stash",
+        "omp-slack": "github:anatoli-tsinovoy/omp-slack",
       },
     },
   },
@@ -290,6 +291,8 @@
     "omp-cache-miss-oof": ["omp-cache-miss-oof@github:anatoli-tsinovoy/omp-cache-miss-oof#cf7569c", { "dependencies": { "@oh-my-pi/pi-natives": "^18.0.11" }, "peerDependencies": { "@oh-my-pi/pi-ai": ">=18.0.11", "@oh-my-pi/pi-coding-agent": ">=18.0.11" }, "optionalPeers": ["@oh-my-pi/pi-ai", "@oh-my-pi/pi-coding-agent"] }, "anatoli-tsinovoy-omp-cache-miss-oof-cf7569c", "sha512-5ABzmCyf4b1Y8jM9Dmq8MnoHO7z1sL1UGLS1bjEGfMKoOf6Kj0Y02a3f4/U9udULvGs3p6imTzqtt0Dj8EuJxQ=="],
 
     "omp-prompt-stash": ["omp-prompt-stash@github:anatoli-tsinovoy/omp-prompt-stash#19159fa", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=17.2.9", "@oh-my-pi/pi-tui": ">=17.2.9", "@oh-my-pi/pi-utils": ">=17.2.9" } }, "anatoli-tsinovoy-omp-prompt-stash-19159fa", "sha512-A8Qvgc0ytI9fhMpCFw4lgDJgTM9b7Zr+3JmitFs6We15uW0k0845/aSWtAjlrGJP1CG8dukSR9RcjSZ5JHe5hQ=="],
+
+    "omp-slack": ["omp-slack@github:anatoli-tsinovoy/omp-slack#6500abb", { "peerDependencies": { "@oh-my-pi/pi-ai": ">=18.18.1", "@oh-my-pi/pi-coding-agent": ">=18.18.1", "@oh-my-pi/pi-tui": ">=18.18.1" }, "optionalPeers": ["@oh-my-pi/pi-ai", "@oh-my-pi/pi-coding-agent", "@oh-my-pi/pi-tui"] }, "anatoli-tsinovoy-omp-slack-6500abb", "sha512-Qj4ALX5Y2HPOejy1gIw4sEG2wkHQa1QJeDMCKDM+2lnk/VPHG9IXwaC6xAwwoXg43S/LowBzPSLy2A5s01iPHw=="],
 
     "onnxruntime-common": ["onnxruntime-common@1.24.3", "", {}, "sha512-GeuPZO6U/LBJXvwdaqHbuUmoXiEdeCjWi/EG7Y1HNnDwJYuk6WUbNXpF6luSUY8yASul3cmUlLGrCCL1ZgVXqA=="],
 

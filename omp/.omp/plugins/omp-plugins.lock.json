@@ -9,6 +9,11 @@
       "version": "0.1.7",
       "enabledFeatures": null,
       "enabled": true
+    },
+    "omp-slack": {
+      "version": "0.1.0",
+      "enabledFeatures": null,
+      "enabled": true
     }
   },
   "settings": {}
