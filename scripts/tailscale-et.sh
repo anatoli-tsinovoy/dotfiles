@@ -122,7 +122,7 @@ fi
 
 if ! command_exists etserver; then
   if [[ "$OS" == "mac" ]]; then
-    log_warn "ET not found. Install with: brew install mistertea/et/et"
+    log_warn "ET not found. Install with: brew install et"
   else
     log_warn "ET not found. Install with:"
     log_warn "  Ubuntu: sudo add-apt-repository ppa:jgmath2000/et && sudo apt install et"
@@ -133,7 +133,7 @@ fi
 
 log_info "Starting ET service..."
 if [[ "$OS" == "mac" ]]; then
-  run_privileged brew services start mistertea/et/et
+  run_privileged brew services start et
 else
   run_privileged systemctl enable --now et
 fi
