@@ -408,6 +408,10 @@ main() {
   if [[ "$os" == "mac" || "$os" == "linux" ]]; then
     log_info "Installing oh-my-pi (binary)..."
     curl -fsSL https://omp.sh/install | sh -s -- --binary
+    # The installer writes to ~/.local/bin, which is only on PATH once the
+    # stowed zsh config is loaded; expose it now for setup_omp_plugins and
+    # setup_zsh_completions.
+    export PATH="$HOME/.local/bin:$PATH"
   fi
 
   # === Common Setup ===
@@ -448,7 +452,11 @@ main() {
     # Remove macOS-specific conflicts
     rm -rf "$HOME/.config/aerospace" "$HOME/.config/ghostty"
 
-    # macOS-specific stow packages
+    # private-macos is gitignored (secrets). Create its .private directory so
+    # stow folds ~/.private into a symlink to the checkout: secrets copied into
+    # either location later land in the repo copy with no re-stow. An empty
+    # package without the subdirectory would create no link at all.
+    mkdir -p "$SCRIPT_DIR/private-macos/.private"
     log_info "Stowing macOS-specific dotfiles..."
     run_stow -t ~ aerospace ghostty private-macos
 
