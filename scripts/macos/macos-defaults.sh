@@ -269,11 +269,35 @@ defaults write com.apple.TextInputMenu visible -bool true
 # Accessibility                                                               #
 ###############################################################################
 
-# Disable reduce motion
-defaults write com.apple.universalaccess reduceMotion -bool false || true
+# Disable reduce motion and reduce transparency. macOS refuses writes to this
+# domain until the terminal has Full Disk Access, so when interactive, open the
+# Privacy pane and retry until the grant takes effect or the user skips.
+write_universalaccess() {
+  {
+    defaults write com.apple.universalaccess reduceMotion -bool false &&
+      defaults write com.apple.universalaccess reduceTransparency -bool false
+  } 2>/dev/null
+}
 
-# Disable reduce transparency
-defaults write com.apple.universalaccess reduceTransparency -bool false || true
+if ! write_universalaccess; then
+  if [[ -t 0 ]]; then
+    open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
+    case "${TERM_PROGRAM:-}" in
+    Apple_Terminal) terminal_app="Terminal" ;;
+    "" | tmux | screen) terminal_app="your terminal app" ;;
+    *) terminal_app="$TERM_PROGRAM" ;;
+    esac
+    echo "macOS refused com.apple.universalaccess. In the System Settings window that opened, enable Full Disk Access for ${terminal_app}."
+    while true; do
+      read -r -p "Press Enter to retry, or type 's' to skip: " reply || reply=s
+      [[ "$reply" == [sS]* ]] && { echo "Skipping accessibility defaults."; break; }
+      write_universalaccess && { echo "Accessibility defaults applied."; break; }
+      echo "Still refused. If access is already enabled, the running terminal may need a relaunch: type 's' to skip, quit and reopen the terminal, then rerun this script."
+    done
+  else
+    echo "Skipping accessibility defaults: grant the terminal Full Disk Access and rerun (non-interactive)."
+  fi
+fi
 
 ###############################################################################
 # Kill affected applications                                                  #

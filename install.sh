@@ -317,6 +317,8 @@ ensure_real_dir() {
 }
 
 run_stow() {
+  # Apple's bash 3.2 runs this script on a fresh Mac and treats an empty
+  # "${arr[@]}" as unbound under set -u, so expand only when non-empty.
   local stow_args=()
   if [[ $STOW_ADOPT -eq 1 ]]; then
     stow_args+=(--adopt)
@@ -324,7 +326,7 @@ run_stow() {
   if [[ $STOW_FORCE -eq 1 ]]; then
     stow_force_cleanup "$@"
   fi
-  stow "${stow_args[@]}" "$@"
+  stow ${stow_args[@]+"${stow_args[@]}"} "$@"
 }
 
 main() {
@@ -359,10 +361,10 @@ main() {
     brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
 
     log_info "Installing latest TypeScript native LSP..."
-    bun install -g typescript@latest --safe-chain-skip-minimum-package-age
+    bun install -g typescript@latest
 
     log_info "Installing sentry-cli via bun..."
-    bun install -g @sentry/cli --safe-chain-skip-minimum-package-age
+    bun install -g @sentry/cli
 
     log_info "Applying macOS defaults..."
     bash "$SCRIPT_DIR/scripts/macos/macos-defaults.sh"
