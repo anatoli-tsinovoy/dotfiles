@@ -27,9 +27,6 @@ omp/.omp/plugins/node_modules
 omp/.omp/autoqa*
 omp/.omp/gpu_cache.json
 
-# Notes kept out of the repo
-zsh/STARSHIP_ASYNC_PATTERN.md
-
 # Sensitive
 private-macos
 
