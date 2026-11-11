@@ -153,6 +153,8 @@ brew "qt"
 brew "ripgrep"
 # Install Ruby, JRuby, Rubinius, TruffleRuby, or mruby
 brew "ruby-install"
+# Rust toolchain installer
+brew "rustup"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
@@ -211,10 +213,10 @@ cask "nikitabobko/tap/aerospace", trusted: true
 cask "betterdisplay"
 # Virtual Audio Driver
 cask "blackhole-2ch"
-# Databases and SQL IDE
-cask "datagrip"
 # Reclaim storage used for Xcode caches
 cask "devcleaner"
+# Voice and text chat software
+cask "discord"
 cask "font-comic-shanns-mono-nerd-font"
 cask "font-meslo-lg-nerd-font"
 cask "font-sf-pro"
@@ -235,8 +237,6 @@ cask "localsend"
 cask "macfuse"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# MySQL/MariaDB database management
-cask "sequel-ace"
 # Tool that provides consistent, highly configurable symbols for apps
 cask "sf-symbols"
 # Team communication and collaboration software

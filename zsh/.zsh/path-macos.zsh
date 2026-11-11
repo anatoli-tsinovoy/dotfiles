@@ -12,6 +12,7 @@
 # duplicates later prepends in ~/.zshrc would otherwise leave behind.
 typeset -U path PATH
 path=(
+  /opt/homebrew/opt/rustup/bin
   /opt/homebrew/bin
   /opt/homebrew/sbin
   /usr/local/et-bin
