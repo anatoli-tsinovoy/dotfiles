@@ -253,6 +253,11 @@ defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 120 '{ e
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 '{ enabled = 0; }'
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 '{ enabled = 0; }'
 
+# Show Notification Center with Ctrl+Option+Cmd+Shift+N; the SketchyBar date
+# item sends this keystroke (plugins/notification_center.sh).
+# 163 = Show Notification Center; parameters = (ASCII "n", key code, modifiers)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 163 '{ enabled = 1; value = { parameters = (110, 45, 1966080); type = standard; }; }'
+
 # Disable Cmd+M minimize shortcut (remap to null)
 # Include both American and British spellings
 defaults write -g NSUserKeyEquivalents -dict-add 'Minimize' '\0'

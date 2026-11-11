@@ -1,58 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-osascript <<'APPLESCRIPT'
-tell application "System Events"
-  set notificationCenterOpened to false
-
-  -- macOS Tahoe moved status items from ControlCenter to grouped items
-  -- owned by MenuBarAgent. The clock is the rightmost group.
-  try
-    tell application process "MenuBarAgent"
-      click menu bar item 1 of last group of menu bar 1
-    end tell
-    set notificationCenterOpened to true
-  on error
-    set notificationCenterOpened to false
-  end try
-
-  if notificationCenterOpened is false then
-    try
-      tell application process "SystemUIServer"
-        click menu bar item "Notification Center" of menu bar 1
-      end tell
-      set notificationCenterOpened to true
-    on error
-      set notificationCenterOpened to false
-    end try
-  end if
-
-  if notificationCenterOpened is false then
-    try
-      tell application process "ControlCenter"
-        tell (first menu bar item of menu bar 1 whose description is "Clock") to click
-      end tell
-      set notificationCenterOpened to true
-    on error
-      set notificationCenterOpened to false
-    end try
-  end if
-
-  if notificationCenterOpened is false then
-    try
-      tell application process "ControlCenter"
-        tell (first menu bar item of menu bar 1 whose description is "clock") to click
-      end tell
-      set notificationCenterOpened to true
-    on error
-      set notificationCenterOpened to false
-    end try
-  end if
-
-  if notificationCenterOpened is false then
-    tell application process "ControlCenter"
-      click menu bar item 1 of menu bar 1
-    end tell
-  end if
-end tell
-APPLESCRIPT
+# Toggle Notification Center with its "Show Notification Center" shortcut
+# (Ctrl+Option+Cmd+Shift+N), which scripts/macos/macos-defaults.sh binds; the
+# binding takes effect at the next login. Accessibility presses on the menu bar
+# clock stopped working in macOS 27: the drawer opens and is dismissed ~0.3s
+# later.
+osascript -e 'tell application "System Events" to key code 45 using {control down, option down, command down, shift down}'
