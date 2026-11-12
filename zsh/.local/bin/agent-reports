@@ -1,0 +1,193 @@
+#!/usr/bin/env bash
+# Per-machine agent-reports (https://github.com/DeprecatedLuke/agent-reports).
+#
+# Runs upstream's Dockerfile targets with podman (or docker) on one network:
+#   agent-reports      `app` image: Rust API, SQLite + assets in volume agent-reports-data
+#   agent-reports-web  `web-static` image: nginx serving the SPA, published on
+#                      $AGENT_REPORTS_BIND:$AGENT_REPORTS_PORT (default 127.0.0.1:8790)
+# Upstream puts Traefik in front to route /api; here the web container's nginx gets an
+# /api proxy that replaces the Cookie header with this machine's session token, like
+# upstream's Vite dev proxy, so neither the browser nor the omp plugin holds the secret.
+# The plugin itself is linked by install.sh (setup_agent_reports_plugin).
+#
+#   agent-reports up       pull upstream, build images for new commits, (re)start
+#   agent-reports down     remove containers (the data volume stays)
+#   agent-reports status   container state + health
+#   agent-reports logs     follow API logs
+set -euo pipefail
+
+log_info() { echo "ℹ️  $*"; }
+log_ok() { echo "✅ $*"; }
+die() {
+  echo "❌ $*" >&2
+  exit 1
+}
+command_exists() { command -v "$1" &>/dev/null; }
+
+REPO="https://github.com/DeprecatedLuke/agent-reports.git"
+SRC="${AGENT_REPORTS_SRC:-${XDG_DATA_HOME:-$HOME/.local/share}/agent-reports}"
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/agent-reports"
+BIND="${AGENT_REPORTS_BIND:-127.0.0.1}"
+PORT="${AGENT_REPORTS_PORT:-8790}"
+# Origin the plugin (agents) uses; override when the engine's published ports are not on
+# this machine's localhost (e.g. docker socket mounted into a dev container).
+URL="${AGENT_REPORTS_URL:-http://localhost:$PORT}"
+# Origin the human's browser uses, stamped into report/share links by the server.
+PUBLIC_URL="${AGENT_REPORTS_PUBLIC_URL:-$URL}"
+NET=agent-reports
+VOLUME=agent-reports-data
+APP=agent-reports
+WEB=agent-reports-web
+
+engine() {
+  local e
+  for e in podman docker; do
+    command_exists "$e" || continue
+    "$e" info &>/dev/null || die "$e is installed but not reachable (macOS: podman machine start)"
+    echo "$e"
+    return 0
+  done
+  die "neither podman nor docker found"
+}
+
+sync_source() {
+  if [[ -d "$SRC/.git" ]]; then
+    git -C "$SRC" pull --ff-only --quiet
+  else
+    log_info "Cloning agent-reports into $SRC..."
+    git clone --quiet "$REPO" "$SRC"
+  fi
+}
+
+ensure_token() {
+  local token_file="$STATE/session-token"
+  if [[ ! -s "$token_file" ]]; then
+    (umask 077 && openssl rand -hex 32 >"$token_file")
+  fi
+  tr -d '[:space:]' <"$token_file"
+}
+
+# Build context for a thin image over upstream `web-static` holding the /api proxy. The
+# context is streamed to the engine, so this also works against a remote docker socket,
+# where bind mounts of client-side paths would not. The token is not baked in: the
+# image's entrypoint renders /etc/nginx/templates/*.template with envsubst at start.
+write_web_context() {
+  local ctx="$STATE/web"
+  local anchor="server_tokens off;"
+  [[ "$(grep -c "$anchor" "$SRC/web/nginx.conf")" == 1 ]] ||
+    die "upstream web/nginx.conf changed: expected one '$anchor' line to anchor the /api proxy"
+  mkdir -p "$ctx"
+
+  awk -v anchor="$anchor" '{ print } index($0, anchor) { print "\tinclude /etc/nginx/conf.d/agent-reports-api.inc;" }' \
+    "$SRC/web/nginx.conf" >"$ctx/default.conf"
+
+  # http-level: Connection header only for websocket upgrades (/api/ws, /api/s/<t>/ws).
+  cat >"$ctx/map.conf" <<'EOF'
+map $http_upgrade $agent_reports_connection {
+	default upgrade;
+	""      "";
+}
+EOF
+
+  # Rendered to conf.d/agent-reports-api.inc; not *.conf, so only the server block includes it.
+  # envsubst replaces only ${VAR} of defined variables; nginx's $host etc. stay intact.
+  cat >"$ctx/api.inc.template" <<EOF
+location /api/ {
+	proxy_pass http://$APP:8080;
+	proxy_http_version 1.1;
+	proxy_set_header Host \$host;
+	proxy_set_header Upgrade \$http_upgrade;
+	proxy_set_header Connection \$agent_reports_connection;
+	proxy_set_header Cookie "__Host-agent-reports=\${AGENT_REPORTS_SESSION_TOKEN}";
+	proxy_read_timeout 1h;
+	client_max_body_size 64m;
+}
+EOF
+
+  cat >"$ctx/Dockerfile" <<'EOF'
+ARG BASE
+FROM ${BASE}
+COPY default.conf /etc/nginx/conf.d/default.conf
+COPY map.conf /etc/nginx/conf.d/agent-reports-map.conf
+COPY api.inc.template /etc/nginx/templates/agent-reports-api.inc.template
+EOF
+}
+
+build_image() {
+  local eng="$1" target="$2" tag="$3"
+  "$eng" image inspect "$tag" &>/dev/null && return 0
+  log_info "Building $tag (first build per commit takes a few minutes)..."
+  "$eng" build --target "$target" -t "$tag" "$SRC"
+}
+
+wait_healthy() {
+  local _
+  for _ in $(seq 1 30); do
+    curl -fsS -o /dev/null "$URL/api/me" 2>/dev/null && return 0
+    sleep 1
+  done
+  die "server did not answer at $URL/api/me (agent-reports logs)"
+}
+
+cmd_up() {
+  local eng token sha app_image web_image
+  eng="$(engine)"
+  mkdir -p "$STATE"
+  chmod 0700 "$STATE"
+  sync_source
+  token="$(ensure_token)"
+  write_web_context
+  (umask 077 && printf 'AGENT_REPORTS_SESSION_TOKEN=%s\nAGENT_REPORTS_PUBLIC_URL=%s\n' "$token" "$PUBLIC_URL" >"$STATE/app.env")
+
+  sha="$(git -C "$SRC" rev-parse --short HEAD)"
+  app_image="localhost/agent-reports:$sha"
+  web_image="localhost/agent-reports-web:$sha"
+  build_image "$eng" app "$app_image"
+  build_image "$eng" web-static "$web_image"
+  "$eng" build -q --build-arg "BASE=$web_image" -t localhost/agent-reports-web-local "$STATE/web" >/dev/null
+
+  "$eng" network inspect "$NET" &>/dev/null || "$eng" network create "$NET" >/dev/null
+  "$eng" volume inspect "$VOLUME" &>/dev/null || "$eng" volume create "$VOLUME" >/dev/null
+  "$eng" rm -f "$WEB" "$APP" &>/dev/null || true
+
+  # A fresh named volume is root-owned; hand it to distroless `nonroot` (65532) with a
+  # one-shot root chown from the alpine-based web image (distroless has no chown).
+  "$eng" run --rm --user 0:0 --entrypoint chown -v "$VOLUME:/data" "$web_image" -R 65532:65532 /data
+  "$eng" run -d --name "$APP" --network "$NET" --restart unless-stopped \
+    --user 65532:65532 --security-opt no-new-privileges \
+    --env-file "$STATE/app.env" -v "$VOLUME:/data" "$app_image" >/dev/null
+  "$eng" run -d --name "$WEB" --network "$NET" --restart unless-stopped \
+    --env-file "$STATE/app.env" -p "$BIND:$PORT:8080" localhost/agent-reports-web-local >/dev/null
+
+  wait_healthy
+  log_ok "agent-reports running at $URL ($sha)"
+}
+
+cmd_down() {
+  local eng
+  eng="$(engine)"
+  "$eng" rm -f "$WEB" "$APP" >/dev/null
+  log_ok "agent-reports stopped (volume $VOLUME kept)"
+}
+
+cmd_status() {
+  local eng
+  eng="$(engine)"
+  "$eng" ps -a --filter "name=^agent-reports" --format '{{.Names}}\t{{.Status}}\t{{.Image}}'
+  if curl -fsS -o /dev/null "$URL/api/me" 2>/dev/null; then
+    log_ok "$URL healthy"
+  else
+    echo "⚠️  $URL not answering"
+  fi
+}
+
+case "${1:-}" in
+up) cmd_up ;;
+down) cmd_down ;;
+status) cmd_status ;;
+logs) "$(engine)" logs -f "$APP" ;;
+*)
+  sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+  exit 1
+  ;;
+esac

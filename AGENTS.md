@@ -147,6 +147,39 @@ scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh
 sketchybar --reload
 ```
 
+## agent-reports
+
+`zsh/.local/bin/agent-reports` runs [agent-reports](https://github.com/DeprecatedLuke/agent-reports) per machine
+(macOS and Linux) from upstream's `Dockerfile` targets: `app` (Rust API, data in volume `agent-reports-data`) and
+`web-static` (nginx). Both run in podman, or in docker if podman is missing, on network `agent-reports`. The server
+is not started by `install.sh`; run it once per machine:
+
+```sh
+agent-reports up       # clone/pull ~/.local/share/agent-reports, build images per commit, (re)start
+agent-reports status   # containers + health
+agent-reports down     # remove containers, keep the volume
+```
+
+- Upstream's Traefik is replaced by an `/api` proxy spliced into upstream `web/nginx.conf` after its single
+  `server_tokens off;` line. If upstream changes that line, `up` fails instead of serving without `/api`. The proxy
+  injects the session cookie, the same way upstream's Vite dev proxy does, so the browser never logs in. Only
+  publish it on localhost.
+- Per-machine token and nginx snippets live in `~/.local/state/agent-reports/`.
+- The omp plugin is installed by `install.sh` (`setup_agent_reports_plugin`, mac/linux): it is a subdirectory of
+  upstream, which `omp plugin install` cannot fetch, so it is `omp plugin link`ed from the same checkout. Its
+  `session` setting is the placeholder `"<url> local"`: the proxy overwrites the Cookie header with the real token,
+  so plugin settings hold no secret (on Linux containers `omp-plugins.lock.json` resolves into this repo). Set
+  `AGENT_REPORTS_URL` before `install.sh` too when the server is not on `localhost:8790`.
+- macOS needs `podman machine start`. Linux dev containers need a reachable engine (rootless podman or a mounted
+  docker socket). With a mounted socket, published ports land on the docker host, and loopback there is not
+  reachable from the dev container. Bind the bridge gateway instead, which only containers on that host can reach:
+  `AGENT_REPORTS_BIND=$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}')` (usually
+  `172.17.0.1`), then set `AGENT_REPORTS_URL=http://$AGENT_REPORTS_BIND:8790`. The proxy injects the session
+  cookie, so whoever reaches the port gets full API access: `0.0.0.0` or a LAN address is an intentional exposure,
+  not a fix. `AGENT_REPORTS_PUBLIC_URL` (default: the plugin URL) is the browser origin the server puts in report
+  links.
+- The API container runs as distroless `nonroot` (65532) with `no-new-privileges`; `up` chowns the volume first.
+
 ## Ghostty
 
 Ghostty config lives in `ghostty/.config/ghostty/` and stows to `~/.config/ghostty/`.
