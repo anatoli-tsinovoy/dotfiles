@@ -170,8 +170,12 @@ agent-reports down     # remove containers, keep the volume
   `session` setting is the placeholder `"<url> local"`: the proxy overwrites the Cookie header with the real token,
   so plugin settings hold no secret (on Linux containers `omp-plugins.lock.json` resolves into this repo). Set
   `AGENT_REPORTS_URL` before `install.sh` too when the server is not on `localhost:8790`.
-- macOS needs `podman machine start`. Linux dev containers need a reachable engine (rootless podman or a mounted
-  docker socket). With a mounted socket, published ports land on the docker host, and loopback there is not
+- macOS needs `podman machine start`. Linux dev containers need a reachable engine: docker-in-docker, rootless
+  podman, or a mounted docker socket. Docker-in-docker (privileged devcontainer with its own `dockerd`, as on
+  `orange`) works like the Mac on `localhost`. `up` does not start `dockerd`; on an overlayfs root it must run
+  with `--storage-driver=vfs`, as DrawRecog's `docker-compose-dind.yml` starts it. Default overlay storage fails
+  the build with `mount source: "overlay" ... invalid argument`.
+  With a mounted socket, published ports land on the docker host, and loopback there is not
   reachable from the dev container. Bind the bridge gateway instead, which only containers on that host can reach:
   `AGENT_REPORTS_BIND=$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}')` (usually
   `172.17.0.1`), then set `AGENT_REPORTS_URL=http://$AGENT_REPORTS_BIND:8790`. The proxy injects the session
