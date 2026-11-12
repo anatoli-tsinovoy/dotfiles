@@ -1,0 +1,3 @@
+(^|/)\.git(/|$)
+(^|/)\.DS_Store$
+^STARSHIP_ASYNC_PATTERN\.md$

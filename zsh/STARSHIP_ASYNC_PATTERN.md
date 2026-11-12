@@ -56,6 +56,7 @@ Scheduling class and cache scope are independent. A job chooses a worker from it
 2. Start unique slow and superslow workers with `async_start_worker NAME -u -n` and register the same callback for both.
 3. In a later `precmd` hook:
    - Flush both workers' previous jobs.
+   - If the exported environment (excluding `PWD`/`OLDPWD`) changed since the workers started, restart both: they fork once and otherwise keep startup values, so env-driven modules such as `custom.aws_identity`, `python` (`VIRTUAL_ENV`), or `nix_shell` would render stale state. Never pass environment values as job arguments instead: zsh-async writes each job as one pty line, and macOS discards lines over 1024 bytes (`MAX_CANON`), which an AWS session token exceeds. Linux allows 4096, so the bug hides there.
    - Increment a shared generation number.
    - Resolve a physical PWD (`${PWD:A}`).
    - Run `starship prompt --profile async-fast` synchronously with Starship's captured `--status`, `--pipestatus`, `--cmd-duration`, `--jobs`, terminal width, and keymap.

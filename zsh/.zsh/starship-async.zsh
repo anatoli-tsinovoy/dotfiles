@@ -36,6 +36,7 @@ typeset -g _STARSHIP_ASYNC_REDRAW_PWD=''
 typeset -g _STARSHIP_ASYNC_FAST_PREFIX=''
 typeset -g _STARSHIP_ASYNC_FAST_SUFFIX=''
 typeset -g _STARSHIP_ASYNC_RENDERED_PROMPT=''
+typeset -g _STARSHIP_ASYNC_WORKER_ENV=''
 typeset -gA _STARSHIP_ASYNC_DIRECTORY_CACHE
 typeset -gA _STARSHIP_ASYNC_SHELL_CACHE
 
@@ -165,34 +166,10 @@ _starship_async_render_aws_identity() {
   local jobs="$6"
   local width="$7"
   local keymap="$8"
-  local access_key="${9-}"
-  local secret_key="${10-}"
-  local session_token="${11-}"
-  local profile="${12-}"
   local rendered
   local -a prompt_args
 
   builtin cd -q -- "$worker_pwd" || return 1
-  if [[ -n "$access_key" ]]; then
-    export AWS_ACCESS_KEY_ID="$access_key"
-  else
-    unset AWS_ACCESS_KEY_ID
-  fi
-  if [[ -n "$secret_key" ]]; then
-    export AWS_SECRET_ACCESS_KEY="$secret_key"
-  else
-    unset AWS_SECRET_ACCESS_KEY
-  fi
-  if [[ -n "$session_token" ]]; then
-    export AWS_SESSION_TOKEN="$session_token"
-  else
-    unset AWS_SESSION_TOKEN
-  fi
-  if [[ -n "$profile" ]]; then
-    export AWS_PROFILE="$profile"
-  else
-    unset AWS_PROFILE
-  fi
   prompt_args=(
     "--terminal-width=$width"
     "--keymap=$keymap"
@@ -287,6 +264,36 @@ _starship_async_callback() {
   _starship_async_maybe_redraw "$has_next"
 }
 
+# Workers fork once and keep the environment they started with. Snapshot the
+# exported environment so precmd can restart them when it changes; values must
+# not travel as job arguments, since zsh-async writes each job as one pty line
+# and macOS drops lines over MAX_CANON (1024 bytes). PWD and OLDPWD are skipped
+# because every job changes into the directory it is given.
+_starship_async_env_snapshot() {
+  local name
+  local -a pairs
+
+  for name in ${(ko)parameters[(R)*-export*]}; do
+    [[ "$name" == (PWD|OLDPWD) ]] && continue
+    pairs+=("${name}=${(P)name}")
+  done
+  REPLY="${(pj:\0:)pairs}"
+}
+
+_starship_async_start_workers() {
+  async_stop_worker "$_STARSHIP_ASYNC_SLOW_WORKER" 2>/dev/null
+  async_stop_worker "$_STARSHIP_ASYNC_SUPERSLOW_WORKER" 2>/dev/null
+  async_start_worker "$_STARSHIP_ASYNC_SLOW_WORKER" -u -n || return 1
+  if ! async_start_worker "$_STARSHIP_ASYNC_SUPERSLOW_WORKER" -u -n; then
+    async_stop_worker "$_STARSHIP_ASYNC_SLOW_WORKER" 2>/dev/null
+    return 1
+  fi
+  async_register_callback "$_STARSHIP_ASYNC_SLOW_WORKER" _starship_async_callback
+  async_register_callback "$_STARSHIP_ASYNC_SUPERSLOW_WORKER" _starship_async_callback
+  _starship_async_env_snapshot
+  _STARSHIP_ASYNC_WORKER_ENV="$REPLY"
+}
+
 _starship_async_precmd() {
   local worker_pwd="${PWD:A}"
   local generation queued=0
@@ -296,16 +303,17 @@ _starship_async_precmd() {
   local jobs="${STARSHIP_JOBS_COUNT:-0}"
   local width="${COLUMNS:-80}"
   local keymap="${KEYMAP:-}"
-  local access_key="${AWS_ACCESS_KEY_ID-}"
-  local secret_key="${AWS_SECRET_ACCESS_KEY-}"
-  local session_token="${AWS_SESSION_TOKEN-}"
-  local profile="${AWS_PROFILE-}"
 
   _STARSHIP_ASYNC_ACTIVE_GENERATION=0
   _STARSHIP_ASYNC_ACTIVE_PWD=''
   _STARSHIP_ASYNC_NEEDS_REDRAW=0
   async_flush_jobs "$_STARSHIP_ASYNC_SLOW_WORKER" 2>/dev/null
   async_flush_jobs "$_STARSHIP_ASYNC_SUPERSLOW_WORKER" 2>/dev/null
+  _starship_async_env_snapshot
+  if [[ "$REPLY" != "$_STARSHIP_ASYNC_WORKER_ENV" ]] && ! _starship_async_start_workers; then
+    _starship_async_restore_prompt
+    return 0
+  fi
   (( ++_STARSHIP_ASYNC_GENERATION ))
   generation="$_STARSHIP_ASYNC_GENERATION"
 
@@ -319,8 +327,7 @@ _starship_async_precmd() {
     "$generation" "$worker_pwd" "$last_status" "$pipestatus" "$duration" "$jobs" "$width" "$keymap" &&
     (( ++queued ))
   async_job "$_STARSHIP_ASYNC_SUPERSLOW_WORKER" "$_STARSHIP_ASYNC_AWS_IDENTITY_JOB" \
-    "$generation" "$worker_pwd" "$last_status" "$pipestatus" "$duration" "$jobs" "$width" "$keymap" \
-    "$access_key" "$secret_key" "$session_token" "$profile" &&
+    "$generation" "$worker_pwd" "$last_status" "$pipestatus" "$duration" "$jobs" "$width" "$keymap" &&
     (( ++queued ))
   if (( ! queued )); then
     _STARSHIP_ASYNC_ACTIVE_GENERATION=0
@@ -363,15 +370,7 @@ _starship_async_zshexit() {
   _STARSHIP_ASYNC_INITIALIZED=0
 }
 
-if ! async_start_worker "$_STARSHIP_ASYNC_SLOW_WORKER" -u -n; then
-  return 0
-fi
-if ! async_start_worker "$_STARSHIP_ASYNC_SUPERSLOW_WORKER" -u -n; then
-  async_stop_worker "$_STARSHIP_ASYNC_SLOW_WORKER" 2>/dev/null
-  return 0
-fi
-async_register_callback "$_STARSHIP_ASYNC_SLOW_WORKER" _starship_async_callback
-async_register_callback "$_STARSHIP_ASYNC_SUPERSLOW_WORKER" _starship_async_callback
+_starship_async_start_workers || return 0
 typeset -g _STARSHIP_ASYNC_INITIALIZED=1
 
 add-zsh-hook precmd _starship_async_precmd
