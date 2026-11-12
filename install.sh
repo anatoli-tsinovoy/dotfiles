@@ -189,6 +189,36 @@ setup_omp_plugins() {
 
 }
 
+# agent-reports ships its omp plugin in a subdirectory, which `omp plugin install`
+# cannot fetch, so it is linked from the checkout `agent-reports up` builds from:
+# plugin and server stay on the same upstream commit. The plugin imports only omp
+# host modules and node builtins (its package.json has devDependencies only), so
+# no `bun install`. The session is a placeholder: the local server's nginx proxy
+# replaces the Cookie header with the real per-machine token
+# (zsh/.local/bin/agent-reports), so no secret lands in plugin settings. URL
+# defaults must match that script.
+setup_agent_reports_plugin() {
+  if ! command -v omp &>/dev/null; then
+    log_skip "oh-my-pi not available; skipping agent-reports plugin"
+    return 0
+  fi
+
+  local src="${AGENT_REPORTS_SRC:-${XDG_DATA_HOME:-$HOME/.local/share}/agent-reports}"
+  local url="${AGENT_REPORTS_URL:-http://localhost:${AGENT_REPORTS_PORT:-8790}}"
+
+  log_info "Installing agent-reports OMP plugin..."
+  if [[ -d "$src/.git" ]]; then
+    git -C "$src" pull --ff-only --quiet
+  else
+    mkdir -p "$(dirname "$src")"
+    git clone --quiet https://github.com/DeprecatedLuke/agent-reports.git "$src"
+  fi
+  omp plugin link "$src/plugin" >/dev/null
+  omp plugin config set agent-reports url "$url" >/dev/null
+  omp plugin config set agent-reports session "$url local" >/dev/null
+  log_ok "agent-reports plugin linked (url $url; start the server with: agent-reports up)"
+}
+
 install_linux_prerequisites() {
   if ! command -v curl &>/dev/null || ! command -v git &>/dev/null; then
     log_info "Installing prerequisites (curl, git)..."
@@ -440,6 +470,9 @@ main() {
   setup_zsh_completions
 
   setup_omp_plugins
+  if [[ "$os" == "mac" || "$os" == "linux" ]]; then
+    setup_agent_reports_plugin
+  fi
 
   # zsh/.local/bin holds prompt helpers, so ~/.local{,/bin} must be real
   # directories (not stow folds) before the zsh package is stowed.
