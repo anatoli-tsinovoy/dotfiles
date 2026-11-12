@@ -190,13 +190,16 @@ setup_omp_plugins() {
 }
 
 # agent-reports ships its omp plugin in a subdirectory, which `omp plugin install`
-# cannot fetch, so it is linked from the checkout `agent-reports up` builds from.
-# The session is a placeholder: the local server's nginx proxy replaces the Cookie
-# header with the real per-machine token (zsh/.local/bin/agent-reports), so no
-# secret lands in plugin settings. URL defaults must match that script.
+# cannot fetch, so it is linked from the checkout `agent-reports up` builds from:
+# plugin and server stay on the same upstream commit. The plugin imports only omp
+# host modules and node builtins (its package.json has devDependencies only), so
+# no `bun install`. The session is a placeholder: the local server's nginx proxy
+# replaces the Cookie header with the real per-machine token
+# (zsh/.local/bin/agent-reports), so no secret lands in plugin settings. URL
+# defaults must match that script.
 setup_agent_reports_plugin() {
-  if ! command -v omp &>/dev/null || ! command -v bun &>/dev/null; then
-    log_skip "omp or bun not available; skipping agent-reports plugin"
+  if ! command -v omp &>/dev/null; then
+    log_skip "oh-my-pi not available; skipping agent-reports plugin"
     return 0
   fi
 
@@ -210,7 +213,6 @@ setup_agent_reports_plugin() {
     mkdir -p "$(dirname "$src")"
     git clone --quiet https://github.com/DeprecatedLuke/agent-reports.git "$src"
   fi
-  (cd "$src/plugin" && bun install --frozen-lockfile --silent)
   omp plugin link "$src/plugin" >/dev/null
   omp plugin config set agent-reports url "$url" >/dev/null
   omp plugin config set agent-reports session "$url local" >/dev/null
