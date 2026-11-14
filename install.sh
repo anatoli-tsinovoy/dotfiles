@@ -545,6 +545,13 @@ main() {
       log_ok "Default shell set to zsh (restart Termux to apply)"
     fi
 
+    # Grant storage through Termux's native flow before opening the APK installer.
+    bash "$SCRIPT_DIR/scripts/termux/setup-storage.sh"
+
+    # Install only after the helper and Termux configuration are stowed.
+    log_info "Installing Open in Neovim Android app..."
+    bash "$SCRIPT_DIR/scripts/termux/install-open-in-neovim.sh"
+
   fi
 
   # Tailscale + ET setup (skip on Termux - requires systemd)

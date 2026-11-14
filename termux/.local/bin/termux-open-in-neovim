@@ -1,0 +1,147 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+
+print_context() {
+  printf 'Original content URI: '
+  printf '%q\n' "$original_uri"
+  printf 'Candidate file path:  '
+  printf '%q\n' "$candidate_path"
+}
+
+show_help() {
+  cat <<'EOF'
+Usage: termux-open-in-neovim [candidate-absolute-path] [original-uri] [mode]
+
+Mode is optional: edit (the default) opens an existing readable regular file
+from shared storage in Neovim; location prints its resolved path and leaves an
+interactive shell in its parent directory. Neither mode copies or imports
+content. If no usable path is available, the helper explains why and leaves an
+interactive Termux shell open.
+EOF
+}
+
+start_user_shell() {
+  local shell_path="${SHELL:-}"
+  local fallback_shell="${PREFIX:-/data/data/com.termux/files/usr}/bin/bash"
+
+  if [[ -n "$shell_path" && -x "$shell_path" ]]; then
+    if exec "$shell_path" -i; then
+      return 0
+    fi
+  fi
+
+  if [[ -x "$fallback_shell" ]]; then
+    if exec "$fallback_shell" -i; then
+      return 0
+    fi
+  fi
+
+  printf 'Could not start an interactive shell; close this Termux session to return.\n' >&2
+}
+
+return_to_start_directory() {
+  cd -- "$start_directory" 2>/dev/null || :
+}
+
+fail_open() {
+  printf '\nUnable to open this item: %s\n' "$1" >&2
+  printf 'No file was copied or imported. The original URI is shown above.\n\n' >&2
+  return_to_start_directory
+  start_user_shell
+}
+
+if [[ $# -eq 1 && "$1" == '--help' ]]; then
+  show_help
+  exit 0
+fi
+
+candidate_path="${1-}"
+original_uri="${2-}"
+mode="${3-edit}"
+start_directory="$PWD"
+print_context
+
+if [[ $# -gt 3 ]]; then
+  fail_open 'the helper received more arguments than its three-argument interface allows.'
+  exit 0
+fi
+
+case "$mode" in
+  edit|location) ;;
+  *)
+    fail_open "unsupported mode '$mode'; use 'edit' or 'location'."
+    exit 0
+    ;;
+esac
+
+if [[ -z "$candidate_path" ]]; then
+  fail_open 'Android did not provide a filesystem path for this URI. Some private/cloud document providers expose content only through Android and cannot be opened directly by this helper.'
+  exit 0
+fi
+
+if [[ "$candidate_path" != /* ]]; then
+  fail_open 'the candidate path is not absolute; only an actual shared-storage file can be opened.'
+  exit 0
+fi
+
+parent_directory="${candidate_path%/*}"
+file_name="${candidate_path##*/}"
+if [[ -z "$parent_directory" ]]; then
+  parent_directory='/'
+fi
+if [[ -z "$file_name" ]]; then
+  fail_open 'the candidate path does not name a file.'
+  exit 0
+fi
+
+if ! cd -P -- "$parent_directory" 2>/dev/null; then
+  fail_open 'the parent directory is missing or inaccessible to Termux.'
+  exit 0
+fi
+
+resolved_parent="$PWD"
+case "$resolved_parent" in
+  /storage|/storage/*) ;;
+  *)
+    fail_open 'the resolved path is outside Android shared storage. Private app data and arbitrary Termux files are intentionally not opened.'
+    exit 0
+    ;;
+esac
+
+resolved_path="$resolved_parent/$file_name"
+if [[ "$mode" == 'location' ]]; then
+  printf '\nResolved original file path: %q\n' "$resolved_path"
+  start_user_shell
+  exit 0
+fi
+if [[ -L "$resolved_path" ]]; then
+  fail_open 'the final path component is a symbolic link. Links are not followed, so a shared-storage path cannot redirect this helper into private files.'
+  exit 0
+fi
+if [[ ! -f "$resolved_path" ]]; then
+  fail_open 'the shared-storage path does not name an existing regular file.'
+  exit 0
+fi
+if [[ ! -r "$resolved_path" ]]; then
+  fail_open 'the file exists but Termux cannot read it. Check Android storage access for Termux.'
+  exit 0
+fi
+
+
+
+if ! command -v nvim >/dev/null 2>&1; then
+  fail_open 'Neovim (nvim) is not installed or is not on Termux PATH.'
+  exit 0
+fi
+
+printf '\nOpening the existing shared-storage file in Neovim.\n'
+if nvim -- "$resolved_path"; then
+  :
+else
+  nvim_status=$?
+  printf 'Neovim exited with status %d.\n' "$nvim_status" >&2
+fi
+
+# This command runs as the foreground Termux session process. Start the user's
+# shell here so the session stays interactive in the file's parent directory.
+start_user_shell

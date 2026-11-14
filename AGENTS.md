@@ -131,6 +131,50 @@ termux/.termux/colors.properties → ~/.termux/colors.properties
 
 **Termux detection must happen BEFORE Linux** in `detect_os()` because `uname -s` returns "Linux" on both.
 
+## Android file actions in Termux
+
+`scripts/termux/open-in-neovim/` contains the bundled APK, source, and build
+instructions for **Open in Neovim** and **Show location in Termux** in one app.
+These repository assets are Stow-ignored. On Termux, `./install.sh` stows the
+helper and runs `scripts/termux/install-open-in-neovim.sh` to install the bundled
+`scripts/termux/open-in-neovim/open-in-neovim.apk`.
+
+The remaining setup steps are Android UI approvals: approve Termux shared-storage
+access, allow APK installation from Termux if prompted, confirm installation,
+and tap **Open** to approve the app's automatic `RUN_COMMAND` permission request.
+The installer cannot silently install apps or grant Android permissions.
+`scripts/termux/setup-storage.sh` runs native storage setup only when `~/storage`
+is absent; existing storage trees are never rebuilt. Missing access opens the
+Android permission settings instead.
+
+Setup enables `allow-external-apps` while preserving existing settings in a
+regular properties file. Native Termux ignores symlinked `termux.properties`;
+setup migrates such settings without overwriting the symlink target. Reloading
+is performed with Termux in the foreground. External-app access permits arbitrary
+Termux commands, so grant `RUN_COMMAND` only to trusted apps.
+
+Normal device bootstrap needs no APK copying, SDK/JDK, or SSH. Maintainers rebuild
+the app on a machine with a JDK and Android SDK platform/build-tools:
+```sh
+ANDROID_HOME=/path/to/Android/Sdk scripts/termux/open-in-neovim/build.sh
+```
+The build output and persistent signing key/password live under
+`${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/open-in-neovim/`. Keep the signing key
+and its matching `.keystore.pass` outside the repository for upgrades. After
+changing app source, run `build.sh` to rebuild and refresh the bundled
+`scripts/termux/open-in-neovim/open-in-neovim.apk`.
+
+The app passes original shared-storage paths to
+`termux/.local/bin/termux-open-in-neovim` through Termux's `RUN_COMMAND` API; it
+does not copy files into Downloads. In a file manager's Open with or Share menu:
+
+- **Open in Neovim** edits the original; quitting leaves a shell in its parent.
+- **Show location in Termux** prints the resolved original path and opens a shell
+  in its parent directory without starting or requiring Neovim.
+
+Private/cloud providers may expose only a `content://` URI with no accessible
+path. Those show the URI and an explanation in Termux, without importing a copy.
+
 ## SketchyBar appearance reload
 
 The hidden `DARK_LIGHT` item subscribes to macOS `AppleInterfaceThemeChangedNotification`.
