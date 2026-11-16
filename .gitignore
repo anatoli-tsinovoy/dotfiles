@@ -15,10 +15,17 @@ omp/.omp/stats.db*
 omp/.omp/agent/models.db*
 omp/.omp/agent/agent.db*
 omp/.omp/agent/history.db*
+omp/.omp/agent/skill-descriptions.db*
 omp/.omp/agent/blobs
+omp/.omp/agent/cache
+omp/.omp/agent/webcache
+omp/.omp/agent/wt
+omp/.omp/agent/reports
 omp/.omp/cache
 omp/.omp/logs
 omp/.omp/puppeteer
+omp/.omp/agent/omp-gdrive
+omp/.omp/agent/omp-slack
 omp/.omp/agent/prompt-stash
 omp/.omp/agent/sessions
 omp/.omp/agent/terminal-sessions
@@ -26,6 +33,22 @@ omp/.omp/agent/keys
 omp/.omp/plugins/node_modules
 omp/.omp/autoqa*
 omp/.omp/gpu_cache.json
+omp/.omp/wt
+omp/.omp/webcache
+omp/.omp/reports
+omp/.omp/run
+omp/.omp/ssh-control
+omp/.omp/update
+omp/.omp/natives
+omp/.omp/install-id
+omp/.omp/remote-host
+omp/.omp/profiles
+omp/.omp/.dev-cwd
+omp/.omp/agent/custom-session-files
+omp/.omp/agent/memories
+omp/.omp/agent/predict
+omp/.omp/agent/kimi-device-id
+omp/.omp/agent/secret-placeholder.key
 
 # Sensitive
 private-macos
