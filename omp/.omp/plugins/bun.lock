@@ -298,7 +298,7 @@
 
     "omp-prompt-stash": ["omp-prompt-stash@github:anatoli-tsinovoy/omp-prompt-stash#6eadc0d", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=17.2.9", "@oh-my-pi/pi-tui": ">=17.2.9", "@oh-my-pi/pi-utils": ">=17.2.9" } }, "anatoli-tsinovoy-omp-prompt-stash-6eadc0d", "sha512-P18uiI+d15umsTbLdV/HeELQSp5hIY8lQNqXCYWhMg+Oszal9hsRsZO9HM0O7BUzgjYkMxPk/YlCNL6IIFZ5bA=="],
 
-    "omp-seance": ["omp-seance@github:anatoli-tsinovoy/omp-seance#daf4179", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=18.20.3 <19", "@oh-my-pi/pi-tui": ">=18.20.3 <19" } }, "anatoli-tsinovoy-omp-seance-daf4179", "sha512-nPpC3KYVBTZh6RGAKzBNx2XnpDARn1RsfNLalG0C/lZUicw5xj0U3uKQu0HKWroyD+20Z5gxBNVF9LXV8mtd/Q=="],
+    "omp-seance": ["omp-seance@github:anatoli-tsinovoy/omp-seance#a0d6ea0", { "peerDependencies": { "@oh-my-pi/pi-coding-agent": ">=18.20.3 <19", "@oh-my-pi/pi-tui": ">=18.20.3 <19" } }, "anatoli-tsinovoy-omp-seance-a0d6ea0", "sha512-8SUgpdQ8zeW3bA8FnMmIeRZtirD9F4yeXnLlG8qrRAIjUlYj1TpAcgXf7hnpeovfyq8toEFoJYCm9NeitFvHnQ=="],
 
     "omp-slack": ["omp-slack@github:anatoli-tsinovoy/omp-slack#3e62bda", { "peerDependencies": { "@oh-my-pi/pi-ai": ">=18.18.1", "@oh-my-pi/pi-coding-agent": ">=18.18.1", "@oh-my-pi/pi-tui": ">=18.18.1" }, "optionalPeers": ["@oh-my-pi/pi-ai", "@oh-my-pi/pi-coding-agent", "@oh-my-pi/pi-tui"] }, "anatoli-tsinovoy-omp-slack-3e62bda", "sha512-WoI0nMY0ljrRB8QMOnMor6p1b0l2zrlZlR7PlEfjsI1XcyBSSHJoZfVny904Ts24A3lMYXqnLLy5ANg4F0ZyWg=="],
 
