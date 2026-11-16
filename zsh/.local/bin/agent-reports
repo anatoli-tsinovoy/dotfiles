@@ -10,6 +10,11 @@
 # upstream's Vite dev proxy, so neither the browser nor the omp plugin holds the secret.
 # The plugin itself is linked by install.sh (setup_agent_reports_plugin).
 #
+# Optional AGENT_REPORTS_TUNNEL_BIND=host-address:port adds a second publish mapping to
+# the same web container port 8080; unset means no extra mapping. This leaves URL and
+# PUBLIC_URL unchanged. The proxy injects auth, so any client reaching this port gets full
+# API access.
+#
 #   agent-reports up       pull upstream, build images for new commits, (re)start
 #   agent-reports down     remove containers (the data volume stays)
 #   agent-reports status   container state + health
@@ -24,6 +29,95 @@ die() {
 }
 command_exists() { command -v "$1" &>/dev/null; }
 
+usage() {
+  cat <<'EOF'
+Usage: agent-reports COMMAND [OPTIONS]
+
+Commands:
+  up [--docker-port [PORT]]  Pull, build, and start agent-reports
+  down                       Stop containers (the data volume stays)
+  status                     Show container state and health
+  logs                       Follow API logs
+  --help, -h                 Show this help
+
+Use "agent-reports up --help" for Docker-in-Docker publishing details.
+The default publish is localhost-only. The authenticated proxy grants full API
+access to anyone who can reach a published port.
+EOF
+}
+
+up_usage() {
+  cat <<'EOF'
+Usage: agent-reports up [--docker-port [PORT]]
+
+  --docker-port [PORT]  Add a secondary publish on this devcontainer's primary
+                        IPv4 address, selected from the source address for its
+                        default route. PORT must be an integer from 1 to 65535;
+                        it defaults to 18790 when omitted.
+
+This is for Docker-in-Docker when a host-side SSH tunnel needs to reach the
+container. It sets the browser URL to http://localhost:PORT while preserving
+the local/plugin URL (default: http://localhost:8790). The AeroSpace shortcut's
+internal address must match the detected IPv4 address, and its local and
+remote ports must both be PORT.
+
+The proxy injects the session token, so every client that can reach this
+published port gets full API access. Use only on a trusted interface. Without
+this option, startup stays localhost-only and does not require ip.
+EOF
+}
+
+is_inside_container() {
+  [[ -f /.dockerenv ]] ||
+    [[ -f /run/.containerenv ]] ||
+    [[ -n "${container:-}" ]] ||
+    grep -Eq 'docker|podman|containerd|kubepods' /proc/1/cgroup 2>/dev/null
+}
+
+docker_primary_ipv4() {
+  local route field device="" address="" i
+  local -a fields=()
+
+  command_exists ip ||
+    die "--docker-port requires ip (iproute2) to detect this container's IPv4 address"
+  if ! route="$(ip -4 route get 1.1.1.1 2>/dev/null)"; then
+    die "cannot determine this container's IPv4 address from its default route (ip -4 route get 1.1.1.1 failed)"
+  fi
+  read -r -a fields <<<"$route"
+  for ((i = 0; i < ${#fields[@]}; i++)); do
+    field="${fields[i]}"
+    if [[ "$field" == dev && $((i + 1)) -lt ${#fields[@]} ]]; then
+      device="${fields[i + 1]}"
+    elif [[ "$field" == src && $((i + 1)) -lt ${#fields[@]} ]]; then
+      address="${fields[i + 1]}"
+    fi
+  done
+  [[ -n "$device" && -n "$address" ]] ||
+    die "cannot determine this container's IPv4 address from its default route (route has no dev/src)"
+  [[ "$address" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] ||
+    die "default route returned an invalid IPv4 source address: $address"
+
+  local -a octets=()
+  local octet
+  IFS=. read -r -a octets <<<"$address"
+  for octet in "${octets[@]}"; do
+    [[ ${#octet} -le 3 ]] && ((10#$octet <= 255)) ||
+      die "default route returned an invalid IPv4 source address: $address"
+  done
+  [[ "$address" != 0.0.0.0 ]] ||
+    die "default route has no usable IPv4 source address (got 0.0.0.0)"
+  printf '%s\n' "$address"
+}
+
+valid_docker_port() {
+  local value="$1"
+  [[ "$value" =~ ^[0-9]+$ ]] || return 1
+  while [[ ${#value} -gt 1 && ${value:0:1} == 0 ]]; do
+    value="${value:1}"
+  done
+  [[ ${#value} -le 5 ]] || return 1
+  ((10#$value >= 1 && 10#$value <= 65535))
+}
 REPO="https://github.com/DeprecatedLuke/agent-reports.git"
 SRC="${AGENT_REPORTS_SRC:-${XDG_DATA_HOME:-$HOME/.local/share}/agent-reports}"
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/agent-reports"
@@ -34,6 +128,7 @@ PORT="${AGENT_REPORTS_PORT:-8790}"
 URL="${AGENT_REPORTS_URL:-http://localhost:$PORT}"
 # Origin the human's browser uses, stamped into report/share links by the server.
 PUBLIC_URL="${AGENT_REPORTS_PUBLIC_URL:-$URL}"
+TUNNEL_BIND="${AGENT_REPORTS_TUNNEL_BIND:-}"
 NET=agent-reports
 VOLUME=agent-reports-data
 APP=agent-reports
@@ -131,6 +226,10 @@ wait_healthy() {
 
 cmd_up() {
   local eng token sha app_image web_image
+  local -a web_publish=(-p "$BIND:$PORT:8080")
+  if [[ -n "$TUNNEL_BIND" ]]; then
+    web_publish+=(-p "$TUNNEL_BIND:8080")
+  fi
   eng="$(engine)"
   mkdir -p "$STATE"
   chmod 0700 "$STATE"
@@ -157,7 +256,7 @@ cmd_up() {
     --user 65532:65532 --security-opt no-new-privileges \
     --env-file "$STATE/app.env" -v "$VOLUME:/data" "$app_image" >/dev/null
   "$eng" run -d --name "$WEB" --network "$NET" --restart unless-stopped \
-    --env-file "$STATE/app.env" -p "$BIND:$PORT:8080" localhost/agent-reports-web-local >/dev/null
+    --env-file "$STATE/app.env" "${web_publish[@]}" localhost/agent-reports-web-local >/dev/null
 
   wait_healthy
   log_ok "agent-reports running at $URL ($sha)"
@@ -181,13 +280,76 @@ cmd_status() {
   fi
 }
 
-case "${1:-}" in
-up) cmd_up ;;
-down) cmd_down ;;
-status) cmd_status ;;
-logs) "$(engine)" logs -f "$APP" ;;
-*)
-  sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+command="${1:-}"
+if (($#)); then
+  shift
+fi
+
+case "$command" in
+--help|-h)
+  (($# == 0)) || die "unexpected argument after --help: $*"
+  usage
+  ;;
+up)
+  docker_port_requested=0
+  docker_port=18790
+  show_up_help=0
+  while (($#)); do
+    arg="$1"
+    shift
+    case "$arg" in
+    --docker-port)
+      ((docker_port_requested == 0)) || die "--docker-port may only be specified once"
+      docker_port_requested=1
+      if (($#)) && [[ "$1" != -* ]]; then
+        docker_port="$1"
+        shift
+        if ! valid_docker_port "$docker_port"; then
+          die "--docker-port must be an integer from 1 to 65535 (got '$docker_port')"
+        fi
+        while [[ ${#docker_port} -gt 1 && ${docker_port:0:1} == 0 ]]; do
+          docker_port="${docker_port:1}"
+        done
+      fi
+      ;;
+    --help|-h)
+      show_up_help=1
+      ;;
+    --*)
+      die "unknown option for up: $arg"
+      ;;
+    *)
+      die "unexpected positional argument for up: $arg"
+      ;;
+    esac
+  done
+  if ((show_up_help)); then
+    up_usage
+    exit 0
+  fi
+  if ((docker_port_requested)); then
+    is_inside_container ||
+      die "--docker-port requires a detectable container environment; refusing to publish on a host address"
+    docker_ip="$(docker_primary_ipv4)"
+    TUNNEL_BIND="$docker_ip:$docker_port"
+    PUBLIC_URL="http://localhost:$docker_port"
+    log_info "Docker tunnel: $TUNNEL_BIND (browser: $PUBLIC_URL)"
+  fi
+  cmd_up
+  ;;
+down|status|logs)
+  (($# == 0)) || die "unexpected argument for '$command': $*"
+  case "$command" in
+  down) cmd_down ;;
+  status) cmd_status ;;
+  logs) "$(engine)" logs -f "$APP" ;;
+  esac
+  ;;
+"")
+  usage
   exit 1
+  ;;
+*)
+  die "unknown command '$command' (run agent-reports --help)"
   ;;
 esac

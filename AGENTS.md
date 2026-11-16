@@ -207,7 +207,7 @@ agent-reports down     # remove containers, keep the volume
 - Upstream's Traefik is replaced by an `/api` proxy spliced into upstream `web/nginx.conf` after its single
   `server_tokens off;` line. If upstream changes that line, `up` fails instead of serving without `/api`. The proxy
   injects the session cookie, the same way upstream's Vite dev proxy does, so the browser never logs in. Only
-  publish it on localhost.
+  publish it on localhost by default; the opt-in tunnel mapping below is bound separately.
 - Per-machine token and nginx snippets live in `~/.local/state/agent-reports/`.
 - The omp plugin is installed by `install.sh` (`setup_agent_reports_plugin`, mac/linux): it is a subdirectory of
   upstream, which `omp plugin install` cannot fetch, so it is `omp plugin link`ed from the same checkout. Its
@@ -220,12 +220,31 @@ agent-reports down     # remove containers, keep the volume
   with `--storage-driver=vfs`, as DrawRecog's `docker-compose-dind.yml` starts it. Default overlay storage fails
   the build with `mount source: "overlay" ... invalid argument`.
   With a mounted socket, published ports land on the docker host, and loopback there is not
-  reachable from the dev container. Bind the bridge gateway instead, which only containers on that host can reach:
-  `AGENT_REPORTS_BIND=$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}')` (usually
-  `172.17.0.1`), then set `AGENT_REPORTS_URL=http://$AGENT_REPORTS_BIND:8790`. The proxy injects the session
-  cookie, so whoever reaches the port gets full API access: `0.0.0.0` or a LAN address is an intentional exposure,
-  not a fix. `AGENT_REPORTS_PUBLIC_URL` (default: the plugin URL) is the browser origin the server puts in report
-  links.
+  reachable from the dev container. Bind the bridge gateway instead:
+  `AGENT_REPORTS_BIND=$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}')`
+  (usually `172.17.0.1`), then set `AGENT_REPORTS_URL=http://$AGENT_REPORTS_BIND:8790`.
+- With Docker-in-Docker, the existing AeroSpace Alt+Shift+O SSH tunnel can reach reports
+  through an opt-in second publish while preserving the default localhost mapping:
+  ```sh
+  agent-reports up --docker-port          # default secondary port 18790
+  agent-reports up --docker-port 18790     # explicit port
+  ```
+  `--docker-port` requires a detectable Docker/Podman container and `ip`; it selects the
+  IPv4 source address for the default route using `ip -4 route get 1.1.1.1`. It fails
+  rather than bind an unspecified address if the container or route address cannot be
+  detected. Plain `agent-reports up` never adds this exposure and does not require `ip`.
+  The option sets the secondary bind to `<detected-ip>:PORT` and the browser URL to
+  `http://localhost:PORT`, overriding `AGENT_REPORTS_TUNNEL_BIND` and
+  `AGENT_REPORTS_PUBLIC_URL`; it does not change `AGENT_REPORTS_URL` (default:
+  `http://localhost:8790`). The existing environment-only tunnel settings remain supported.
+  In the shortcut, set its internal address to the detected IP and use `PORT` for both
+  local and remote ports: it forwards `localhost:PORT` to `<detected-ip>:PORT` on the SSH
+  host. The shortcut's internal address defaults to `172.18.0.2`, but the detected
+  address can differ or change when the container is recreated.
+  The proxy injects the session cookie, so anyone who can reach the published port gets
+  full API access. Keep the binding on a trusted interface; `0.0.0.0` or a LAN address is
+  an intentional exposure, not a fix. `AGENT_REPORTS_PUBLIC_URL` (default: the plugin
+  URL) is the browser origin the server puts in report links and security policies.
 - The API container runs as distroless `nonroot` (65532) with `no-new-privileges`; `up` chowns the volume first.
 
 ## Ghostty

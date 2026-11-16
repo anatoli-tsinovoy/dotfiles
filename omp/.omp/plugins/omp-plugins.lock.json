@@ -1,7 +1,7 @@
 {
   "plugins": {
     "omp-prompt-stash": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "enabledFeatures": null,
       "enabled": true
     },
@@ -14,7 +14,27 @@
       "version": "0.1.0",
       "enabledFeatures": null,
       "enabled": true
+    },
+    "omp-gdrive": {
+      "version": "0.1.0",
+      "enabledFeatures": null,
+      "enabled": true
+    },
+    "agent-reports": {
+      "version": "0.1.0",
+      "enabledFeatures": null,
+      "enabled": true
+    },
+    "omp-seance": {
+      "version": "0.1.0",
+      "enabledFeatures": null,
+      "enabled": true
     }
   },
-  "settings": {}
+  "settings": {
+    "agent-reports": {
+      "url": "http://localhost:8790",
+      "session": "http://localhost:8790 local"
+    }
+  }
 }

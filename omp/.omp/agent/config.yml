@@ -44,7 +44,7 @@ dev:
 github:
   enabled: true
 task:
-  autoParallel: on
+  autoParallel: "on"
   showResolvedModelBadge: true
   enableLsp: true
   eager: always
@@ -95,7 +95,8 @@ branchSummary:
 memory:
   backend: "off"
 codexResets:
-  autoRedeem: "no"
+  autoRedeem5h: "no"
+  autoRedeemWeekly: "no"
 steeringMode: all
 ttsr:
   contextMode: discard
@@ -108,3 +109,5 @@ telemetry:
   otlpExportEnabled: false
 update:
   auto: false
+title:
+  refreshAfterPrompts: 3
