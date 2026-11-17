@@ -1,10 +1,10 @@
 modelRoles:
   default: amazon-bedrock/global.anthropic.claude-opus-5-5:medium
   smol: openai/gpt-6-luna:xhigh
-  slow: openai/gpt-6.1-sol:xhigh
-  designer: openai/gpt-6-astra
-  vision: openai/gpt-6.1-sol
-  plan: openai/gpt-6-astra:high
+  slow: openai/gpt-6.2-sol:xhigh
+  designer: openai/gpt-6.2-astra
+  vision: openai/gpt-6.2-sol
+  plan: openai/gpt-6.2-astra:high
   task: openai/gpt-6-luna:max
   commit: openai/gpt-6-luna:off
   tiny: openai/gpt-6-luna:medium
