@@ -401,3 +401,4 @@ if [[ -z "$IS_OMP_COMMAND_SHELL" && -f "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/
   source "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
+setopt interactivecomments

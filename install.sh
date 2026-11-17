@@ -179,9 +179,11 @@ setup_omp_plugins() {
 
   local plugin
   local remote_plugins=(
+    "github:anatoli-tsinovoy/omp-seance"
     "github:anatoli-tsinovoy/omp-prompt-stash"
     "github:anatoli-tsinovoy/omp-cache-miss-oof"
     "github:anatoli-tsinovoy/omp-slack"
+    "github:anatoli-tsinovoy/omp-gdrive"
   )
   for plugin in "${remote_plugins[@]}"; do
     omp plugin install "$plugin"
