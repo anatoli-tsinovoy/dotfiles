@@ -84,6 +84,7 @@
     "thinkingXhigh": "red",
     "bashMode": "cyan",
     "pythonMode": "fn",
+    "btwMode": "accent",
     "statusLineBg": "chrome",
     "statusLineSep": "borderMuted",
     "statusLineModel": "label",
