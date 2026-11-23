@@ -188,9 +188,10 @@ configuration behavior do not transfer directly. OmniWM workspace IDs are
 numeric 1–15; the corresponding labels are `1`–`9`, then `a`–`f` for IDs
 10–15.
 
-The native workspace bar and OmniWM borders are enabled; the default workspace
-bar is positioned below the native menu bar. SketchyBar and JankyBorders are
-not integrated into the new setup.
+The OmniShell workspace bar is full-width and flush with the top of the screen.
+In this mode OmniWM auto-hides the macOS menu bar; use OmniShell's App Menu
+widget to reach the focused app's menus. OmniWM's native borders are enabled.
+SketchyBar and JankyBorders are not part of the new setup.
 
 The old bespoke SketchyBar widgets/artwork and fullscreen-gradient border
 effect are not ported. Hammerspoon retains the audio-output cycle on

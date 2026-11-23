@@ -1,2 +1,2 @@
 [profiles.default.workspaceBar]
-position = "belowMenuBar"
+position = "overlappingMenuBar"
