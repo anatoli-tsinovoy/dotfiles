@@ -1,2 +1,5 @@
+[profiles.default]
+leading = ["apple-menu", "app-menu", "workspaces", "scratchpads"]
+
 [profiles.default.workspaceBar]
 position = "overlappingMenuBar"
