@@ -192,8 +192,10 @@ The OmniShell workspace bar is full-width and flush with the top of the screen.
 In this mode OmniWM auto-hides the macOS menu bar; use OmniShell's App Menu
 widget to reach the focused app's menus. The OmniWM logo widget is hidden.
 
-OmniWM draws a 2.5-point teal-to-purple focus border. JankyBorders is not
-part of the setup.
+OmniWM draws a 2.5-point teal-to-purple focus border. Fullscreen layout frames
+retain outer gaps so a lone tiled window's border clears the bar and screen
+edges. JankyBorders is not part of the setup.
+
 The old SketchyBar widgets, artwork and fullscreen-gradient border effect
 are not ported. Hammerspoon retains the audio-output cycle on
 Option+PageUp/Option+PageDown.

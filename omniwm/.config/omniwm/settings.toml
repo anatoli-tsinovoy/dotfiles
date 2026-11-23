@@ -33,7 +33,7 @@ arrangements = []
 
 [gaps]
 size = 8.0
-fullscreenUsesOuterGaps = false
+fullscreenUsesOuterGaps = true
 
 [gaps.outer]
 left = 8.0
