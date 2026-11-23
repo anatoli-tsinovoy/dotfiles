@@ -1,4 +1,5 @@
 [profiles.default]
+theme = "dotfiles"
 leading = ["apple-menu", "app-menu", "workspaces", "scratchpads"]
 
 [profiles.default.workspaceBar]
