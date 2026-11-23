@@ -55,7 +55,7 @@ defaults write NSGlobalDomain com.apple.trackpad.forceClick -bool false
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerTapGesture -int 2
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerTapGesture -int 2
 
-# Disable multi-finger gestures (using Aerospace for window management)
+# Disable multi-finger gestures (using OmniWM for window management)
 defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int 0
 defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture -int 0
 defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture -int 0
@@ -74,9 +74,10 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeF
 # UI & Windows                                                                #
 ###############################################################################
 
-# Hide menu bar (using Sketchybar instead)
-defaults write NSGlobalDomain _HIHideMenuBar -bool true
-defaults write NSGlobalDomain AppleMenuBarVisibleInFullscreen -bool false
+# Keep the native menu bar visible; the legacy third-party status bar is not
+# installed by the OmniWM setup.
+defaults write NSGlobalDomain _HIHideMenuBar -bool false
+defaults write NSGlobalDomain AppleMenuBarVisibleInFullscreen -bool true
 
 # Disable window animations (faster UI)
 defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
@@ -126,7 +127,7 @@ defaults write com.apple.dock show-recents -bool false
 # Group windows by application in Mission Control
 defaults write com.apple.dock expose-group-apps -bool true
 
-# Disable all dock gestures (using Aerospace)
+# Disable all dock gestures (using OmniWM)
 defaults write com.apple.dock showAppExposeGestureEnabled -bool false
 defaults write com.apple.dock showDesktopGestureEnabled -bool false
 defaults write com.apple.dock showLaunchpadGestureEnabled -bool false
@@ -170,7 +171,7 @@ defaults write com.apple.WindowManager GloballyEnabled -bool false
 # Disable click-to-show-desktop
 defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
 
-# Disable all native tiling (using Aerospace)
+# Disable all native tiling (using OmniWM)
 defaults write com.apple.WindowManager EnableTiledWindowMargins -bool false
 defaults write com.apple.WindowManager EnableTilingByEdgeDrag -bool false
 defaults write com.apple.WindowManager EnableTilingOptionAccelerator -bool false
@@ -241,7 +242,7 @@ if [[ -d /Applications/Ghostty.app ]]; then
 fi
 
 # Disable Mission Control space switching shortcuts (Ctrl+1, Ctrl+2, etc.)
-# These interfere with Aerospace and terminal shortcuts
+# These interfere with OmniWM and terminal shortcuts
 # 118 = Ctrl+1, 119 = Ctrl+2, 120 = Ctrl+3
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 118 '{ enabled = 0; }'
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 119 '{ enabled = 0; }'
@@ -253,8 +254,7 @@ defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 120 '{ e
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 '{ enabled = 0; }'
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 '{ enabled = 0; }'
 
-# Show Notification Center with Ctrl+Option+Cmd+Shift+N; the SketchyBar date
-# item sends this keystroke (plugins/notification_center.sh).
+# Preserve the Ctrl+Option+Cmd+Shift+N Notification Center shortcut.
 # 163 = Show Notification Center; parameters = (ASCII "n", key code, modifiers)
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 163 '{ enabled = 1; value = { parameters = (110, 45, 1966080); type = standard; }; }'
 

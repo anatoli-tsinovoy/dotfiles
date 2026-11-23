@@ -1,0 +1,146 @@
+local home = os.getenv("HOME")
+local homebrewPath = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+local function run(program, arguments)
+  local argv = { "PATH=" .. homebrewPath, program }
+  for _, argument in ipairs(arguments or {}) do
+    table.insert(argv, argument)
+  end
+
+  local task = hs.task.new("/usr/bin/env", function(exitCode, _, stderr)
+    if exitCode ~= 0 then
+      local message = (stderr or ""):gsub("%s+$", "")
+      hs.alert.show(message ~= "" and message or (program .. " exited " .. tostring(exitCode)))
+    end
+  end, nil, argv)
+
+  if not task or not task:start() then
+    hs.alert.show("Unable to start " .. program)
+  end
+  return task
+end
+
+local hotkeys = {}
+local function bind(modifiers, key, callback, repeatCallback)
+  local hotkey = hs.hotkey.bind(modifiers, key, callback, nil, repeatCallback)
+  if hotkey then
+    table.insert(hotkeys, hotkey)
+  end
+end
+
+local function openApp(name)
+  run("open", { "-a", name })
+end
+
+-- Applications and commands carried over from AeroSpace.
+bind({ "alt" }, "g", function() openApp("Google Chrome") end)
+bind({ "alt" }, "t", function()
+  run("osascript", { "-e", 'tell application "Ghostty" to activate' })
+end)
+bind({ "alt", "shift" }, "t", function()
+  run("open", {
+    "-na", "Ghostty.app", "--args", "--window-save-state=never", "--title=tmux-init",
+    "-e", "/usr/bin/env", "PATH=" .. homebrewPath, "zsh", "-lc",
+    "exec tmux new-session -A -s init",
+  })
+end)
+bind({ "alt", "shift" }, "o", function()
+  run("open", {
+    "-na", "Ghostty.app", "--args", "--window-save-state=never", "--title=ssh-tunnel",
+    "-e", "/usr/bin/env", "PATH=" .. homebrewPath, "bash", "-lc",
+    'exec "$HOME/.config/omniwm/ssh-tunnel.sh"',
+  })
+end)
+bind({ "alt", "shift" }, "c", function()
+  run("zsh", { "-ic", "clipssh" })
+end)
+bind({ "alt" }, "m", function() openApp("Spotify") end)
+bind({ "alt" }, "v", function() openApp("WhatsApp") end)
+bind({ "alt" }, "s", function() openApp("Slack") end)
+bind({ "alt" }, "y", function() openApp("YouTube") end)
+bind({ "alt" }, "f", function() openApp("Finder") end)
+bind({ "cmd", "alt", "shift" }, "l", function()
+  run("open", { "-a", "Google Chrome", home .. "/.private/redirect1.html" })
+end)
+bind({ "ctrl", "cmd", "alt", "shift" }, "l", function()
+  run("open", { "-a", "Google Chrome", home .. "/.private/redirect2.html" })
+end)
+bind({ "alt", "shift" }, "s", function()
+  run("screencapture", { "-i", "-c" })
+end)
+
+-- Cycle output devices without SwitchAudioSource; apply after the key sequence settles.
+local pendingOutput
+local outputTimer
+local outputAlert
+local function cycleOutput(direction)
+  local devices = hs.audiodevice.allOutputDevices() or {}
+  if #devices == 0 then
+    hs.alert.show("No audio outputs available")
+    return
+  end
+
+  local currentUID = pendingOutput and pendingOutput.uid
+  if not currentUID then
+    local current = hs.audiodevice.defaultOutputDevice()
+    currentUID = current and current:uid()
+  end
+
+  local currentIndex
+  for index, device in ipairs(devices) do
+    if device:uid() == currentUID then
+      currentIndex = index
+      break
+    end
+  end
+  if not currentIndex then
+    currentIndex = direction > 0 and 0 or 1
+  end
+
+  local targetIndex = ((currentIndex - 1 + direction) % #devices) + 1
+  local target = devices[targetIndex]
+  pendingOutput = { uid = target:uid(), name = target:name() }
+
+  if outputAlert then
+    hs.alert.closeSpecific(outputAlert)
+  end
+  outputAlert = hs.alert.show("Audio: " .. pendingOutput.name, nil, 0.8)
+
+  if outputTimer then
+    outputTimer:stop()
+  end
+  outputTimer = hs.timer.doAfter(0.35, function()
+    outputTimer = nil
+    local selection = pendingOutput
+    pendingOutput = nil
+    if not selection then
+      return
+    end
+
+    local device = hs.audiodevice.findOutputByUID(selection.uid)
+    if not device or not device:setDefaultOutputDevice() then
+      hs.alert.show("Could not select " .. selection.name)
+    end
+  end)
+end
+
+bind({ "alt" }, "pageup", function() cycleOutput(-1) end, function() cycleOutput(-1) end)
+bind({ "alt" }, "pagedown", function() cycleOutput(1) end, function() cycleOutput(1) end)
+
+-- One-shot service layer. Settings.toml reloads automatically; Escape also reloads Hammerspoon.
+local service = hs.hotkey.modal.new({ "alt", "shift" }, ";")
+local function serviceCommand(command)
+  return function()
+    service:exit()
+    run("omniwmctl", { "command", command })
+  end
+end
+
+service:bind({}, "escape", function()
+  service:exit()
+  hs.timer.doAfter(0.1, hs.reload)
+end)
+service:bind({}, "r", serviceCommand("balance-sizes"))
+service:bind({}, "f", serviceCommand("toggle-focused-window-floating"))
+service:bind({ "shift" }, "f", serviceCommand("toggle-workspace-layout"))
+service:bind({}, "b", serviceCommand("toggle-workspace-bar"))

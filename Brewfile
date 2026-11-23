@@ -199,16 +199,14 @@ brew "yt-dlp"
 brew "zoxide"
 # UNIX shell (command interpreter)
 brew "zsh"
-# A window border system for macOS
-brew "felixkratz/formulae/borders"
-# Custom macOS statusbar with shell plugin, interaction and graph support
-brew "felixkratz/formulae/sketchybar"
 # Remote terminal with IP roaming
 brew "et"
 # Incredibly fast JavaScript runtime, bundler, transpiler and package manager - all in one.
 brew "oven-sh/bun/bun"
-# AeroSpace is an i3-like tiling window manager for macOS
-cask "nikitabobko/tap/aerospace", trusted: true
+# OmniWM is a Niri-inspired macOS window manager
+cask "omniwm"
+# Scriptable automation for macOS, including global hotkeys
+cask "hammerspoon"
 # Display management tool
 cask "betterdisplay"
 # Virtual Audio Driver
@@ -220,7 +218,6 @@ cask "discord"
 cask "font-comic-shanns-mono-nerd-font"
 cask "font-meslo-lg-nerd-font"
 cask "font-sf-pro"
-cask "font-sketchybar-app-font"
 # Free and open-source image editor
 cask "gimp"
 # Web browser
