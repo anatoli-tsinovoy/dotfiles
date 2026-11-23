@@ -158,7 +158,7 @@ provider = "ghostty"
 labels = {}
 
 [appearance]
-mode = "dark"
+mode = "automatic"
 tabRailAppIcons = false
 
 [[workspaces]]
