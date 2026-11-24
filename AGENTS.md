@@ -206,8 +206,8 @@ The standalone font comes from
 Homebrew cask installs the font only, not the SketchyBar daemon. The tracked
 overlay sources are `scripts/macos/sketchybar-app-font/overrides.json` for
 app-name mappings and `scripts/macos/sketchybar-app-font/svgs/*.svg` for custom
-glyph artwork. Edit the JSON mappings and SVG artwork as needed, then explicitly
-rebuild with:
+glyph artwork. The macOS Open in Neovim launcher reuses the Ghostty glyph.
+Edit the JSON mappings and SVG artwork as needed, then explicitly rebuild with:
 
 ```sh
 bash scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh
