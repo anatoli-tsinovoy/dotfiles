@@ -25,7 +25,7 @@ look = require("../lib/skin")({
         local signal = if state.muted or state.volume == 0 then "M14 6 L20 12 M20 6 L14 12"
             else table.concat(VOLUME_WAVES, " ", 1, waveCount)
         local scale = look.scale(ctx)
-        local width, height = 24 * scale, 18 * scale
+        local width, height = 22 * scale, 16.5 * scale
         local viewBox = { 0, 0, 24, 18 }
         local icon = ui.stack{ w = width, h = height,
             ui.path{ w = width, h = height, viewBox = viewBox, d = SPEAKER, fill = "foreground" },
@@ -42,7 +42,7 @@ look = require("../lib/skin")({
         return look.bar(ctx, {
             pad = 2 * scale,
             ui.stack{
-                w = 15 * scale, h = 16 * scale, radius = 2.5 * scale, fill = "foreground",
+                w = 15 * scale, h = 14 * scale, radius = 2.5 * scale, fill = "foreground",
                 look.text{
                     text = SOURCE_GLYPHS[source] or "?", size = 11 * scale, weight = "medium", color = "background",
                 },
