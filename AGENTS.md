@@ -202,9 +202,13 @@ OmniWM draws a 2.5-point teal-to-purple focus border. Fullscreen layout frames
 retain outer gaps so a lone tiled window's border clears the bar and screen
 edges. JankyBorders is not part of the setup.
 
-The old SketchyBar widgets, artwork and fullscreen-gradient border effect
-are not ported. Hammerspoon retains the audio-output cycle on
-Option+PageUp/Option+PageDown.
+The old SketchyBar widgets, artwork and fullscreen-gradient border effect are
+not ported. OmniShell keeps the stock media, notifications, Wi-Fi, volume,
+battery-details, control-center and clock widgets. The audio-output indicator
+beside Volume shows the actual default output. Input Source near the clock
+displays the current language/input source and opens its selection popout.
+Volume retains its volume controls and opens the stock audio picker. Hammerspoon
+retains the audio-output cycle on Option+PageUp/Option+PageDown.
 
 ### Window and command shortcuts
 

@@ -1,9 +1,11 @@
 [profiles.default]
 theme = "dotfiles"
 leading = ["apple-menu", "app-menu", "workspaces", "scratchpads"]
+trailing = ["media", "notifications", "wifi", "volume", "audio-output", "battery-details", "control-center", "input-source", "clock"]
 
 [profiles.default.workspaceBar]
 position = "overlappingMenuBar"
 height = 40
+systemStatsButton = false
 # The bundled profile sets this to zero; let the theme control fill alpha.
 backgroundOpacity = 1.0
