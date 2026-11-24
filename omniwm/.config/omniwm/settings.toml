@@ -344,7 +344,7 @@ binding = "Control+Option+Down Arrow"
 
 [[hotkeys]]
 id = "openMenuAnywhere"
-binding = "Control+Option+M"
+binding = "Option+Shift+M"
 
 [[hotkeys]]
 id = "toggleFocusedWindowFloating"

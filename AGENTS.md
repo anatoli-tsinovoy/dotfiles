@@ -224,7 +224,7 @@ The configured window-manager bindings retain these semantics:
 | Toggle fullscreen | Control+Option+Up |
 | Balance window sizes | Control+Option+Down |
 | Toggle Niri/Dwindle layout | Option+/ |
-| Open Menu Anywhere | Control+Option+M |
+| Open Menu Anywhere | Shift+Option+M |
 
 Hammerspoon owns the shell/application shortcuts and prepends Homebrew's bin
 directories explicitly. Option+G/T/M/V/S/Y/F opens Chrome, Ghostty, Spotify,
