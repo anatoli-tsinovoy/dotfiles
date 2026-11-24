@@ -343,6 +343,10 @@ id = "balanceSizes"
 binding = "Control+Option+Down Arrow"
 
 [[hotkeys]]
+id = "openMenuAnywhere"
+binding = "Control+Option+M"
+
+[[hotkeys]]
 id = "toggleFocusedWindowFloating"
 binding = "Option+Shift+F"
 
