@@ -3,15 +3,14 @@
 
 local look = require("../lib/look")
 
-local TRANSPORT = {
-    builtin = "laptopcomputer",
-    usb = "cable.connector",
-    bluetooth = "headphones",
-    hdmi = "display",
-    displayport = "display",
-    airplay = "airplayaudio",
-    thunderbolt = "bolt.horizontal",
-}
+local function outputSymbol(output)
+    if string.find(string.lower(output.name), "blackhole", 1, true) then
+        return "laser.burst"
+    elseif output.transport == "builtin" then
+        return "hifispeaker.2.fill"
+    end
+    return "headphones.over.ear"
+end
 
 function render(ctx)
     local output
@@ -26,10 +25,8 @@ function render(ctx)
     end
 
     local scale = look.scale(ctx)
-    local props = { help = output.name }
-    props[1] = look.glyph{ name = TRANSPORT[output.transport] or "hifispeaker.fill", size = 14 * scale }
-    if not ctx.data.bar.style.vertical then
-        props[2] = look.text{ text = output.name, size = 13 * scale, maxWidth = 160 * scale }
-    end
-    return look.bar(ctx, props)
+    return look.bar(ctx, {
+        help = output.name,
+        [1] = look.glyph{ name = outputSymbol(output), size = 14 * scale },
+    })
 end

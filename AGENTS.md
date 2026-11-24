@@ -202,13 +202,13 @@ OmniWM draws a 2.5-point teal-to-purple focus border. Fullscreen layout frames
 retain outer gaps so a lone tiled window's border clears the bar and screen
 edges. JankyBorders is not part of the setup.
 
-The old SketchyBar widgets, artwork and fullscreen-gradient border effect are
-not ported. OmniShell keeps the stock media, notifications, Wi-Fi, volume,
-battery-details, control-center and clock widgets. The audio-output indicator
-beside Volume shows the actual default output. Input Source near the clock
-displays the current language/input source and opens its selection popout.
-Volume retains its volume controls and opens the stock audio picker. Hammerspoon
-retains the audio-output cycle on Option+PageUp/Option+PageDown.
+OmniShell keeps media, notifications, Wi-Fi, battery details, Control Center,
+and the clock/calendar. Its compact audio icons distinguish the active output
+and volume level without labels; the volume icon still opens the native mixer.
+Hammerspoon previews and cycles outputs on Option+PageUp/Option+PageDown.
+The language badge uses A for ABC and א for Hebrew; macOS Control+Space switches
+layouts. Hammerspoon sends the settled source ID to the badge after a macOS
+source-change event to avoid a stale OmniWM 0.8 reading. No polling.
 
 ### Window and command shortcuts
 

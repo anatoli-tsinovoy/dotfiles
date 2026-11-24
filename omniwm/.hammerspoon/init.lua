@@ -127,6 +127,25 @@ end
 bind({ "alt" }, "pageup", function() cycleOutput(-1) end, function() cycleOutput(-1) end)
 bind({ "alt" }, "pagedown", function() cycleOutput(1) end, function() cycleOutput(1) end)
 
+-- OmniWM 0.8 can read the previous layout during the source-change notification.
+local inputSourceTimer = hs.timer.delayed.new(0.2, function()
+  local source = hs.keycodes.currentSourceID()
+  if source then
+    local task = hs.task.new("/usr/bin/env", function(exitCode, _, stderr)
+      if exitCode ~= 0 then
+        hs.printf("OmniShell input source update failed: %s", stderr)
+      end
+    end, {
+      "PATH=" .. homebrewPath, "omniwmctl", "shell", "set", "dotfilesInputSourceID", source,
+    })
+    if task then
+      task:start()
+    end
+  end
+end)
+hs.keycodes.inputSourceChanged(function() inputSourceTimer:start() end)
+inputSourceTimer:start()
+
 -- One-shot service layer. Settings.toml reloads automatically; Escape also reloads Hammerspoon.
 local service = hs.hotkey.modal.new({ "alt", "shift" }, ";")
 local function serviceCommand(command)
