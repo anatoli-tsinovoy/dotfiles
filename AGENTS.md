@@ -221,6 +221,7 @@ The configured window-manager bindings retain these semantics:
 | Move workspace to the right monitor (no wrap; respects workspace home) | Option+Shift+Tab |
 | Move focused window to the right monitor (no wrap) | Control+Option+Shift+Tab |
 | Toggle fullscreen | Control+Option+Up |
+| Balance window sizes | Control+Option+Down |
 | Toggle Niri/Dwindle layout | Option+/ |
 
 Hammerspoon owns the shell/application shortcuts and prepends Homebrew's bin

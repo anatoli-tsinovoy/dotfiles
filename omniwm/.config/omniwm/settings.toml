@@ -340,7 +340,7 @@ binding = "Option+="
 
 [[hotkeys]]
 id = "balanceSizes"
-binding = "Option+Shift+B"
+binding = "Control+Option+Down Arrow"
 
 [[hotkeys]]
 id = "toggleFocusedWindowFloating"
