@@ -193,9 +193,10 @@ In this mode OmniWM auto-hides the macOS menu bar; use OmniShell's App Menu
 widget to reach the focused app's menus. The OmniWM logo widget is hidden.
 The `dotfiles` OmniShell palette follows macOS appearance, using the old SketchyBar
 light colors in Light mode and dark colors in Dark mode. It keeps OmniShell's
-built-in widgets and native app icons. The default profile sets
-`workspaceBar.backgroundOpacity` to `1.0`, overriding OmniWM's zero default so
-the theme's 50% fill alpha controls the bar.
+built-in widgets and native app icons. The bar is 40 points tall, with 5 points
+of space above and below the workspace capsules. `shell/lib/look.luau` sets
+the capsule inset using the bundled skin. The profile sets
+`workspaceBar.backgroundOpacity` to `1.0` so the theme controls the 50% fill.
 
 OmniWM draws a 2.5-point teal-to-purple focus border. Fullscreen layout frames
 retain outer gaps so a lone tiled window's border clears the bar and screen
