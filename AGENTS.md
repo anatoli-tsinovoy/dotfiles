@@ -191,14 +191,15 @@ numeric 1–15; the corresponding labels are `1`–`9`, then `a`–`f` for IDs
 The OmniShell workspace bar is full-width and flush with the top of the screen.
 In this mode OmniWM auto-hides the macOS menu bar; use OmniShell's App Menu
 widget to reach the focused app's menus. The OmniWM logo widget is hidden.
-The `dotfiles` OmniShell palette follows macOS appearance, using the old SketchyBar
-light colors in Light mode and dark colors in Dark mode. It keeps OmniShell's
-built-in widgets and uses the SketchyBar App Font with a custom glyph overlay for
-application icons. The bar is 40 points tall, with 5 points of space above and
-below the workspace capsules. `shell/lib/look.luau` sets the capsule inset using
-the bundled skin. The profile sets `workspaceBar.backgroundOpacity` to `1.0` so
-the theme controls the 50% fill.
-In Dark mode only, workspace capsules are filled, inactive labels are pink, and inactive app glyphs retain full-strength violet; Light mode is unchanged.
+The `dotfiles` OmniShell palette follows macOS appearance, with solid cream
+workspace capsules in Light mode and solid deep-violet capsules in Dark mode.
+In both appearances, inactive workspace labels are pink in appearance-specific
+shades, and app glyphs remain undimmed purple. The outer bar stays translucent.
+OmniShell's built-in widgets use the SketchyBar App Font with a custom glyph
+overlay for application icons. The bar is 40 points tall, with 5 points of
+space above and below the workspace capsules. `shell/lib/look.luau` sets the
+capsule inset using the bundled skin. The profile sets
+`workspaceBar.backgroundOpacity` to `1.0` so the theme controls the 50% fill.
 
 The standalone font comes from
 [SketchyBar App Font](https://github.com/kvndrsslr/sketchybar-app-font); the

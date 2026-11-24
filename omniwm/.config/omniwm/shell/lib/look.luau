@@ -42,7 +42,7 @@ local function appGlyphOpacity(item, style, metrics)
     if item.count > 0 and item.hidden == item.count then
         return 0.9
     end
-    if item.focused or metrics.darkPills then
+    if item.focused or metrics.indicator == "pills" then
         return 1
     end
     return if style.inactive >= 0 then style.inactive else 0.5
@@ -92,28 +92,28 @@ local VOLUME_WAVES = {
 
 look = require("../lib/skin")({
     capsules = true,
-    workspaceMetrics = function(ctx, style, metrics)
+    workspaceMetrics = function(_, style, metrics)
         local item = style.height - 10
         return {
             item = item >= 16 and math.min(metrics.item, item) or metrics.item,
-            darkPills = ctx.data.appearance == "dark" and metrics.indicator == "pills",
         }
     end,
     workspacePill = function(pill, workspace, _, metrics)
-        if metrics.darkPills then
+        if metrics.indicator == "pills" then
             pill.fill = "background"
             pill.border = workspace.focused and "accent" or "border/0.38"
             pill.borderWidth = 1.5
         end
     end,
-    workspaceMarker = function(_, workspace, _, metrics)
-        if not metrics.darkPills or workspace.focused then
+    workspaceMarker = function(ctx, workspace, _, metrics)
+        if metrics.indicator ~= "pills" or workspace.focused then
             return nil
         end
         local length = utf8.len(workspace.name)
         local width = metrics.vertical and metrics.item - 4 or (length == 1 and 16 or 28) * metrics.scale
         local label = look.text{
-            text = workspace.name, size = 13 * metrics.scale, weight = "medium", color = "#FFC9D7",
+            text = workspace.name, size = 13 * metrics.scale, weight = "medium",
+            color = ctx.data.appearance == "light" and "#C47891" or "#FFC9D7",
             maxWidth = metrics.vertical and width or nil,
         }
         return length <= 2 and ui.stack{ w = width, h = metrics.icon, label } or label
