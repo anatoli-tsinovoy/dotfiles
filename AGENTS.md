@@ -193,10 +193,28 @@ In this mode OmniWM auto-hides the macOS menu bar; use OmniShell's App Menu
 widget to reach the focused app's menus. The OmniWM logo widget is hidden.
 The `dotfiles` OmniShell palette follows macOS appearance, using the old SketchyBar
 light colors in Light mode and dark colors in Dark mode. It keeps OmniShell's
-built-in widgets and native app icons. The bar is 40 points tall, with 5 points
-of space above and below the workspace capsules. `shell/lib/look.luau` sets
-the capsule inset using the bundled skin. The profile sets
-`workspaceBar.backgroundOpacity` to `1.0` so the theme controls the 50% fill.
+built-in widgets and uses the SketchyBar App Font with a custom glyph overlay for
+application icons. The bar is 40 points tall, with 5 points of space above and
+below the workspace capsules. `shell/lib/look.luau` sets the capsule inset using
+the bundled skin. The profile sets `workspaceBar.backgroundOpacity` to `1.0` so
+the theme controls the 50% fill.
+
+The standalone font comes from
+[SketchyBar App Font](https://github.com/kvndrsslr/sketchybar-app-font); the
+Homebrew cask installs the font only, not the SketchyBar daemon. The tracked
+overlay sources are `scripts/macos/sketchybar-app-font/overrides.json` for
+app-name mappings and `scripts/macos/sketchybar-app-font/svgs/*.svg` for custom
+glyph artwork. Edit the JSON mappings and SVG artwork as needed, then explicitly
+rebuild with:
+
+```sh
+bash scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh
+```
+
+The bootstrap runs this rebuild after stowing OmniWM; source edits alone do not
+refresh `~/.config/omniwm/shell/lib/app-font-map.luau` or the font files under
+`~/.config/omniwm/shell/fonts/`. These generated runtime artifacts are not tracked.
+After replacing the registered font file, restart OmniWM to load it.
 
 OmniWM draws a 2.5-point teal-to-purple focus border. Fullscreen layout frames
 retain outer gaps so a lone tiled window's border clears the bar and screen
@@ -258,8 +276,8 @@ brew services stop sketchybar
 if pgrep -x borders >/dev/null; then pkill -x borders; fi
 ```
 
-The Brewfile no longer installs SketchyBar, JankyBorders or the SketchyBar app
-font; the bootstrap does not uninstall any existing copies.
+The Brewfile installs the standalone SketchyBar App Font cask, not SketchyBar or
+JankyBorders; the bootstrap does not uninstall any existing copies.
 
 The bootstrap only unlinks `~/.config/aerospace` and
 `~/.config/sketchybar` when each is a symlink resolving exactly to this

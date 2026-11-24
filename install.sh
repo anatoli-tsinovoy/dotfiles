@@ -666,7 +666,9 @@ main() {
     # it unfolded so --no-folding links only the tracked files into it.
     log_info "Stowing OmniWM configuration..."
     ensure_real_dir "$HOME/.config/omniwm"
-    run_stow --no-folding -t ~ omniwm
+    run_stow --no-folding -R -t ~ omniwm
+    log_info "Installing SketchyBar app font..."
+    bash "$SCRIPT_DIR/scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh"
 
     log_info "Stowing macOS-specific dotfiles..."
     run_stow -t ~ ghostty private-macos

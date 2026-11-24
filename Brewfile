@@ -215,6 +215,7 @@ cask "blackhole-2ch"
 cask "devcleaner"
 # Voice and text chat software
 cask "discord"
+cask "font-sketchybar-app-font"
 cask "font-comic-shanns-mono-nerd-font"
 cask "font-meslo-lg-nerd-font"
 cask "font-sf-pro"
