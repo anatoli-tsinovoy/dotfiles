@@ -4,3 +4,5 @@ leading = ["apple-menu", "app-menu", "workspaces", "scratchpads"]
 
 [profiles.default.workspaceBar]
 position = "overlappingMenuBar"
+# The bundled profile sets this to zero; let the theme control fill alpha.
+backgroundOpacity = 1.0

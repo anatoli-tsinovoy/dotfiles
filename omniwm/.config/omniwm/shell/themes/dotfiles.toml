@@ -1,6 +1,6 @@
 # Legacy SketchyBar colors, selected by macOS appearance.
 [workspaceBar]
-barFill = "background/0.85"
+barFill = "background/0.5"
 barBorder = "border/0.55"
 
 [light]
