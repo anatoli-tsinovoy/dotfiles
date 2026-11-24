@@ -38,11 +38,11 @@ local function appGlyphColor(item, showHidden)
     return item.focused and "accent" or "purple"
 end
 
-local function appGlyphOpacity(item, style)
+local function appGlyphOpacity(item, style, metrics)
     if item.count > 0 and item.hidden == item.count then
         return 0.9
     end
-    if item.focused then
+    if item.focused or metrics.darkPills then
         return 1
     end
     return if style.inactive >= 0 then style.inactive else 0.5
@@ -58,7 +58,7 @@ local function renderWorkspaceGlyph(parent, native, item, size, opacity, showHid
 end
 
 local function windowIcon(icon, glyph, item, style, metrics)
-    renderWorkspaceGlyph(icon, glyph, item, metrics.icon, appGlyphOpacity(item, style), true)
+    renderWorkspaceGlyph(icon, glyph, item, metrics.icon, appGlyphOpacity(item, style, metrics), true)
 end
 
 local function scratchpadIcon(slot, glyph, member, _scratchpad, _style, metrics)
@@ -92,11 +92,31 @@ local VOLUME_WAVES = {
 
 look = require("../lib/skin")({
     capsules = true,
-    workspaceMetrics = function(_, style, metrics)
+    workspaceMetrics = function(ctx, style, metrics)
         local item = style.height - 10
-        if item >= 16 then
-            return { item = math.min(metrics.item, item) }
+        return {
+            item = item >= 16 and math.min(metrics.item, item) or metrics.item,
+            darkPills = ctx.data.appearance == "dark" and metrics.indicator == "pills",
+        }
+    end,
+    workspacePill = function(pill, workspace, _, metrics)
+        if metrics.darkPills then
+            pill.fill = "background"
+            pill.border = workspace.focused and "accent" or "border/0.38"
+            pill.borderWidth = 1.5
         end
+    end,
+    workspaceMarker = function(_, workspace, _, metrics)
+        if not metrics.darkPills or workspace.focused then
+            return nil
+        end
+        local length = utf8.len(workspace.name)
+        local width = metrics.vertical and metrics.item - 4 or (length == 1 and 16 or 28) * metrics.scale
+        local label = look.text{
+            text = workspace.name, size = 13 * metrics.scale, weight = "medium", color = "#FFC9D7",
+            maxWidth = metrics.vertical and width or nil,
+        }
+        return length <= 2 and ui.stack{ w = width, h = metrics.icon, label } or label
     end,
     windowIcon = windowIcon,
     scratchpadIcon = scratchpadIcon,

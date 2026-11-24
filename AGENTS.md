@@ -198,6 +198,7 @@ application icons. The bar is 40 points tall, with 5 points of space above and
 below the workspace capsules. `shell/lib/look.luau` sets the capsule inset using
 the bundled skin. The profile sets `workspaceBar.backgroundOpacity` to `1.0` so
 the theme controls the 50% fill.
+In Dark mode only, workspace capsules are filled, inactive labels are pink, and inactive app glyphs retain full-strength violet; Light mode is unchanged.
 
 The standalone font comes from
 [SketchyBar App Font](https://github.com/kvndrsslr/sketchybar-app-font); the
