@@ -43,7 +43,7 @@ bottom = 8.0
 
 [niri]
 visibleContainerCount = 2
-infiniteLoop = false
+infiniteLoop = true
 centerFocusedColumn = "never"
 alwaysCenterSingleColumn = false
 singleWindowFit = "fill"
