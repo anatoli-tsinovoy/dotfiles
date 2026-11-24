@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$CONFIG_DIR/colors.sh" # Loads all defined colors
+SKETCHYBAR_DETECT_THEME=1 source "$CONFIG_DIR/colors.sh" # Loads all defined colors
 source "$CONFIG_DIR/icons.sh"  # Loads all defined icons
 
 ITEM_DIR="$CONFIG_DIR/items"     # Directory where the items are configured

@@ -16,11 +16,28 @@
 # export BG2=0xff414550
 # export THEME="DARK"
 
-if defaults read -g AppleInterfaceStyle &>/dev/null; then
-  export THEME="DARK"
-else
-  export THEME="LIGHT"
+# AppleInterfaceStyle is only written for a manual Dark choice; under Auto it is absent even
+# while dark, so ask AppKit for the effective appearance instead.
+detect_theme() {
+  if defaults read -g AppleInterfaceStyle &>/dev/null; then
+    echo "DARK"
+  elif [ "$(defaults read -g AppleInterfaceStyleSwitchesAutomatically 2>/dev/null)" = "1" ] &&
+    [ "$(osascript -l JavaScript -e 'ObjC.import("AppKit"); $.NSApplication.sharedApplication.effectiveAppearance.bestMatchFromAppearancesWithNames(["NSAppearanceNameAqua", "NSAppearanceNameDarkAqua"]).js' 2>/dev/null)" = "NSAppearanceNameDarkAqua" ]; then
+    echo "DARK"
+  else
+    echo "LIGHT"
+  fi
+}
+# Detection under Auto costs ~0.2 s (osascript), so only sketchybarrc and the appearance watcher
+# (SKETCHYBAR_DETECT_THEME=1) run it; every other plugin reads the cached result. An appearance
+# change restarts the bar, so sketchybarrc refreshes the cache before any plugin needs it.
+THEME_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/sketchybar/theme"
+if [ "${SKETCHYBAR_DETECT_THEME:-}" = "1" ] || ! read -r THEME <"$THEME_CACHE" 2>/dev/null; then
+  THEME="$(detect_theme)"
+  mkdir -p "${THEME_CACHE%/*}"
+  echo "$THEME" >"$THEME_CACHE"
 fi
+export THEME
 if [ $THEME = "DARK" ]; then
   # Simply Dark
   export BLACK=0xff110034
