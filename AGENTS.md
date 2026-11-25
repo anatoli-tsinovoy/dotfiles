@@ -285,16 +285,11 @@ if pgrep -x borders >/dev/null; then pkill -x borders; fi
 The Brewfile installs the standalone SketchyBar App Font cask, not SketchyBar or
 JankyBorders; the bootstrap does not uninstall any existing copies.
 
-The bootstrap only unlinks `~/.config/aerospace` and
-`~/.config/sketchybar` when each is a symlink resolving exactly to this
-checkout's former `aerospace/.config/...` paths, including a broken symlink
-whose normalized target is that exact path. Real directories, unrelated
-symlinks and links to an archived/other checkout are left alone. This occurs
-only after the OmniWM app bundle is present and the new package has stowed.
-Stow reports unowned-file conflicts rather than overwriting them by default;
-`--force` preserves conflicts under `.config/omniwm` and `.hammerspoon`, so
-Stow may still stop on a same-file conflict that must be reviewed and merged.
-`--force` may remove other unowned conflicts; `--adopt` is unsafe.
+The bootstrap leaves legacy paths such as `~/.config/aerospace` and
+`~/.config/sketchybar` alone. Normal Stow reports conflicts rather than
+overwriting them. The existing `--force` option is generic and may remove
+conflicting unowned files, including under `.config/omniwm` or `.hammerspoon`;
+review conflicts before using it. Never use `--adopt`.
 
 For rollback, use a retained worktree at the previous dotfiles commit: unstow
 only the new WM package, then re-stow the old one and restore its login/service

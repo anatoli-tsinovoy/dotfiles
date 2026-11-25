@@ -422,80 +422,11 @@ stow_force_cleanup() {
       if [[ "$conflict" != /* ]]; then
         path="$target/$conflict"
       fi
-      case "$path" in
-        "$HOME/.config/omniwm"|"$HOME/.config/omniwm/"*|\
-        "$HOME/.config/aerospace"|"$HOME/.config/aerospace/"*|\
-        "$HOME/.config/sketchybar"|"$HOME/.config/sketchybar/"*|\
-        "$HOME/.config/ghostty"|"$HOME/.config/ghostty/"*|\
-        "$HOME/.hammerspoon"|"$HOME/.hammerspoon/"*)
-          log_warn "Force: preserving existing configuration at $path"
-          continue
-          ;;
-      esac
-
       log_warn "Force: removing conflicting target $path"
       rm -rf "$path"
     fi
   done <<<"$output"
 }
-
-# Resolve through the nearest existing ancestor so old Stow links still match
-# after the legacy package has been removed from this checkout.
-resolve_absolute_path() {
-  local probe="$1" suffix="" component base parent
-
-  while [[ ! -e "$probe" && ! -L "$probe" ]]; do
-    [[ "$probe" == "/" ]] && break
-    component="${probe##*/}"
-    suffix="/$component$suffix"
-    probe="${probe%/*}"
-    [[ -n "$probe" ]] || probe="/"
-  done
-
-  if [[ -d "$probe" ]]; then
-    base="$(cd -P -- "$probe" 2>/dev/null && pwd -P)" || return 1
-  else
-    parent="$(cd -P -- "$(dirname -- "$probe")" 2>/dev/null && pwd -P)" || return 1
-    base="$parent/$(basename -- "$probe")"
-  fi
-  if [[ "$base" == "/" ]]; then
-    printf '/%s\n' "${suffix#/}"
-  else
-    printf '%s%s\n' "$base" "$suffix"
-  fi
-}
-
-unlink_legacy_aerospace_link() {
-  local link="$1" expected="$2" actual raw parent target
-
-  [[ -L "$link" ]] || return 0
-  raw="$(readlink "$link")" || return 0
-  if [[ "$raw" == /* ]]; then
-    target="$raw"
-  else
-    parent="$(cd -P -- "$(dirname -- "$link")" 2>/dev/null && pwd -P)" || return 0
-    target="$parent/$raw"
-  fi
-  actual="$(resolve_absolute_path "$target")" || actual=""
-  if [[ "$actual" != "$expected" ]]; then
-    log_warn "Leaving legacy config path untouched: $link"
-    return 0
-  fi
-
-  log_info "Unlinking legacy AeroSpace Stow link: $link"
-  rm -f "$link"
-}
-
-unlink_legacy_aerospace_links() {
-  local repo_root
-  repo_root="$(cd -- "$SCRIPT_DIR" && pwd -P)"
-  unlink_legacy_aerospace_link "$HOME/.config/aerospace" \
-    "$repo_root/aerospace/.config/aerospace"
-  unlink_legacy_aerospace_link "$HOME/.config/sketchybar" \
-    "$repo_root/aerospace/.config/sketchybar"
-}
-
-
 
 # Stow "folds" a directory into a single symlink when the target does not exist
 # yet (e.g. ~/.local => dotfiles/shims/linux/.local on a fresh machine). Once
@@ -665,22 +596,12 @@ main() {
     # OmniWM writes generated settings/assets into this real directory. Keep
     # it unfolded so --no-folding links only the tracked files into it.
     log_info "Stowing OmniWM configuration..."
-    ensure_real_dir "$HOME/.config/omniwm"
-    run_stow --no-folding -R -t ~ omniwm
+    run_stow --no-folding -t ~ omniwm
     log_info "Installing SketchyBar app font..."
     bash "$SCRIPT_DIR/scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh"
 
     log_info "Stowing macOS-specific dotfiles..."
     run_stow -t ~ ghostty private-macos
-
-    # The cask receipt is not authoritative: OmniWM may have been installed
-    # directly from a verified upstream release. Retire only the exact old
-    # repository links, and only once an app bundle is present.
-    if [[ -d /Applications/OmniWM.app || -d "$HOME/Applications/OmniWM.app" ]]; then
-      unlink_legacy_aerospace_links
-    else
-      log_warn "OmniWM app bundle not found; preserving legacy AeroSpace and SketchyBar links."
-    fi
 
     # Create macOS-specific gitconfig.local
     cp "$SCRIPT_DIR/git/.gitconfig.macos" "$HOME/.gitconfig.local"
