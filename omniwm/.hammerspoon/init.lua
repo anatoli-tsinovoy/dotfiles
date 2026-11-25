@@ -12,7 +12,7 @@ local function run(program, arguments)
       local message = (stderr or ""):gsub("%s+$", "")
       hs.alert.show(message ~= "" and message or (program .. " exited " .. tostring(exitCode)))
     end
-  end, nil, argv)
+  end, argv)
 
   if not task or not task:start() then
     hs.alert.show("Unable to start " .. program)
@@ -47,8 +47,13 @@ end)
 bind({ "alt", "shift" }, "o", function()
   run("open", {
     "-na", "Ghostty.app", "--args", "--window-save-state=never", "--title=ssh-tunnel",
-    "-e", "/usr/bin/env", "PATH=" .. homebrewPath, "bash", "-lc",
-    'exec "$HOME/.config/omniwm/ssh-tunnel.sh"',
+    "-e", "/usr/bin/env", "bash", hs.configdir .. "/ssh-tunnel.sh",
+  })
+end)
+bind({ "alt", "shift" }, "escape", function()
+  run("open", {
+    "-na", "Ghostty.app", "--args", "--window-save-state=never", "--title=btop",
+    "-e", "/opt/homebrew/bin/btop",
   })
 end)
 bind({ "alt", "shift" }, "c", function()
@@ -73,10 +78,22 @@ end)
 local pendingOutput
 local outputTimer
 local outputAlert
+local function showOutputAlert(message)
+  if outputAlert then
+    hs.alert.closeSpecific(outputAlert)
+  end
+  outputAlert = hs.alert.show(message, 0.8)
+end
+
 local function cycleOutput(direction)
   local devices = hs.audiodevice.allOutputDevices() or {}
   if #devices == 0 then
-    hs.alert.show("No audio outputs available")
+    if outputTimer then
+      outputTimer:stop()
+      outputTimer = nil
+    end
+    pendingOutput = nil
+    showOutputAlert("No audio outputs available")
     return
   end
 
@@ -98,13 +115,15 @@ local function cycleOutput(direction)
   end
 
   local targetIndex = ((currentIndex - 1 + direction) % #devices) + 1
-  local target = devices[targetIndex]
-  pendingOutput = { uid = target:uid(), name = target:name() }
-
-  if outputAlert then
-    hs.alert.closeSpecific(outputAlert)
+  local candidates = {}
+  for offset = 0, #devices - 1 do
+    local index = ((targetIndex - 1 + direction * offset) % #devices) + 1
+    local device = devices[index]
+    candidates[#candidates + 1] = { uid = device:uid(), name = device:name() }
   end
-  outputAlert = hs.alert.show("Audio: " .. pendingOutput.name, nil, 0.8)
+  local target = candidates[1]
+  pendingOutput = { uid = target.uid, candidates = candidates }
+  showOutputAlert("Audio: " .. target.name)
 
   if outputTimer then
     outputTimer:stop()
@@ -117,10 +136,21 @@ local function cycleOutput(direction)
       return
     end
 
-    local device = hs.audiodevice.findOutputByUID(selection.uid)
-    if not device or not device:setDefaultOutputDevice() then
-      hs.alert.show("Could not select " .. selection.name)
+    local available = {}
+    for _, device in ipairs(hs.audiodevice.allOutputDevices() or {}) do
+      available[device:uid()] = device
     end
+    for _, candidate in ipairs(selection.candidates) do
+      local device = available[candidate.uid]
+      if device and device:setDefaultOutputDevice() then
+        local current = hs.audiodevice.defaultOutputDevice()
+        if current and current:uid() == candidate.uid then
+          showOutputAlert("Audio: " .. candidate.name)
+          return
+        end
+      end
+    end
+    showOutputAlert("Could not select an audio output")
   end)
 end
 
@@ -146,20 +176,10 @@ end)
 hs.keycodes.inputSourceChanged(function() inputSourceTimer:start() end)
 inputSourceTimer:start()
 
--- One-shot service layer. Settings.toml reloads automatically; Escape also reloads Hammerspoon.
-local service = hs.hotkey.modal.new({ "alt", "shift" }, ";")
-local function serviceCommand(command)
-  return function()
-    service:exit()
-    run("omniwmctl", { "command", command })
+-- Respond only to native app-hide events; window minimization and OmniWM parking are separate.
+local hiddenApplicationWatcher = hs.application.watcher.new(function(_, event, application)
+  if event == hs.application.watcher.hidden and application then
+    application:unhide()
   end
-end
-
-service:bind({}, "escape", function()
-  service:exit()
-  hs.timer.doAfter(0.1, hs.reload)
 end)
-service:bind({}, "r", serviceCommand("balance-sizes"))
-service:bind({}, "f", serviceCommand("toggle-focused-window-floating"))
-service:bind({ "shift" }, "f", serviceCommand("toggle-workspace-layout"))
-service:bind({}, "b", serviceCommand("toggle-workspace-bar"))
+hiddenApplicationWatcher:start()

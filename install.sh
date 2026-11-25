@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_PATH="${BASH_SOURCE[0]}"
 SCRIPT_DIR="$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd)"
+source "$SCRIPT_DIR/scripts/macos/omniwm-config-root.sh"
 
 log_info() { echo "ℹ️  $*"; }
 log_ok() { echo "✅ $*"; }
@@ -403,6 +404,33 @@ apply_keycastr_settings() {
   log_ok "KeyCastr settings applied from keycastr/io.github.keycastr.plist"
 }
 
+setup_omniwm_configuration() {
+  local config_root settings_path
+  config_root="$(omniwm_config_root)"
+  settings_path="$config_root/omniwm/settings.toml"
+
+  mkdir -p "$config_root/omniwm"
+  if [[ -L "$settings_path" ]]; then
+    log_warn "Refusing to use OmniWM settings symlink: $settings_path"
+    return 1
+  fi
+  if [[ -e "$settings_path" ]]; then
+    if [[ ! -f "$settings_path" ]]; then
+      log_warn "OmniWM settings path is not a regular file: $settings_path"
+      return 1
+    fi
+    log_info "Preserving existing OmniWM settings: $settings_path"
+  else
+    cp "$SCRIPT_DIR/omniwm/.config/omniwm/settings.toml" "$settings_path"
+    log_ok "Seeded writable OmniWM settings at $settings_path"
+  fi
+
+  log_info "Stowing Hammerspoon configuration..."
+  run_stow --no-folding --ignore='^\.config$' -t "$HOME" omniwm
+  log_info "Stowing OmniWM shell configuration..."
+  run_stow -d "$SCRIPT_DIR/omniwm/.config" --no-folding -t "$config_root/omniwm" --ignore='^settings\.toml$' omniwm
+}
+
 stow_force_cleanup() {
   local args=("$@")
   local target="$HOME"
@@ -493,7 +521,7 @@ main() {
     trust_homebrew_taps "$SCRIPT_DIR/Brewfile"
 
     log_info "Installing Homebrew packages..."
-    brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
+    brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose
     apply_keycastr_settings
 
     log_info "Installing latest TypeScript native LSP..."
@@ -593,10 +621,7 @@ main() {
     # package without the subdirectory would create no link at all.
     mkdir -p "$SCRIPT_DIR/private-macos/.private"
 
-    # OmniWM writes generated settings/assets into this real directory. Keep
-    # it unfolded so --no-folding links only the tracked files into it.
-    log_info "Stowing OmniWM configuration..."
-    run_stow --no-folding -t ~ omniwm
+    setup_omniwm_configuration
     log_info "Installing SketchyBar app font..."
     bash "$SCRIPT_DIR/scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh"
 

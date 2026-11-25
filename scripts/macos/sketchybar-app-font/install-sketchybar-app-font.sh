@@ -5,21 +5,18 @@ export LC_ALL=C
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd -P)"
+source "$REPO_ROOT/scripts/macos/omniwm-config-root.sh"
 STOCK_FONT="$HOME/Library/Fonts/sketchybar-app-font.ttf"
 OVERRIDES="$SCRIPT_DIR/overrides.json"
 BUILDER="$SCRIPT_DIR/build-overlay.py"
 INSTALLER="$SCRIPT_DIR/install-sketchybar-app-font.sh"
-CONFIG_ROOT="${XDG_CONFIG_HOME:-$HOME/.config}"
-if [[ "$CONFIG_ROOT" != /* ]]; then
-  CONFIG_ROOT="$HOME/.config"
-fi
+CONFIG_ROOT="$(omniwm_config_root)"
 SHELL_ROOT="$CONFIG_ROOT/omniwm/shell"
 FONT_DIR="$SHELL_ROOT/fonts"
 LIB_DIR="$SHELL_ROOT/lib"
 FONT_DEST="$FONT_DIR/sketchybar-app-font-local.ttf"
 MAP_DEST="$LIB_DIR/app-font-map.luau"
-CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/sketchybar-app-font"
-MAP_STAMP="$CACHE_DIR/build.sha256"
+MAP_STAMP="$LIB_DIR/app-font-map.sha256"
 
 fail() {
   printf 'install-sketchybar-app-font: error: %s\n' "$*" >&2
@@ -40,23 +37,19 @@ physical_candidate() {
 }
 
 check_output_paths() {
-  local path
-  for path in "$CONFIG_ROOT/omniwm" "$SHELL_ROOT" "$FONT_DIR" "$LIB_DIR"; do
+  local path resolved
+  for path in "$CONFIG_ROOT/omniwm" "$SHELL_ROOT" "$FONT_DIR" "$LIB_DIR" "$FONT_DEST" "$MAP_DEST" "$MAP_STAMP"; do
     if [[ -L "$path" ]]; then
-      fail "$path is a symlink; restow omniwm without directory folding before building (the installer will not write into the Stow checkout)"
+      fail "$path is a symlink; the installer will not write into a Stow checkout"
     fi
+    resolved="$(physical_candidate "$path")"
+    case "$resolved/" in
+      "$REPO_ROOT/"*)
+        fail "configured OmniWM output resolves inside the dotfiles checkout: $resolved"
+        ;;
+    esac
   done
-  if [[ -L "$FONT_DEST" || -L "$MAP_DEST" ]]; then
-    fail "font outputs must not be symlinks: $FONT_DEST and $MAP_DEST"
-  fi
 }
-
-resolved_config_root="$(physical_candidate "$CONFIG_ROOT")"
-case "$resolved_config_root/" in
-  "$REPO_ROOT/"*)
-    fail "configured OmniWM output resolves inside the dotfiles checkout: $resolved_config_root"
-    ;;
-esac
 check_output_paths
 
 [[ -f "$STOCK_FONT" ]] || fail "stock font not found at $STOCK_FONT; provide the sketchybar-app-font TTF first (this script does not install SketchyBar)"
@@ -92,7 +85,7 @@ if [[ -z "$UV" ]]; then
 fi
 [[ -n "$UV" ]] || fail "uv is required to build the isolated FontTools overlay"
 
-mkdir -p "$FONT_DIR" "$LIB_DIR" "$CACHE_DIR"
+mkdir -p "$FONT_DIR" "$LIB_DIR"
 check_output_paths
 "$UV" run --quiet --python 3.13 --script "$BUILDER" \
   --stock-font "$STOCK_FONT" \

@@ -276,6 +276,7 @@ layout = "float"
 [[appRules]]
 id = "B0000000-0000-4000-8000-000000000004"
 bundleId = "com.mitchellh.ghostty"
+titleRegex = "(?is)^(?!.*btop).+"
 assignToWorkspace = "2"
 
 [[appRules]]
@@ -349,10 +350,6 @@ binding = "Option+Shift+M"
 [[hotkeys]]
 id = "toggleFocusedWindowFloating"
 binding = "Option+Shift+F"
-
-[[hotkeys]]
-id = "toggleColumnTabbed"
-binding = "Option+Shift+G"
 
 [[hotkeys]]
 id = "workspaceBackAndForth"

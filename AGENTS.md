@@ -7,7 +7,7 @@ Personal dotfiles for macOS, Linux, and Termux using GNU Stow for symlink manage
 ```bash
 # Bootstrap (detects OS automatically: mac, linux, termux)
 ./install.sh                            # Full setup (packages + stow)
-./install.sh --force                    # Force other conflicts; preserve app settings
+./install.sh --force                    # Remove conflicting targets before Stow
 
 # Verification (NO AUTOMATED TESTS)
 bash -n script.sh                       # Syntax check bash
@@ -177,139 +177,20 @@ path. Those show the URI and an explanation in Termux, without importing a copy.
 
 ## OmniWM and Hammerspoon
 
-The macOS bootstrap installs the OmniWM and Hammerspoon casks, then stows
-`omniwm/` with `--no-folding`. Keep `~/.config/omniwm` a real directory:
-OmniWM writes generated settings/assets there, while the tracked defaults and
-Hammerspoon config remain individual symlinks into this checkout.
+OmniWM is macOS-only. Its tracked settings seed is `omniwm/.config/omniwm/settings.toml`; the
+bootstrap copies it only when the destination is missing. OmniWM uses an absolute
+`XDG_CONFIG_HOME`, or `~/.config` when it is unset or relative.
 
-OmniWM is a macOS window manager inspired by Niri, not the Niri Wayland
-compositor. It uses macOS window/Space APIs; Niri's runtime, IPC and exact
-configuration behavior do not transfer directly. OmniWM workspace IDs are
-numeric 1–15; the corresponding labels are `1`–`9`, then `a`–`f` for IDs
-10–15.
-
-The OmniShell workspace bar is full-width and flush with the top of the screen.
-In this mode OmniWM auto-hides the macOS menu bar; use OmniShell's App Menu
-widget to reach the focused app's menus. The OmniWM logo widget is hidden.
-The `dotfiles` OmniShell palette follows macOS appearance, with solid cream
-workspace capsules in Light mode and solid deep-violet capsules in Dark mode.
-In both appearances, inactive workspace labels are pink in appearance-specific
-shades, and app glyphs remain undimmed purple. The outer bar stays translucent.
-OmniShell's built-in widgets use the SketchyBar App Font with a custom glyph
-overlay for application icons. The bar is 40 points tall, with 7 points of
-space above and below the 26-point workspace capsules. `shell/lib/look.luau`
-sets the capsule inset using the bundled skin. The profile sets
-`workspaceBar.backgroundOpacity` to `1.0` so the theme controls the 50% fill.
-
-The standalone font comes from
-[SketchyBar App Font](https://github.com/kvndrsslr/sketchybar-app-font); the
-Homebrew cask installs the font only, not the SketchyBar daemon. The tracked
-overlay sources are `scripts/macos/sketchybar-app-font/overrides.json` for
-app-name mappings and `scripts/macos/sketchybar-app-font/svgs/*.svg` for custom
-glyph artwork. The macOS Open in Neovim launcher reuses the Ghostty glyph.
-Edit the JSON mappings and SVG artwork as needed, then explicitly rebuild with:
+The shipped OmniShell look is in `omniwm/.config/omniwm/shell/`, especially
+`shell/themes/dotfiles.toml` and `shell/lib/look.luau`. Hammerspoon bindings are in
+`omniwm/.hammerspoon/init.lua`; Option+Shift+O launches `omniwm/.hammerspoon/ssh-tunnel.sh`.
+To rebuild the generated font and app map after changing their overlay sources:
 
 ```sh
 bash scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh
 ```
 
-The bootstrap runs this rebuild after stowing OmniWM; source edits alone do not
-refresh `~/.config/omniwm/shell/lib/app-font-map.luau` or the font files under
-`~/.config/omniwm/shell/fonts/`. These generated runtime artifacts are not tracked.
-After replacing the registered font file, restart OmniWM to load it.
-
-OmniWM draws a 2.5-point teal-to-purple focus border. Fullscreen layout frames
-retain outer gaps so a lone tiled window's border clears the bar and screen
-edges. JankyBorders is not part of the setup.
-
-OmniShell keeps media, notifications, Wi-Fi, battery details, Control Center,
-and the clock/calendar. The bar shows an icon-only battery; the native details
-popup shows its level. The battery icon follows the legacy SketchyBar charge
-bands, with a yellow bolt on AC. Its compact audio icons distinguish the
-active output and volume level without labels; the volume icon still opens the
-native mixer. The clock's date and time use the same typography.
-Hammerspoon previews and cycles outputs on Option+PageUp/Option+PageDown.
-The language badge uses A for ABC and א for Hebrew; both letters are transparent
-cutouts. macOS Control+Space switches layouts. Hammerspoon sends the settled
-source ID to the badge after a macOS source-change event to avoid a stale OmniWM
-0.8 reading. No polling.
-
-### Window and command shortcuts
-
-The configured window-manager bindings retain these semantics:
-
-| Action | Shortcut |
-| --- | --- |
-| Focus left/down/up/right | Option+H/J/K/L |
-| Move window left/down/up/right | Option+Shift+H/J/K/L |
-| Switch to workspaces 1–9 | Option+1 through Option+9 |
-| Switch to workspaces 10–15 (labels a–f) | Control+Option+1 through Control+Option+6 |
-| Move window to workspaces 1–9 | Option+Shift+1 through Option+Shift+9 |
-| Move window to workspaces 10–15 | Control+Option+Shift+1 through Control+Option+Shift+6 |
-| Switch to previous workspace | Option+Tab |
-| Move workspace to the right monitor (no wrap; respects workspace home) | Option+Shift+Tab |
-| Move focused window to the right monitor (no wrap) | Control+Option+Shift+Tab |
-| Toggle fullscreen | Control+Option+Up |
-| Balance window sizes | Control+Option+Down |
-| Toggle Niri/Dwindle layout | Option+/ |
-| Open Menu Anywhere | Shift+Option+M |
-
-Hammerspoon owns the shell/application shortcuts and prepends Homebrew's bin
-directories explicitly. Option+G/T/M/V/S/Y/F opens Chrome, Ghostty, Spotify,
-WhatsApp, Slack, YouTube and Finder; Option+Shift+T opens the shared tmux
-session, Option+Shift+O opens the SSH tunnel, and Option+Shift+C runs ClipSSH.
-Option+Shift+S starts an interactive screenshot. These commands do not depend
-on a SketchyBar widget.
-
-### First activation and rollback
-
-Before switching, grant Accessibility permission to both OmniWM and Hammerspoon,
-and Input Monitoring permission to OmniWM, under System Settings → Privacy &
-Security. Enable Displays have separate Spaces in System Settings → Desktop &
-Dock → Mission Control. macOS may require a manual logout/login after changing
-that setting or granting permissions. `install.sh` never logs out, changes
-Login Items, or stops the currently running legacy apps.
-
-Keep AeroSpace, SketchyBar and JankyBorders installed until OmniWM is verified.
-Leave currently running bar/borders in the existing session until the approved
-permissions/logout transition. At the new session, disable AeroSpace in System
-Settings → General → Login Items and enable OmniWM and Hammerspoon there.
-Then stop SketchyBar and quit AeroSpace; its old config starts `borders`
-standalone, so `brew services stop borders` alone may not stop it:
-
-```sh
-brew services stop sketchybar
-if pgrep -x borders >/dev/null; then pkill -x borders; fi
-```
-
-The Brewfile installs the standalone SketchyBar App Font cask, not SketchyBar or
-JankyBorders; the bootstrap does not uninstall any existing copies.
-
-The bootstrap leaves legacy paths such as `~/.config/aerospace` and
-`~/.config/sketchybar` alone. Normal Stow reports conflicts rather than
-overwriting them. The existing `--force` option is generic and may remove
-conflicting unowned files, including under `.config/omniwm` or `.hammerspoon`;
-review conflicts before using it. Never use `--adopt`.
-
-For rollback, use a retained worktree at the previous dotfiles commit: unstow
-only the new WM package, then re-stow the old one and restore its login/service
-items. Stow removes its symlinks without deleting OmniWM's generated settings:
-
-```sh
-cd /path/to/current-dotfiles
-stow -D --no-folding -t ~ omniwm
-cd /path/to/previous-commit-worktree
-stow -t ~ aerospace
-```
-
-Re-enable AeroSpace in Login Items, start SketchyBar, and launch AeroSpace
-(which starts its configured border process) only after restoring the old
-configuration:
-
-```sh
-brew services start sketchybar
-open -a AeroSpace
-```
+OmniWM needs Accessibility and Input Monitoring permissions; Hammerspoon needs Accessibility.
 
 ## Chrome PWAs (macOS)
 
