@@ -1,0 +1,49 @@
+{
+  "theme": "System",
+  "theme_dark": "dotfiles-tern-dark",
+  "theme_light": "dotfiles-tern-light",
+  "cursor": {
+    "trail": "warp"
+  },
+  "link_click": "Command",
+  "link_target": "Browser",
+  "paste": {
+    "confirm": false
+  },
+  "contrast": "Always",
+  "font_size": 20,
+  "font_family": "MesloLGS Nerd Font Mono",
+  "tabs": "Vertical",
+  "material": "Glass",
+  "opacity": 45,
+  "blur": 25,
+  "keybinds": {
+    "ctrl+b>-": "split_down",
+    "ctrl+b>1": "goto_tab:1",
+    "ctrl+b>2": "goto_tab:2",
+    "ctrl+b>3": "goto_tab:3",
+    "ctrl+b>4": "goto_tab:4",
+    "ctrl+b>5": "goto_tab:5",
+    "ctrl+b>6": "goto_tab:6",
+    "ctrl+b>7": "goto_tab:7",
+    "ctrl+b>8": "goto_tab:8",
+    "ctrl+b>9": "goto_tab:9",
+    "ctrl+b>[": "open_scrollback",
+    "ctrl+b>c": "new_tab",
+    "ctrl+b>ctrl+b": "text:\\x02",
+    "ctrl+b>h": "focus_pane:left",
+    "ctrl+b>j": "focus_pane:down",
+    "ctrl+b>k": "focus_pane:up",
+    "ctrl+b>l": "focus_pane:right",
+    "ctrl+b>shift+h": "resize_split:left",
+    "ctrl+b>shift+j": "resize_split:down",
+    "ctrl+b>shift+k": "resize_split:up",
+    "ctrl+b>shift+l": "resize_split:right",
+    "ctrl+b>shift+r": "reload_config",
+    "ctrl+b>|": "split_right"
+  },
+  "keymap": "tmux",
+  "clipboard_write": "allow",
+  "notifications": true,
+  "keymap_prefix": "ctrl+b"
+}

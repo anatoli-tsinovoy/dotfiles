@@ -300,6 +300,39 @@ set_macos_default_shell() {
   log_ok "Login shell set to $shell (open a new terminal to apply)"
 }
 
+# Tern (invite-only download, installed by hand) saves settings.json by writing
+# settings.json.tmp and renaming it over the file, which would replace a stow
+# symlink, so merge the repo keys into the live file instead: repo keys win,
+# keys Tern adds on its own stay. CSS themes are only read, so they are
+# symlinked into themes/. `tern plugin dir` is <config dir>/plugins, which
+# resolves $TERN_CONFIG_DIR and the per-OS default the way Tern does.
+apply_tern_settings() {
+  local repo_settings="$SCRIPT_DIR/tern/settings.json"
+  local plugins dir live merged
+
+  command -v tern &>/dev/null || {
+    log_skip "tern not on PATH; skipping Tern settings"
+    return 0
+  }
+  command -v jq &>/dev/null || {
+    log_warn "jq not found; skipping Tern settings"
+    return 0
+  }
+  plugins="$(tern plugin dir)"
+  dir="$(dirname -- "$plugins")"
+  live="$dir/settings.json"
+  mkdir -p "$dir"
+  [[ -f "$live" ]] || echo '{}' >"$live"
+
+  merged="$(jq -s '.[0] * .[1]' "$live" "$repo_settings")"
+  printf '%s\n' "$merged" >"$live"
+  log_ok "Tern settings merged from tern/settings.json"
+
+  mkdir -p "$dir/themes"
+  ln -sfn "$SCRIPT_DIR"/tern/themes/*.css "$dir/themes/"
+  log_ok "Tern CSS themes linked from tern/themes"
+}
+
 # KeyCastr keeps its settings only in the io.github.keycastr defaults domain.
 # Write each key from keycastr/io.github.keycastr.plist individually so window
 # positions and updater state stay; `defaults import` would replace the domain.
@@ -493,6 +526,7 @@ main() {
   setup_omp_plugins
   if [[ "$os" == "mac" || "$os" == "linux" ]]; then
     setup_agent_reports_plugin
+    apply_tern_settings
   fi
 
   # zsh/.local/bin holds prompt helpers, so ~/.local{,/bin} must be real

@@ -44,7 +44,10 @@ dotfiles/
 ├── git/                   # .gitconfig + .gitconfig.macos
 ├── aerospace/             # Tiling WM + sketchybar (macOS only)
 ├── ghostty/               # Ghostty config and light/dark themes
-└── keycastr/              # Not stowed; io.github.keycastr.plist written key by key by apply_keycastr_settings in install.sh, right after brew bundle
+├── keycastr/              # Not stowed; io.github.keycastr.plist written key by key by apply_keycastr_settings in install.sh, right after brew bundle
+└── tern/                  # Not stowed; applied by apply_tern_settings in install.sh (mac/linux, only with `tern` on PATH)
+    ├── settings.json      # Keys merged into <tern config dir>/settings.json
+    └── themes/*.css       # CSS themes (@import the omp dotfiles-* themes) symlinked into <tern config dir>/themes/
 ```
 
 ## Shell Script Style
@@ -191,6 +194,23 @@ The `font-sketchybar-app-font` cask remains the untouched stock input. `install.
 scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh
 sketchybar --reload
 ```
+
+## Tern
+
+Tern is an invite-only download with no package-manager source, so the user installs it by hand
+(macOS: `Tern.app`, with `~/.local/bin/tern` linking to `Tern.app/Contents/MacOS/tern`).
+`apply_tern_settings` in `install.sh` runs on macOS and Linux only when `tern` is on PATH, and needs `jq`.
+
+- Config dir: the parent of `tern plugin dir`, which honours `$TERN_CONFIG_DIR` and Tern's per-OS
+  default (`~/Library/Application Support/Tern` on macOS).
+- `settings.json` is not stowed: Tern saves by writing `settings.json.tmp` and renaming it over the
+  file (checked in 0.9.34), which replaces a symlink with a regular file. `install.sh` deep-merges
+  `tern/settings.json` into the live file instead; repo keys win, other live keys stay. Tern also
+  drops keys equal to its defaults on save, so a repo key set to a default disappears from the live
+  file after the next UI change without changing behaviour.
+- Settings changed in the Tern UI land only in the live file; copy them into `tern/settings.json`
+  or the next `install.sh` reverts them.
+- `tern/themes/*.css` are only read by Tern, so they are symlinked into `<config dir>/themes/`.
 
 ## agent-reports
 

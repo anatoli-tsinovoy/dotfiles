@@ -1,0 +1,6 @@
+@import "dotfiles-dark";
+
+/* Tern's base.css draws every .ico at stroke-width 1.45, which renders heavy. */
+.ico {
+  stroke-width: 1;
+}
