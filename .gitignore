@@ -12,6 +12,7 @@ termux/.termux/.current-theme
 omp/.omp/agent/config.yml.lock
 omp/.omp/agent/last-changelog-version
 omp/.omp/stats.db*
+omp/.omp/agent/transcripts.db*
 omp/.omp/agent/models.db*
 omp/.omp/agent/agent.db*
 omp/.omp/agent/history.db*
