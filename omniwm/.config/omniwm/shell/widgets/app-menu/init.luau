@@ -12,7 +12,7 @@ function render(ctx: Context)
     local node = button.render(ctx, { app = if app.bundle ~= "" then app.bundle else nil,
         pid = if app.bundle == "" then app.pid else nil, action = "menu app", help = app.name })
     local image = node[1]
-    local glyph = look.appGlyph(app.name, image.w, ctx.data.bar.style.solidBlack and "#FFFFFF" or "foreground")
+    local glyph = look.appGlyph(app.name, image.w * 0.86, ctx.data.bar.style.solidBlack and "#FFFFFF" or "foreground")
     if glyph then
         node[1] = glyph
     end

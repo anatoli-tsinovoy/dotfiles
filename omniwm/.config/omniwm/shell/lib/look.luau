@@ -71,7 +71,7 @@ local function activeWindowBar(ctx, model)
     local scale = look.scale(ctx)
     local props = { help = model.help }
     if model.showIcon then
-        local glyph = appGlyph(model.app, 18 * scale, "foreground")
+        local glyph = appGlyph(model.app, 15.5 * scale, "foreground")
         if not glyph then
             return nil
         end
@@ -116,9 +116,11 @@ end
 look = require("../lib/skin")({
     capsules = true,
     workspaceMetrics = function(_, style, metrics)
-        local item = style.height - 10
+        local item = style.height - 14
         return {
             item = item >= 16 and math.min(metrics.item, item) or metrics.item,
+            icon = 16 * metrics.scale,
+            slot = 19 * metrics.scale,
         }
     end,
     workspacePill = function(pill, workspace, _, metrics)
@@ -128,15 +130,18 @@ look = require("../lib/skin")({
             pill.borderWidth = 1.5
         end
     end,
-    workspaceMarker = function(ctx, workspace, _, metrics)
-        if metrics.indicator ~= "pills" or workspace.focused then
+    workspaceMarker = function(ctx, workspace, style, metrics)
+        if metrics.indicator ~= "pills" then
             return nil
         end
         local length = utf8.len(workspace.name)
         local width = metrics.vertical and metrics.item - 4 or (length == 1 and 16 or 28) * metrics.scale
+        local color = if workspace.focused then
+            (not style.textColor and not metrics.capsule and style.accents) and "accent" or "foreground"
+            else ctx.data.appearance == "light" and "#C47891" or "#FFC9D7"
         local label = look.text{
-            text = workspace.name, size = 13 * metrics.scale, weight = "medium",
-            color = ctx.data.appearance == "light" and "#C47891" or "#FFC9D7",
+            text = workspace.name, size = 12 * metrics.scale, color = color,
+            weight = workspace.focused and "semibold" or "medium",
             maxWidth = metrics.vertical and width or nil,
         }
         return length <= 2 and ui.stack{ w = width, h = metrics.icon, label } or label
@@ -148,19 +153,27 @@ look = require("../lib/skin")({
     batteryDetailsBar = function(ctx, state)
         local symbol, color = batteryIcon(ctx, state)
         local scale = look.scale(ctx)
-        local icon = look.glyph{ name = symbol, size = 18 * scale, color = color }
+        return look.bar(ctx, { look.glyph{ name = symbol, size = 21 * scale, color = color } })
+    end,
+    clockBar = function(ctx, model)
+        local scale = look.scale(ctx)
+        local props = { gap = 4 * scale }
+        if model.showIcon then
+            props[#props + 1] = look.glyph{ name = "calendar", size = 12 * scale }
+        end
+        local function addText(text)
+            props[#props + 1] = look.text{ text = text, size = 11 * scale, weight = "semibold", color = "foreground" }
+        end
         if ctx.data.bar.style.vertical then
-            return look.bar(ctx, { gap = scale, pad = 2 * scale, icon,
-                look.text{ text = state.text, size = 10 * scale } })
+            addText(model.hour)
+            addText(model.minute)
+            if model.meridiem then
+                addText(model.meridiem)
+            end
+        else
+            addText(model.showDate and (model.date .. " " .. model.time) or model.time)
         end
-        if state.mode == "inside" then
-            icon = ui.stack{ w = 30 * scale, h = 15 * scale, radius = 4 * scale,
-                border = color, borderWidth = scale,
-                look.text{ text = state.text, size = 10 * scale, color = color } }
-        end
-        return look.bar(ctx, { icon,
-            if state.mode == "beside" then look.text{ text = state.percent, size = 13 * scale, reserve = state.reserve }
-            else nil })
+        return look.bar(ctx, props)
     end,
     volumeBar = function(ctx, state)
         local level = state.volume or 0
@@ -168,13 +181,13 @@ look = require("../lib/skin")({
         local signal = if state.muted or state.volume == 0 then "M14 6 L20 12 M20 6 L14 12"
             else table.concat(VOLUME_WAVES, " ", 1, waveCount)
         local scale = look.scale(ctx)
-        local width, height = 22 * scale, 16.5 * scale
+        local width, height = 18 * scale, 13.5 * scale
         local viewBox = { 0, 0, 24, 18 }
         local icon = ui.stack{ w = width, h = height,
             ui.path{ w = width, h = height, viewBox = viewBox, d = SPEAKER, fill = "foreground" },
             if signal ~= "" then ui.path{
                 w = width, h = height, viewBox = viewBox, d = signal,
-                border = "foreground", borderWidth = 1.5 * scale,
+                border = "foreground", borderWidth = 1.3 * scale,
             } else nil,
         }
         return look.bar(ctx, { icon })

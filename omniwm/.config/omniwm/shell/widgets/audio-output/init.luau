@@ -27,6 +27,6 @@ function render(ctx)
     local scale = look.scale(ctx)
     return look.bar(ctx, {
         help = output.name,
-        [1] = look.glyph{ name = outputSymbol(output), size = 14 * scale },
+        [1] = look.glyph{ name = outputSymbol(output), size = 16 * scale },
     })
 end
