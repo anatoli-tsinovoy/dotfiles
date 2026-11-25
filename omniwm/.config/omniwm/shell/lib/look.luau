@@ -1,7 +1,9 @@
-local SOURCE_GLYPHS = {
-    ["com.apple.keylayout.ABC"] = "A",
-    ["com.apple.keylayout.Hebrew"] = "א",
+local SOURCE_BADGE = "M2.5 0 H12.5 Q15 0 15 2.5 V11.5 Q15 14 12.5 14 H2.5 Q0 14 0 11.5 V2.5 Q0 0 2.5 0 Z "
+local SOURCE_CUTOUTS = {
+    ["com.apple.keylayout.ABC"] = "M6.7 3 H8.3 L11.5 11 H9.9 L9.2 9.1 H5.8 L5.1 11 H3.5 Z M7.5 4.7 L6.3 7.8 H8.7 Z",
+    ["com.apple.keylayout.Hebrew"] = "M3.8 3.5 H5.6 L8.8 7.2 Q9.5 6.1 9.5 3.5 H11 Q11 6.6 9.7 8.3 L11.5 10.5 H9.7 L6.4 6.6 Q5.5 7.8 5.5 10.5 H4 Q4 7.2 5.5 5.5 Z",
 }
+local UNKNOWN_SOURCE_CUTOUT = "M4.8 5.6 C4.8 2.1 10.2 2.1 10.2 5.2 C10.2 7.1 8.2 7.1 8.2 8.5 H6.8 C6.8 6.5 8.8 6.4 8.8 5.2 C8.8 3.9 6.2 3.9 6.2 5.6 Z M6.8 9.5 H8.2 V11 H6.8 Z"
 
 local look
 local appFontMapAvailable, APP_FONT_MAP = pcall(function()
@@ -144,11 +146,10 @@ look = require("../lib/skin")({
         local scale = look.scale(ctx)
         return look.bar(ctx, {
             pad = 2 * scale,
-            ui.stack{
-                w = 15 * scale, h = 14 * scale, radius = 2.5 * scale, fill = "foreground",
-                look.text{
-                    text = SOURCE_GLYPHS[source] or "?", size = 11 * scale, weight = "medium", color = "background",
-                },
+            ui.path{
+                w = 15 * scale, h = 14 * scale, viewBox = { 0, 0, 15, 14 },
+                d = SOURCE_BADGE .. (SOURCE_CUTOUTS[source] or UNKNOWN_SOURCE_CUTOUT),
+                fill = "foreground", evenOdd = true,
             },
         })
     end,

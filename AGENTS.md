@@ -226,9 +226,10 @@ OmniShell keeps media, notifications, Wi-Fi, battery details, Control Center,
 and the clock/calendar. Its compact audio icons distinguish the active output
 and volume level without labels; the volume icon still opens the native mixer.
 Hammerspoon previews and cycles outputs on Option+PageUp/Option+PageDown.
-The language badge uses A for ABC and א for Hebrew; macOS Control+Space switches
-layouts. Hammerspoon sends the settled source ID to the badge after a macOS
-source-change event to avoid a stale OmniWM 0.8 reading. No polling.
+The language badge uses A for ABC and א for Hebrew; both letters are transparent
+cutouts. macOS Control+Space switches layouts. Hammerspoon sends the settled
+source ID to the badge after a macOS source-change event to avoid a stale OmniWM
+0.8 reading. No polling.
 
 ### Window and command shortcuts
 
