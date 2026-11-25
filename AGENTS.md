@@ -223,8 +223,10 @@ retain outer gaps so a lone tiled window's border clears the bar and screen
 edges. JankyBorders is not part of the setup.
 
 OmniShell keeps media, notifications, Wi-Fi, battery details, Control Center,
-and the clock/calendar. Its compact audio icons distinguish the active output
-and volume level without labels; the volume icon still opens the native mixer.
+and the clock/calendar. Its battery icon follows the legacy SketchyBar charge
+bands, with a yellow bolt on AC; the details popup remains native. Its compact
+audio icons distinguish the active output and volume level without labels; the
+volume icon still opens the native mixer.
 Hammerspoon previews and cycles outputs on Option+PageUp/Option+PageDown.
 The language badge uses A for ABC and א for Hebrew; both letters are transparent
 cutouts. macOS Control+Space switches layouts. Hammerspoon sends the settled

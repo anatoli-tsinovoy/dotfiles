@@ -92,6 +92,27 @@ local VOLUME_WAVES = {
     "M20 2 Q24 9 20 16",
 }
 
+-- SketchyBar used these bands on battery, with a yellow bolt whenever on AC.
+local BATTERY_BANDS = {
+    { 80, "battery.100percent", "accent", "accent" },
+    { 60, "battery.75percent", "warning", "warning" },
+    { 30, "battery.50percent", "#E6B334", "#FFE680" },
+    { 10, "battery.25percent", "error", "#FF6767" },
+    { 0, "battery.0percent", "error", "error" },
+}
+
+local function batteryIcon(ctx, state)
+    local power = ctx.data.power
+    if state.charging or (power and power.source == "ac") then
+        return "battery.100percent.bolt", "warning"
+    end
+    for _, band in ipairs(BATTERY_BANDS) do
+        if state.level >= band[1] then
+            return band[2], ctx.data.appearance == "light" and band[3] or band[4]
+        end
+    end
+end
+
 look = require("../lib/skin")({
     capsules = true,
     workspaceMetrics = function(_, style, metrics)
@@ -124,6 +145,23 @@ look = require("../lib/skin")({
     scratchpadIcon = scratchpadIcon,
     activeWindowBar = activeWindowBar,
     appGlyph = appGlyph,
+    batteryDetailsBar = function(ctx, state)
+        local symbol, color = batteryIcon(ctx, state)
+        local scale = look.scale(ctx)
+        local icon = look.glyph{ name = symbol, size = 18 * scale, color = color }
+        if ctx.data.bar.style.vertical then
+            return look.bar(ctx, { gap = scale, pad = 2 * scale, icon,
+                look.text{ text = state.text, size = 10 * scale } })
+        end
+        if state.mode == "inside" then
+            icon = ui.stack{ w = 30 * scale, h = 15 * scale, radius = 4 * scale,
+                border = color, borderWidth = scale,
+                look.text{ text = state.text, size = 10 * scale, color = color } }
+        end
+        return look.bar(ctx, { icon,
+            if state.mode == "beside" then look.text{ text = state.percent, size = 13 * scale, reserve = state.reserve }
+            else nil })
+    end,
     volumeBar = function(ctx, state)
         local level = state.volume or 0
         local waveCount = if level >= 60 then 3 elseif level >= 30 then 2 elseif level >= 10 then 1 else 0
