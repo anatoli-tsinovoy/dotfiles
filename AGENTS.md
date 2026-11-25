@@ -44,6 +44,7 @@ dotfiles/
 ├── git/                   # .gitconfig + .gitconfig.macos
 ├── aerospace/             # Tiling WM + sketchybar (macOS only)
 └── ghostty/               # Ghostty config and light/dark themes
+├── keycastr/              # Not stowed; io.github.keycastr.plist written key by key by apply_keycastr_settings in install.sh, right after brew bundle
 ```
 
 ## Shell Script Style

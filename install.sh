@@ -300,6 +300,24 @@ set_macos_default_shell() {
   log_ok "Login shell set to $shell (open a new terminal to apply)"
 }
 
+# KeyCastr keeps its settings only in the io.github.keycastr defaults domain.
+# Write each key from keycastr/io.github.keycastr.plist individually so window
+# positions and updater state stay; `defaults import` would replace the domain.
+apply_keycastr_settings() {
+  local plist="$SCRIPT_DIR/keycastr/io.github.keycastr.plist"
+  local key
+
+  [[ -d /Applications/KeyCastr.app ]] || {
+    log_skip "KeyCastr not installed; skipping its settings"
+    return 0
+  }
+  # plutil's xml1 output indents top-level keys with exactly one tab
+  while IFS= read -r key; do
+    defaults write io.github.keycastr "$key" "$(plutil -extract "${key//./\\.}" xml1 -o - "$plist")"
+  done < <(sed -n 's|^\t<key>\(.*\)</key>$|\1|p' "$plist")
+  log_ok "KeyCastr settings applied from keycastr/io.github.keycastr.plist"
+}
+
 stow_force_cleanup() {
   local args=("$@")
   local target="$HOME"
@@ -391,6 +409,7 @@ main() {
 
     log_info "Installing Homebrew packages..."
     brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
+    apply_keycastr_settings
 
     log_info "Installing latest TypeScript native LSP..."
     bun install -g typescript@latest
