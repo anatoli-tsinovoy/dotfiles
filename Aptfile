@@ -31,6 +31,7 @@ package "fzf"
 package "zoxide"
 # NOTE: tmux installed via GitHub releases in scripts/linux/install-binaries.sh
 package "timg"
+package "jq"           # apply_tern_settings merges Tern settings with it
 
 # === Git tools ===
 package "git-lfs"
