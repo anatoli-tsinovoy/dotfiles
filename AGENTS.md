@@ -195,6 +195,17 @@ scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh
 sketchybar --reload
 ```
 
+## Chrome PWAs (macOS)
+
+`setup_chrome_pwas` in `install.sh` keeps the YouTube and Netflix Chrome PWAs installed. Chrome
+installs PWAs silently only through an enforced `WebAppInstallForceList` policy (MDM or an approved
+configuration profile; `defaults write` sets recommended level, which this policy ignores), so the
+script asks per missing app, opens its site in Chrome and polls
+`~/Applications/Chrome Apps.localized/*.app` until the user clicks Install (any key skips).
+Apps are matched by `CrAppModeShortcutURL` in their `Info.plist`, since bundle IDs
+(`com.google.Chrome.app.<id>`) differ per install. Netflix serves its manifest only when logged in.
+Without a terminal on stdin, missing apps are only reported. Add apps to the `apps` array there.
+
 ## Tern
 
 Tern is an invite-only download with no package-manager source, so the user installs it by hand

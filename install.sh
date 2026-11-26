@@ -300,6 +300,58 @@ set_macos_default_shell() {
   log_ok "Login shell set to $shell (open a new terminal to apply)"
 }
 
+# Chrome only installs PWAs silently through an enforced WebAppInstallForceList
+# policy (MDM or an approved profile), so open each missing app's site in Chrome
+# and wait until the user clicks Install. Apps are matched by the start URL
+# Chrome records in their bundle, not by bundle ID, which differs per install.
+chrome_pwa_installed() {
+  local app url
+  for app in "$HOME/Applications/Chrome Apps.localized"/*.app; do
+    url="$(plutil -extract CrAppModeShortcutURL raw "$app/Contents/Info.plist" 2>/dev/null)" || continue
+    [[ "$url" == "$1"* ]] && return 0
+  done
+  return 1
+}
+
+setup_chrome_pwas() {
+  local chrome="/Applications/Google Chrome.app" entry name origin url response
+  local -a apps=(
+    "YouTube|https://www.youtube.com/|https://www.youtube.com/"
+    "Netflix|https://www.netflix.com/|https://www.netflix.com/browse"
+  )
+
+  [[ -d "$chrome" ]] || {
+    log_warn "Google Chrome not found; skipping PWAs"
+    return 0
+  }
+  for entry in "${apps[@]}"; do
+    IFS='|' read -r name origin url <<<"$entry"
+    if chrome_pwa_installed "$origin"; then
+      log_skip "$name PWA installed"
+      continue
+    fi
+    if [[ ! -t 0 ]]; then
+      log_warn "$name PWA missing; run install.sh from a terminal to install it"
+      continue
+    fi
+    read -rp "Install the $name PWA through Chrome now? [Y/n] " response
+    if [[ "$response" =~ ^[Nn] ]]; then
+      log_skip "$name PWA"
+      continue
+    fi
+    open -a "$chrome" "$url"
+    log_info "In Chrome: log in if asked, then click Install in the address bar" \
+      "(or ⋮ › Cast, save, and share › Install page as app). Press any key to skip."
+    until chrome_pwa_installed "$origin"; do
+      if read -rsn1 -t 2 _; then
+        log_skip "$name PWA"
+        continue 2
+      fi
+    done
+    log_ok "$name PWA installed"
+  done
+}
+
 # Tern (invite-only download, installed by hand) saves settings.json by writing
 # settings.json.tmp and renaming it over the file, which would replace a stow
 # symlink, so merge the repo keys into the live file instead: repo keys win,
@@ -562,6 +614,7 @@ main() {
     run_stow -t ~ -d shims macos
 
     set_macos_default_shell
+    setup_chrome_pwas
 
   elif [[ "$os" == "linux" ]]; then
     # Linux-specific setup
