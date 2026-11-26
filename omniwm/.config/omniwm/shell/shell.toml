@@ -1,7 +1,7 @@
 [profiles.default]
 theme = "dotfiles"
 leading = ["apple-menu", "app-menu", "workspaces", "scratchpads"]
-trailing = ["media", "notifications", "wifi", "audio-output", "volume", "battery-details", "control-center", "input-source", "clock"]
+trailing = ["media", "notifications", "wifi", "control-center", "audio-output", "volume", "input-source", "battery-details", "clock"]
 
 [profiles.default.workspaceBar]
 position = "overlappingMenuBar"
