@@ -1,0 +1,34 @@
+# Legacy SketchyBar colors, selected by macOS appearance.
+[workspaceBar]
+barFill = "background/0.5"
+barBorder = "border/0.55"
+
+[light]
+background = "#F3F0DF"
+surface = "#EBE4E8"
+elevatedSurface = "#E0D4EC"
+border = "#A289EE"
+foreground = "#110034"
+secondaryForeground = "#330D81"
+mutedForeground = "#62517B"
+accent = "#009A81"
+accentForeground = "#110034"
+focus = "#009A81"
+purple = "#330D81"
+warning = "#CD9A1B"
+error = "#CC3E34"
+
+[dark]
+background = "#110034"
+surface = "#1D0947"
+elevatedSurface = "#28105D"
+border = "#330D81"
+foreground = "#F3F0DF"
+secondaryForeground = "#F3F0DF"
+mutedForeground = "#C4AEE3"
+accent = "#00C8AB"
+accentForeground = "#110034"
+focus = "#00C8AB"
+purple = "#8217FF"
+warning = "#FFD44F"
+error = "#FF4F44"

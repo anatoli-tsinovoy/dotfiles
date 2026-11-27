@@ -403,6 +403,33 @@ apply_keycastr_settings() {
   log_ok "KeyCastr settings applied from keycastr/io.github.keycastr.plist"
 }
 
+# Seed, do not Stow, settings: OmniWM resolves settings symlinks and atomically writes
+# to their target, so a linked seed would let the Settings UI modify this checkout.
+setup_omniwm_configuration() {
+  local config_root="$1" settings_path="$1/omniwm/settings.toml"
+
+  mkdir -p "$config_root/omniwm"
+  if [[ -L "$settings_path" ]]; then
+    log_warn "Refusing to use OmniWM settings symlink: $settings_path"
+    return 1
+  fi
+  if [[ -e "$settings_path" ]]; then
+    if [[ ! -f "$settings_path" ]]; then
+      log_warn "OmniWM settings path is not a regular file: $settings_path"
+      return 1
+    fi
+    log_info "Preserving existing OmniWM settings: $settings_path"
+  else
+    cp "$SCRIPT_DIR/omniwm/.config/omniwm/settings.toml" "$settings_path"
+    log_ok "Seeded writable OmniWM settings at $settings_path"
+  fi
+
+  log_info "Stowing Hammerspoon configuration..."
+  run_stow --no-folding --ignore='^\.config$' -t "$HOME" omniwm
+  log_info "Stowing OmniWM shell configuration..."
+  run_stow -d "$SCRIPT_DIR/omniwm/.config" --no-folding -t "$config_root/omniwm" --ignore='^settings\.toml$' omniwm
+}
+
 stow_force_cleanup() {
   local args=("$@")
   local target="$HOME"
@@ -493,7 +520,7 @@ main() {
     trust_homebrew_taps "$SCRIPT_DIR/Brewfile"
 
     log_info "Installing Homebrew packages..."
-    brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose || true
+    brew bundle --file="$SCRIPT_DIR/Brewfile" --verbose
     apply_keycastr_settings
 
     log_info "Installing latest TypeScript native LSP..."
@@ -509,8 +536,6 @@ main() {
     bash "$SCRIPT_DIR/scripts/macos/open-in-neovim/install-open-in-neovim.sh"
     log_info "Installing btop Spotlight integration..."
     bash "$SCRIPT_DIR/scripts/macos/btop/install-btop.sh"
-    log_info "Refreshing local sketchybar-app-font overlay..."
-    bash "$SCRIPT_DIR/scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh"
 
     log_info "Installing clipssh"
     curl -fsSL https://raw.githubusercontent.com/samuellawrentz/clipssh/main/install.sh | bash
@@ -589,25 +614,25 @@ main() {
   run_stow -t ~ zsh
 
   if [[ "$os" == "mac" ]]; then
-    # Remove macOS-specific conflicts
-    rm -rf "$HOME/.config/aerospace" "$HOME/.config/ghostty"
-
     # private-macos is gitignored (secrets). Create its .private directory so
     # stow folds ~/.private into a symlink to the checkout: secrets copied into
     # either location later land in the repo copy with no re-stow. An empty
     # package without the subdirectory would create no link at all.
     mkdir -p "$SCRIPT_DIR/private-macos/.private"
+
+    local config_root="${XDG_CONFIG_HOME:-}"
+    if [[ "$config_root" != /* ]]; then
+      config_root="$HOME/.config"
+    fi
+    setup_omniwm_configuration "$config_root"
+    log_info "Installing SketchyBar app font..."
+    bash "$SCRIPT_DIR/scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh" "$config_root"
+
     log_info "Stowing macOS-specific dotfiles..."
-    run_stow -t ~ aerospace ghostty private-macos
+    run_stow -t ~ ghostty private-macos
 
     # Create macOS-specific gitconfig.local
     cp "$SCRIPT_DIR/git/.gitconfig.macos" "$HOME/.gitconfig.local"
-
-    # Compile Swift helpers
-    if command -v swiftc &>/dev/null; then
-      swiftc "$SCRIPT_DIR/aerospace/.config/aerospace/winbounds.swift" \
-        -o "$SCRIPT_DIR/aerospace/.config/aerospace/winbounds"
-    fi
 
     # Stow macOS shims (podman -> docker)
     log_info "Stowing macOS shims..."

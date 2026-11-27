@@ -1,6 +1,3 @@
-aerospace/.config/sketchybar/helper/helper
-aerospace/.config/aerospace/winbounds
-
 # Termux user files (not tracked, created at runtime)
 termux/.termux/colors.properties
 termux/.termux/font.ttf

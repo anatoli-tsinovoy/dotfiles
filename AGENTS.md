@@ -7,7 +7,7 @@ Personal dotfiles for macOS, Linux, and Termux using GNU Stow for symlink manage
 ```bash
 # Bootstrap (detects OS automatically: mac, linux, termux)
 ./install.sh                            # Full setup (packages + stow)
-./install.sh --force                    # Force: remove conflicting targets
+./install.sh --force                    # Remove conflicting targets before Stow
 
 # Verification (NO AUTOMATED TESTS)
 bash -n script.sh                       # Syntax check bash
@@ -31,7 +31,6 @@ dotfiles/
 │   ├── linux/install-binaries.sh   # Tools not in apt (neovim, fzf, bun, uv)
 │   ├── termux/install-packages.sh  # Termux pkg installer
 │   ├── macos/macos-defaults.sh     # macOS system preferences
-│   ├── macos/sketchybar-app-font/  # Explicit installer generates local SVG overlays from overrides.json; startup loads existing artifacts only
 │   └── tailscale-et.sh             # Tailscale + ET setup (mac/linux only)
 ├── shims/                 # OS-specific binary wrappers
 │   ├── linux/.local/bin/  # bat fallback, fd→fdfind, node→bun
@@ -42,7 +41,7 @@ dotfiles/
 ├── zsh/                   # Unified zsh config (ORDER-SENSITIVE)
 ├── nvim/                  # LazyVim-based Neovim config
 ├── git/                   # .gitconfig + .gitconfig.macos
-├── aerospace/             # Tiling WM + sketchybar (macOS only)
+├── omniwm/                # OmniWM + Hammerspoon config (macOS only)
 ├── ghostty/               # Ghostty config and light/dark themes
 ├── keycastr/              # Not stowed; io.github.keycastr.plist written key by key by apply_keycastr_settings in install.sh, right after brew bundle
 └── tern/                  # Not stowed; applied by apply_tern_settings in install.sh (mac/linux, only with `tern` on PATH)
@@ -95,23 +94,20 @@ The `.zshrc` is **order-sensitive**. Sections must execute in sequence:
 
 **Startup order (macOS):** `~/.zshenv` → `/etc/zprofile` → `~/.zprofile` → `~/.zshrc`.
 `/etc/zprofile` runs `path_helper`, which rebuilds PATH with `/etc/paths` first and
-drops Homebrew behind `/usr/bin`, so `~/.zprofile` re-sources
-`~/.zsh/path-macos.zsh` afterwards. That ordering is what makes
-`#!/usr/bin/env bash` resolve to brew's bash 5 instead of Apple's 3.2 — `emojify`
-(the git pager) refuses to run under 3.2 and sketchybar scripts use `mapfile`. The
-module is idempotent: `typeset -U path PATH` makes the re-source a reorder.
+drops Homebrew behind `/usr/bin`. Re-sourcing `~/.zsh/path-macos.zsh` from
+`~/.zprofile` restores Homebrew order, so `/usr/bin/env bash` resolves to brew's
+bash 5; the `emojify` git pager does not run under Apple's 3.2. The module is
+idempotent: `typeset -U path PATH` makes the re-source a reorder.
 
 **Login shell (macOS):** `/opt/homebrew/bin/zsh`, registered in `/etc/shells` and
 applied by `set_macos_default_shell` in `install.sh` (needs sudo). `~/.zcompdump` is
 keyed by `$ZSH_VERSION` because `compinit -C` skips its own version check and would
 otherwise load a dump written by the other zsh.
 
-**GUI launchers** (`aerospace.toml`, `open-in-neovim.applescript`) use
-`/usr/bin/env zsh|bash`, never a Homebrew path. They can: AeroSpace substitutes its
-own PATH for `exec-and-forget` (`aerospace list-exec-env-vars` — Homebrew first,
-unlike the AeroSpace process env), and Ghostty, which executes the `-e` command and
-surface commands, inherits that same PATH. Only launchd-spawned processes
-(Automator, `do shell script`) get the bare `/usr/bin:/bin:/usr/sbin:/sbin`.
+**GUI launchers** (including `omniwm/.hammerspoon/init.lua` and
+`open-in-neovim.applescript`) do not inherit the interactive shell PATH.
+Hammerspoon shell bindings prepend Homebrew's bin directories explicitly;
+Ghostty commands use `/usr/bin/env` and inherit their caller's environment.
 
 ## Stow Package Layout
 
@@ -179,21 +175,26 @@ does not copy files into Downloads. In a file manager's Open with or Share menu:
 Private/cloud providers may expose only a `content://` URI with no accessible
 path. Those show the URI and an explanation in Termux, without importing a copy.
 
-## SketchyBar appearance reload
+## OmniWM and Hammerspoon
 
-The hidden `DARK_LIGHT` item subscribes to macOS `AppleInterfaceThemeChangedNotification`.
-On an appearance change, its plugin restarts the Homebrew service via
-`launchctl kickstart -kp "gui/$UID/sh.brew.sketchybar"` to reload the palette.
-The display-change plugin uses the same service target. Launchd enforces a 10-second
-minimum runtime, so allow for that delay when checking repeated appearance switches.
+OmniWM is macOS-only. Bootstrap seeds `omniwm/.config/omniwm/settings.toml` only when the live
+file is missing. OmniWM follows settings symlinks when saving from its UI, so Stowing that file
+would write UI changes into the checkout. Stow manages only the OmniShell and Hammerspoon files.
+OmniWM uses an absolute `XDG_CONFIG_HOME`, or `~/.config` when it is unset or relative.
 
-## SketchyBar app font
+The shipped OmniShell look is in `omniwm/.config/omniwm/shell/`, especially
+`shell/themes/dotfiles.toml` and `shell/lib/look.luau`. Hammerspoon bindings are in
+`omniwm/.hammerspoon/init.lua`; Option+Shift+O launches `omniwm/.hammerspoon/ssh-tunnel.sh`.
+To rebuild the generated font and app map after changing their overlay sources, pass the absolute
+config directory where OmniWM stores its configuration:
 
-The `font-sketchybar-app-font` cask remains the untouched stock input. `install.sh` generates a separate local overlay font and cached app map from ordered app-pattern-to-ligature entries in `scripts/macos/sketchybar-app-font/overrides.json` and custom artwork in its `svgs/` directory. SketchyBar startup only loads the existing local font and generated map; it does not run the installer or rebuild artifacts. After changing an SVG or override, or upgrading the cask, refresh explicitly and reload SketchyBar:
-```sh
-scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh
-sketchybar --reload
+```bash
+config_root="${XDG_CONFIG_HOME:-}"
+if [[ "$config_root" != /* ]]; then config_root="$HOME/.config"; fi
+bash scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh "$config_root"
 ```
+
+OmniWM needs Accessibility and Input Monitoring permissions; Hammerspoon needs Accessibility.
 
 ## Chrome PWAs (macOS)
 
@@ -255,7 +256,7 @@ agent-reports down     # remove containers, keep the volume
   reachable from the dev container. Bind the bridge gateway instead:
   `AGENT_REPORTS_BIND=$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}')`
   (usually `172.17.0.1`), then set `AGENT_REPORTS_URL=http://$AGENT_REPORTS_BIND:8790`.
-- With Docker-in-Docker, the existing AeroSpace Alt+Shift+O SSH tunnel can reach reports
+- With Docker-in-Docker, the existing Hammerspoon Option+Shift+O SSH tunnel can reach reports
   through an opt-in second publish while preserving the default localhost mapping:
   ```sh
   agent-reports up --docker-port          # default secondary port 18790
@@ -283,9 +284,9 @@ agent-reports down     # remove containers, keep the volume
 
 Ghostty config lives in `ghostty/.config/ghostty/` and stows to `~/.config/ghostty/`.
 
-- Keep `macos-titlebar-style = hidden`; AeroSpace still matches the invisible window title used by btop.
+- Keep `macos-titlebar-style = hidden`; OmniWM still matches the invisible window title used by btop.
 - Keep exact light/dark palettes in `themes/Dotfiles Dark` and `themes/Dotfiles Light`; their names must match `theme` in `config`.
-- Keep one-off commands out of the global `command` setting. AeroSpace and SketchyBar launch btop, tmux, and SSH with `open -na Ghostty.app --args ... -e ...`.
+- Keep one-off commands out of the global `command` setting. Hammerspoon launches btop, tmux and SSH with `open -na Ghostty.app --args ... -e ...`.
 - `scripts/macos/btop/install-btop.sh` builds `/Applications/btop.app` for Spotlight, Raycast, and Alfred.
 - Validate the staged config without stowing:
 

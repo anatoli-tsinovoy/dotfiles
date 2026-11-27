@@ -57,7 +57,7 @@ Usage: agent-reports up [--docker-port [PORT]]
 
 This is for Docker-in-Docker when a host-side SSH tunnel needs to reach the
 container. It sets the browser URL to http://localhost:PORT while preserving
-the local/plugin URL (default: http://localhost:8790). The AeroSpace shortcut's
+the local/plugin URL (default: http://localhost:8790). The Hammerspoon shortcut's
 internal address must match the detected IPv4 address, and its local and
 remote ports must both be PORT.
 
