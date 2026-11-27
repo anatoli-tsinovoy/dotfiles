@@ -403,9 +403,10 @@ apply_keycastr_settings() {
   log_ok "KeyCastr settings applied from keycastr/io.github.keycastr.plist"
 }
 
+# Seed, do not Stow, settings: OmniWM resolves settings symlinks and atomically writes
+# to their target, so a linked seed would let the Settings UI modify this checkout.
 setup_omniwm_configuration() {
-  local config_root="$1" settings_path
-  settings_path="$config_root/omniwm/settings.toml"
+  local config_root="$1" settings_path="$1/omniwm/settings.toml"
 
   mkdir -p "$config_root/omniwm"
   if [[ -L "$settings_path" ]]; then

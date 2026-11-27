@@ -177,10 +177,10 @@ path. Those show the URI and an explanation in Termux, without importing a copy.
 
 ## OmniWM and Hammerspoon
 
-OmniWM is macOS-only. Its tracked settings seed is `omniwm/.config/omniwm/settings.toml`; the
-bootstrap copies it only when the destination is missing, leaving a regular writable file rather
-than a Stow symlink. OmniWM uses an absolute `XDG_CONFIG_HOME`, or `~/.config` when it is unset
-or relative.
+OmniWM is macOS-only. Bootstrap seeds `omniwm/.config/omniwm/settings.toml` only when the live
+file is missing. OmniWM follows settings symlinks when saving from its UI, so Stowing that file
+would write UI changes into the checkout. Stow manages only the OmniShell and Hammerspoon files.
+OmniWM uses an absolute `XDG_CONFIG_HOME`, or `~/.config` when it is unset or relative.
 
 The shipped OmniShell look is in `omniwm/.config/omniwm/shell/`, especially
 `shell/themes/dotfiles.toml` and `shell/lib/look.luau`. Hammerspoon bindings are in

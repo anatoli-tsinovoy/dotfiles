@@ -140,10 +140,9 @@ historyEnabled = false
 maxItems = 200
 maxItemBytes = 8388608
 maxTotalBytes = 67108864
-ignoredTypes = []
 
 [quakeTerminal]
-enabled = true
+enabled = false
 position = "center"
 widthPercent = 50.0
 heightPercent = 50.0
@@ -300,7 +299,7 @@ assignToWorkspace = "3"
 
 [[hotkeys]]
 id = "toggleWorkspaceLayout"
-binding = "Option+/"
+binding = "Unassigned"
 
 [[hotkeys]]
 id = "focus.left"
@@ -352,7 +351,7 @@ binding = "Option+Shift+M"
 
 [[hotkeys]]
 id = "toggleFocusedWindowFloating"
-binding = "Option+Shift+F"
+binding = "Unassigned"
 
 [[hotkeys]]
 id = "workspaceBackAndForth"
