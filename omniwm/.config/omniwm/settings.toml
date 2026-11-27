@@ -162,6 +162,7 @@ labels = {}
 mode = "automatic"
 tabRailAppIcons = false
 
+# Workspace UUIDs are required for decoding and identify editable workspace settings.
 [[workspaces]]
 id = "AD36F001-C57E-41A5-AC1D-DF5249D007F0"
 name = "1"
@@ -258,6 +259,7 @@ displayName = "f"
 monitorAssignment = { type = "main" }
 layoutType = "niri"
 
+# Keep rule UUIDs stable: the editor and IPC address rules by ID.
 [[appRules]]
 id = "B0000000-0000-4000-8000-000000000001"
 bundleId = "com.tinyspeck.slackmacgap"

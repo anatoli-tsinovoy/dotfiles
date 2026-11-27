@@ -3,7 +3,6 @@ set -euo pipefail
 
 SCRIPT_PATH="${BASH_SOURCE[0]}"
 SCRIPT_DIR="$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd)"
-source "$SCRIPT_DIR/scripts/macos/omniwm-config-root.sh"
 
 log_info() { echo "ℹ️  $*"; }
 log_ok() { echo "✅ $*"; }
@@ -405,8 +404,7 @@ apply_keycastr_settings() {
 }
 
 setup_omniwm_configuration() {
-  local config_root settings_path
-  config_root="$(omniwm_config_root)"
+  local config_root="$1" settings_path
   settings_path="$config_root/omniwm/settings.toml"
 
   mkdir -p "$config_root/omniwm"
@@ -621,9 +619,13 @@ main() {
     # package without the subdirectory would create no link at all.
     mkdir -p "$SCRIPT_DIR/private-macos/.private"
 
-    setup_omniwm_configuration
+    local config_root="${XDG_CONFIG_HOME:-}"
+    if [[ "$config_root" != /* ]]; then
+      config_root="$HOME/.config"
+    fi
+    setup_omniwm_configuration "$config_root"
     log_info "Installing SketchyBar app font..."
-    bash "$SCRIPT_DIR/scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh"
+    bash "$SCRIPT_DIR/scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh" "$config_root"
 
     log_info "Stowing macOS-specific dotfiles..."
     run_stow -t ~ ghostty private-macos

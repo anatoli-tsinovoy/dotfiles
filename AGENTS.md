@@ -178,16 +178,20 @@ path. Those show the URI and an explanation in Termux, without importing a copy.
 ## OmniWM and Hammerspoon
 
 OmniWM is macOS-only. Its tracked settings seed is `omniwm/.config/omniwm/settings.toml`; the
-bootstrap copies it only when the destination is missing. OmniWM uses an absolute
-`XDG_CONFIG_HOME`, or `~/.config` when it is unset or relative.
+bootstrap copies it only when the destination is missing, leaving a regular writable file rather
+than a Stow symlink. OmniWM uses an absolute `XDG_CONFIG_HOME`, or `~/.config` when it is unset
+or relative.
 
 The shipped OmniShell look is in `omniwm/.config/omniwm/shell/`, especially
 `shell/themes/dotfiles.toml` and `shell/lib/look.luau`. Hammerspoon bindings are in
 `omniwm/.hammerspoon/init.lua`; Option+Shift+O launches `omniwm/.hammerspoon/ssh-tunnel.sh`.
-To rebuild the generated font and app map after changing their overlay sources:
+To rebuild the generated font and app map after changing their overlay sources, pass the absolute
+config directory where OmniWM stores its configuration:
 
-```sh
-bash scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh
+```bash
+config_root="${XDG_CONFIG_HOME:-}"
+if [[ "$config_root" != /* ]]; then config_root="$HOME/.config"; fi
+bash scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh "$config_root"
 ```
 
 OmniWM needs Accessibility and Input Monitoring permissions; Hammerspoon needs Accessibility.

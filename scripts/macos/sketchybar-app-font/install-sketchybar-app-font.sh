@@ -5,12 +5,11 @@ export LC_ALL=C
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd -P)"
-source "$REPO_ROOT/scripts/macos/omniwm-config-root.sh"
 STOCK_FONT="$HOME/Library/Fonts/sketchybar-app-font.ttf"
 OVERRIDES="$SCRIPT_DIR/overrides.json"
 BUILDER="$SCRIPT_DIR/build-overlay.py"
 INSTALLER="$SCRIPT_DIR/install-sketchybar-app-font.sh"
-CONFIG_ROOT="$(omniwm_config_root)"
+CONFIG_ROOT="${1:-}"
 SHELL_ROOT="$CONFIG_ROOT/omniwm/shell"
 FONT_DIR="$SHELL_ROOT/fonts"
 LIB_DIR="$SHELL_ROOT/lib"
@@ -22,6 +21,8 @@ fail() {
   printf 'install-sketchybar-app-font: error: %s\n' "$*" >&2
   exit 1
 }
+[[ $# -eq 1 ]] || fail "usage: $0 <absolute-config-root>"
+[[ "$CONFIG_ROOT" == /* ]] || fail "config root must be an absolute path: $CONFIG_ROOT"
 
 physical_candidate() {
   local candidate="$1" tail="" parent
