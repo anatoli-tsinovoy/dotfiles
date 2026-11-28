@@ -403,32 +403,6 @@ apply_keycastr_settings() {
   log_ok "KeyCastr settings applied from keycastr/io.github.keycastr.plist"
 }
 
-# Seed, do not Stow, settings: OmniWM resolves settings symlinks and atomically writes
-# to their target, so a linked seed would let the Settings UI modify this checkout.
-setup_omniwm_configuration() {
-  local config_root="$1" settings_path="$1/omniwm/settings.toml"
-
-  mkdir -p "$config_root/omniwm"
-  if [[ -L "$settings_path" ]]; then
-    log_warn "Refusing to use OmniWM settings symlink: $settings_path"
-    return 1
-  fi
-  if [[ -e "$settings_path" ]]; then
-    if [[ ! -f "$settings_path" ]]; then
-      log_warn "OmniWM settings path is not a regular file: $settings_path"
-      return 1
-    fi
-    log_info "Preserving existing OmniWM settings: $settings_path"
-  else
-    cp "$SCRIPT_DIR/omniwm/.config/omniwm/settings.toml" "$settings_path"
-    log_ok "Seeded writable OmniWM settings at $settings_path"
-  fi
-
-  log_info "Stowing Hammerspoon configuration..."
-  run_stow --no-folding --ignore='^\.config$' -t "$HOME" omniwm
-  log_info "Stowing OmniWM shell configuration..."
-  run_stow -d "$SCRIPT_DIR/omniwm/.config" --no-folding -t "$config_root/omniwm" --ignore='^settings\.toml$' omniwm
-}
 
 stow_force_cleanup() {
   local args=("$@")
@@ -624,7 +598,12 @@ main() {
     if [[ "$config_root" != /* ]]; then
       config_root="$HOME/.config"
     fi
-    setup_omniwm_configuration "$config_root"
+    mkdir -p "$config_root/omniwm"
+
+    log_info "Stowing Hammerspoon configuration..."
+    run_stow --no-folding --ignore='^\.config$' -t "$HOME" omniwm
+    log_info "Stowing OmniWM configuration..."
+    run_stow -d "$SCRIPT_DIR/omniwm/.config" --no-folding -t "$config_root/omniwm" omniwm
     log_info "Installing SketchyBar app font..."
     bash "$SCRIPT_DIR/scripts/macos/sketchybar-app-font/install-sketchybar-app-font.sh" "$config_root"
 

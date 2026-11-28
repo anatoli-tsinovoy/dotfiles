@@ -177,16 +177,22 @@ path. Those show the URI and an explanation in Termux, without importing a copy.
 
 ## OmniWM and Hammerspoon
 
-OmniWM is macOS-only. Bootstrap seeds `omniwm/.config/omniwm/settings.toml` only when the live
-file is missing. OmniWM follows settings symlinks when saving from its UI, so Stowing that file
-would write UI changes into the checkout. Stow manages only the OmniShell and Hammerspoon files.
-OmniWM uses an absolute `XDG_CONFIG_HOME`, or `~/.config` when it is unset or relative.
+OmniWM is macOS-only. Stow manages Hammerspoon files from `omniwm/.hammerspoon`
+under `~/.hammerspoon`, and OmniWM files from `omniwm/.config/omniwm` under
+`$config_root/omniwm`. OmniWM's config root is the absolute `$XDG_CONFIG_HOME`, or
+`~/.config` when it is unset or relative. The live settings file is tracked at
+`omniwm/.config/omniwm/settings.toml`; upstream OmniWM resolves its symlink when
+saving, so UI edits intentionally update the repository file.
+Before linking, compare any existing regular config files at either target with
+the repository versions and back them up. Never use `stow --adopt`.
 
 The shipped OmniShell look is in `omniwm/.config/omniwm/shell/`, especially
 `shell/themes/dotfiles.toml` and `shell/lib/look.luau`. Hammerspoon bindings are in
 `omniwm/.hammerspoon/init.lua`; Option+Shift+O launches `omniwm/.hammerspoon/ssh-tunnel.sh`.
-To rebuild the generated font and app map after changing their overlay sources, pass the absolute
-config directory where OmniWM stores its configuration:
+Generated font and app-map artifacts belong in `$config_root/omniwm/shell/`, outside
+the repository. Stow OmniWM with `--no-folding` so those live output paths remain
+writable. To rebuild the generated font and app map after changing their overlay
+sources, pass the absolute config directory where OmniWM stores its configuration:
 
 ```bash
 config_root="${XDG_CONFIG_HOME:-}"
